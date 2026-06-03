@@ -1,20 +1,33 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
+import { useState } from "react";
 import {
   Sparkles,
   ShieldCheck,
-  LineChart,
-  Eye,
-  Clock,
-  Wallet,
   CheckCircle2,
   XCircle,
   ArrowLeft,
-  Store,
-  Bot,
-  FileText,
+  Search,
+  Users,
+  ClipboardList,
+  CreditCard,
+  Send,
+  Wallet,
+  Clock,
+  AlertTriangle,
+  Mail,
+  Link as LinkIcon,
+  Check,
+  Twitter,
+  Linkedin,
+  ChevronDown,
 } from "lucide-react";
-import heroBg from "@/assets/hero-bg.jpg";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -23,12 +36,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "خطة تسويقية متكاملة مدعومة بالذكاء الاصطناعي لمتاجر زد وسلة. شفافية كاملة، تنفيذ محكم، وتقارير أسبوعية — بـ ٩٩٩ ريال فقط بدلاً من آلاف الريالات شهرياً.",
+          "حملة تسويقية كاملة ٣٠ يوم بـ ٩٩٩ ريال فقط. تحليل مجاني لمتجرك على زد وسلة. شفافية كاملة، بدون عقود، بدون وعود كاذبة.",
       },
       { property: "og:title", content: "المسوق الذكي — تسويق صادق للمتاجر السعودية" },
       {
         property: "og:description",
-        content: "تحليل متجرك، دراسة المنافسين، وخطة ٣٠ يوماً تُنفّذ تلقائياً على تيك توك وسناب شات.",
+        content: "دفعت ٢٠ ألف ريال للمسوقين وما استفدت شي. قررت أبني الحل بنفسي.",
       },
       { property: "og:type", content: "website" },
     ],
@@ -42,299 +55,263 @@ function Landing() {
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
       <link
-        href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;600;700&family=Tajawal:wght@400;500;700;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&family=Tajawal:wght@300;400;500;700;800&display=swap"
         rel="stylesheet"
       />
 
       <Nav />
       <Hero />
-      <PainSection />
-      <HonestPromise />
-      <HowItWorks />
-      <Pricing />
+      <ProblemSection />
+      <SolutionSection />
+      <ComparisonSection />
+      <PricingSection />
+      <SocialProofSection />
+      <FAQSection />
+      <FinalCTA />
       <Footer />
     </div>
   );
 }
 
+/* ---------------- NAV ---------------- */
+
 function Nav() {
   return (
-    <header className="sticky top-0 z-50 glass">
+    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <div className="flex items-center gap-2">
-          <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-gold text-gold-foreground">
+          <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-primary text-white">
             <Sparkles className="h-5 w-5" />
           </div>
           <span className="font-display text-xl font-bold">المسوق الذكي</span>
         </div>
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
-          <a href="#how" className="hover:text-foreground transition">كيف يعمل</a>
-          <a href="#promise" className="hover:text-foreground transition">وعدنا</a>
-          <a href="#pricing" className="hover:text-foreground transition">الباقة</a>
+          <a href="#problem" className="transition hover:text-primary">المشكلة</a>
+          <a href="#solution" className="transition hover:text-primary">الحل</a>
+          <a href="#pricing" className="transition hover:text-primary">السعر</a>
+          <a href="#faq" className="transition hover:text-primary">الأسئلة</a>
         </nav>
         <a
-          href="#pricing"
-          className="rounded-xl bg-gradient-gold px-5 py-2.5 text-sm font-bold text-gold-foreground shadow-gold transition hover:opacity-90"
+          href="#final-cta"
+          className="btn-primary inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold"
         >
-          ابدأ الآن
+          ابدأ مجاناً
+          <ArrowLeft className="h-4 w-4" />
         </a>
       </div>
     </header>
   );
 }
 
+/* ---------------- HERO ---------------- */
+
 function Hero() {
   return (
-    <section className="relative overflow-hidden">
-      <div
-        className="absolute inset-0 -z-10"
-        style={{
-          backgroundImage: `url(${heroBg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
-      <div
-        className="absolute inset-0 -z-10"
-        style={{
-          background:
-            "linear-gradient(180deg, transparent 0%, color-mix(in oklab, var(--background) 30%, transparent) 60%, var(--background) 100%)",
-        }}
-      />
-
-      <div className="mx-auto max-w-7xl px-6 pt-24 pb-32 md:pt-32 md:pb-40">
+    <section className="relative overflow-hidden bg-hero-radial">
+      <div className="mx-auto grid max-w-7xl gap-12 px-6 pt-16 pb-24 md:grid-cols-12 md:pt-24 md:pb-32">
+        {/* Right side (60%) — RTL means first child appears on the right */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: "easeOut" }}
-          className="mx-auto max-w-3xl text-center"
+          className="md:col-span-7"
         >
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-gold/30 bg-card/50 px-4 py-1.5 text-xs text-muted-foreground backdrop-blur">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-4 py-1.5 text-xs font-semibold text-foreground">
             <span className="h-1.5 w-1.5 rounded-full bg-gold" />
-            مصنوع في السعودية — لمتاجر زد وسلة
+            للمتاجر السعودية الصغيرة على زد وسلة
           </div>
 
-          <h1 className="font-display text-4xl font-bold leading-tight md:text-6xl">
-            تسويق <span className="text-gradient-gold">صادق</span> لمتجرك،
+          <h1 className="font-display text-4xl font-bold leading-[1.2] md:text-6xl">
+            دفعت <span className="text-gradient-primary">٢٠ ألف ريال</span> للمسوقين
             <br />
-            بدون وعود زائفة.
+            وما استفدت شي.
+            <br />
+            <span className="text-gradient-gold">قررت أبني الحل بنفسي.</span>
           </h1>
 
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">
-            أعطني عنوان متجرك، وسأدرسه، وأحلّل منافسيك، وأرسم لك خطة تسويق متكاملة لـ ٣٠ يوماً تُنفَّذ
-            تلقائياً على تيك توك وسناب شات.{" "}
-            <span className="text-foreground">لا أضمن لك نتائج خيالية</span> — لكنني أضمن تنفيذاً
-            محكماً وتقارير شفافة.
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+            <span className="font-bold text-foreground">المسوق الذكي:</span> تسويق صادق بسعر منافس.
+            ما نعدك بالنتائج، لكن نعدك بالتنفيذ المحكم والتقارير الواضحة.
           </p>
 
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-            <a
-              href="#pricing"
-              className="inline-flex items-center gap-2 rounded-2xl bg-gradient-gold px-7 py-4 text-base font-bold text-gold-foreground shadow-gold transition hover:scale-[1.02]"
-            >
-              حلّل متجري الآن
-              <ArrowLeft className="h-4 w-4" />
-            </a>
-            <a
-              href="#how"
-              className="inline-flex items-center gap-2 rounded-2xl border border-border bg-card/40 px-7 py-4 text-base font-semibold backdrop-blur transition hover:bg-card/70"
-            >
-              كيف يعمل؟
-            </a>
+          <div className="mt-8 max-w-xl">
+            <SignupForm cta="احصل على تحليل متجرك مجاناً" compact />
           </div>
 
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
-            <Stat value="٩٩٩ ر.س" label="رسوم لمرة واحدة" />
-            <span className="h-1 w-1 rounded-full bg-border" />
-            <Stat value="٣٠ يوم" label="خطة كاملة" />
-            <span className="h-1 w-1 rounded-full bg-border" />
-            <Stat value="٠ مفاجآت" label="شفافية كاملة" />
+          <div className="mt-6 inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-primary">
+            <ShieldCheck className="h-4 w-4" />
+            ٩٩٩ ريال فقط لحملة ٣٠ يوم — بدون عقود طويلة
           </div>
+        </motion.div>
+
+        {/* Left side (40%) — Visual */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="relative md:col-span-5"
+        >
+          <DashboardMockup />
         </motion.div>
       </div>
     </section>
   );
 }
 
-function Stat({ value, label }: { value: string; label: string }) {
+function DashboardMockup() {
   return (
-    <div className="text-center">
-      <div className="font-display text-lg font-bold text-gradient-gold">{value}</div>
-      <div className="text-xs">{label}</div>
+    <div className="relative mx-auto max-w-md">
+      {/* Main mockup */}
+      <div className="relative rounded-3xl border border-border bg-card p-6 shadow-glow">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-primary text-white">
+              <Sparkles className="h-4 w-4" />
+            </div>
+            <span className="font-display font-bold">لوحة متجرك</span>
+          </div>
+          <div className="h-2 w-2 rounded-full bg-success" />
+        </div>
+
+        <div className="mb-4 rounded-2xl bg-gradient-primary p-5 text-white">
+          <div className="text-xs opacity-90">حملة نشطة</div>
+          <div className="mt-1 font-display text-2xl font-bold">اليوم ١٤ من ٣٠</div>
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/20">
+            <motion.div
+              initial={{ width: 0 }}
+              whileInView={{ width: "46%" }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.2, ease: "easeOut" }}
+              className="h-full rounded-full bg-gold"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <MiniStat label="منشورات نُشرت" value="١٤" tone="primary" />
+          <MiniStat label="مشاهدات" value="٢٤٫٧ك" tone="gold" />
+          <MiniStat label="تفاعلات" value="١٬٢٣٠" tone="success" />
+          <MiniStat label="نقرات للمتجر" value="٣٤٢" tone="primary" />
+        </div>
+
+        <div className="mt-4 flex items-center gap-2 rounded-xl border border-border bg-muted/50 p-3 text-xs text-muted-foreground">
+          <ShieldCheck className="h-4 w-4 text-primary" />
+          تقرير الأسبوع الثاني جاهز
+        </div>
+      </div>
+
+      {/* Floating cards */}
+      <motion.div
+        animate={{ y: [0, -8, 0] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        className="glass-card absolute -top-6 -right-6 rounded-2xl px-4 py-3"
+      >
+        <div className="text-xs text-muted-foreground">سعر الحملة</div>
+        <div className="font-display text-lg font-bold text-primary">٩٩٩ ر.س</div>
+      </motion.div>
+
+      <motion.div
+        animate={{ y: [0, 8, 0] }}
+        transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+        className="glass-card absolute -bottom-6 -left-6 rounded-2xl px-4 py-3"
+      >
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Check className="h-3.5 w-3.5 text-success" />
+          منشور جديد
+        </div>
+        <div className="mt-1 text-sm font-semibold">نُشر على تيك توك</div>
+      </motion.div>
     </div>
   );
 }
 
-function PainSection() {
+function MiniStat({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone: "primary" | "gold" | "success";
+}) {
+  const colorMap = {
+    primary: "text-primary",
+    gold: "text-gold",
+    success: "text-success",
+  };
+  return (
+    <div className="rounded-xl border border-border bg-secondary p-3">
+      <div className="text-[11px] text-muted-foreground">{label}</div>
+      <div className={`mt-0.5 font-display text-xl font-bold ${colorMap[tone]}`}>{value}</div>
+    </div>
+  );
+}
+
+/* ---------------- PROBLEM ---------------- */
+
+function ProblemSection() {
   const pains = [
-    { icon: Wallet, text: "وكالات تسويق تأخذ ٣٬٠٠٠ إلى ١٠٬٠٠٠ ريال شهرياً" },
-    { icon: XCircle, text: "وعود بـ«نتائج مضمونة» لا تتحقق أبداً" },
-    { icon: Clock, text: "محتوى عام لا يفهم السوق السعودي" },
-    { icon: Store, text: "٤٠٪ من المتاجر الصغيرة تُغلق في أول سنة" },
+    {
+      icon: Wallet,
+      emoji: "💸",
+      title: "غالي ومحد يستحق",
+      body: "المسوقين يطلبون ٣-١٠ آلاف ريال شهرياً. والنتائج؟ محتوى عام ما يشد حد. فلوسك تضيع والمتجر ما ينمو.",
+    },
+    {
+      icon: Clock,
+      emoji: "⏰",
+      title: "ما عندي وقت",
+      body: "مشغول بالطلبات والشحن والعملاء. التسويق يحتاج ٣-٥ ساعات يومياً. النتيجة: المتجر يبقى خفي.",
+    },
+    {
+      icon: AlertTriangle,
+      emoji: "🤥",
+      title: "وعود كاذبة",
+      body: "«نضمن لك مبيعات!» «راح تصير فايرل!» بالآخر: لا شي. وفلوسك راحت.",
+    },
   ];
 
   return (
-    <section className="border-y border-border/50 bg-card/30 py-20">
-      <div className="mx-auto max-w-5xl px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="font-display text-3xl font-bold md:text-4xl">
-            دفعتُ ٢٠٬٠٠٠ ريال لوكالة تسويق، ولم أحصل على شيء.
+    <section id="problem" className="relative overflow-hidden bg-ink py-24 text-ink-foreground">
+      <div
+        className="absolute inset-0 opacity-[0.05]"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
+          backgroundSize: "32px 32px",
+        }}
+      />
+      <div className="relative mx-auto max-w-6xl px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mx-auto max-w-2xl text-center"
+        >
+          <span className="inline-block rounded-full bg-destructive/20 px-4 py-1 text-xs font-semibold text-destructive-foreground">
+            المشكلة الحقيقية
+          </span>
+          <h2 className="mt-4 font-display text-3xl font-bold md:text-5xl">
+            المشكلة اللي عشتها
+            <br />
+            <span className="text-gradient-gold">(وعايشها ٨٠ ألف متجر سعودي)</span>
           </h2>
-          <p className="mt-4 text-muted-foreground">
-            هذه القصة تتكرر مع ٨٠٬٠٠٠ صاحب متجر سعودي كل يوم. بنينا «المسوق الذكي» حتى لا تتكررها معك.
-          </p>
-        </div>
-        <div className="mt-12 grid gap-4 sm:grid-cols-2">
+        </motion.div>
+
+        <div className="mt-14 grid gap-6 md:grid-cols-3">
           {pains.map((p, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
-              className="flex items-start gap-4 rounded-2xl border border-border bg-card/60 p-5"
-            >
-              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-destructive/15 text-destructive">
-                <p.icon className="h-5 w-5" />
-              </div>
-              <p className="pt-2 text-foreground">{p.text}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function HonestPromise() {
-  const yes = [
-    "محتوى احترافي بثقافة سعودية أصيلة لـ ٣٠ يوم",
-    "نشر آلي على تيك توك وسناب شات",
-    "تحليل المنافسين والاتجاهات بالذكاء الاصطناعي",
-    "تقارير أسبوعية بأرقام حقيقية — بدون تجميل",
-    "تعتمد الخطة قبل أن تدفع ريالاً واحداً",
-  ];
-  const no = [
-    "«١٠٬٠٠٠ متابع في ٧ أيام!»",
-    "«منشورات فيروسية مضمونة!»",
-    "«ضاعف مبيعاتك فوراً!»",
-  ];
-
-  return (
-    <section id="promise" className="py-24">
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <span className="text-sm font-semibold uppercase tracking-widest text-gold">
-            وعدنا الصادق
-          </span>
-          <h2 className="mt-3 font-display text-3xl font-bold md:text-4xl">
-            الصدق هو ميزتنا التنافسية
-          </h2>
-        </div>
-
-        <div className="mt-14 grid gap-6 md:grid-cols-2">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="rounded-3xl border border-gold/40 bg-card/60 p-8 shadow-gold"
-          >
-            <div className="mb-6 flex items-center gap-3">
-              <CheckCircle2 className="h-6 w-6 text-gold" />
-              <h3 className="font-display text-xl font-bold">نَعِدُك بـ:</h3>
-            </div>
-            <ul className="space-y-4">
-              {yes.map((t, i) => (
-                <li key={i} className="flex items-start gap-3 text-foreground">
-                  <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-gradient-gold" />
-                  <span>{t}</span>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="rounded-3xl border border-border bg-card/30 p-8"
-          >
-            <div className="mb-6 flex items-center gap-3">
-              <XCircle className="h-6 w-6 text-destructive" />
-              <h3 className="font-display text-xl font-bold">لن نَعِدَك بـ:</h3>
-            </div>
-            <ul className="space-y-4">
-              {no.map((t, i) => (
-                <li key={i} className="flex items-start gap-3 text-muted-foreground line-through">
-                  <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-destructive/60" />
-                  <span>{t}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-6 rounded-xl bg-muted/40 p-4 text-sm text-muted-foreground">
-              لأن أي شخص يَعِدُك بهذا — يكذب عليك.
-            </p>
-          </motion.div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function HowItWorks() {
-  const steps = [
-    {
-      icon: Store,
-      title: "أعطنا رابط متجرك",
-      desc: "من زد، سلة، أو أي منصة. خطوة واحدة، أقل من دقيقة.",
-    },
-    {
-      icon: Bot,
-      title: "نحلل ونرسم الخطة",
-      desc: "ذكاؤنا الاصطناعي يدرس متجرك ومنافسيك ويبني خطة ٣٠ يوماً مفصّلة.",
-    },
-    {
-      icon: Eye,
-      title: "تراجع وتعتمد",
-      desc: "تشاهد كل منشور وكل تصميم قبل أن يُنشر. لا شيء يحدث بدون موافقتك.",
-    },
-    {
-      icon: LineChart,
-      title: "ننفّذ ونرسل تقارير",
-      desc: "نشر تلقائي على تيك توك وسناب شات + تقرير أسبوعي شفاف.",
-    },
-  ];
-
-  return (
-    <section id="how" className="border-y border-border/50 bg-card/30 py-24">
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <span className="text-sm font-semibold uppercase tracking-widest text-gold">
-            كيف يعمل
-          </span>
-          <h2 className="mt-3 font-display text-3xl font-bold md:text-4xl">
-            من رابط متجرك إلى حملة كاملة — في ٤ خطوات
-          </h2>
-        </div>
-
-        <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {steps.map((s, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="relative rounded-2xl border border-border bg-background/60 p-6"
+              whileHover={{ scale: 1.02 }}
+              className="glass-card-dark rounded-2xl p-7"
             >
-              <div className="absolute -top-3 right-6 rounded-full bg-gradient-gold px-3 py-1 text-xs font-bold text-gold-foreground">
-                {["١", "٢", "٣", "٤"][i]}
-              </div>
-              <div className="mb-4 grid h-12 w-12 place-items-center rounded-xl bg-gradient-emerald">
-                <s.icon className="h-6 w-6 text-foreground" />
-              </div>
-              <h3 className="font-display text-lg font-bold">{s.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
+              <div className="mb-4 text-4xl">{p.emoji}</div>
+              <h3 className="font-display text-xl font-bold">{p.title}</h3>
+              <p className="mt-3 leading-relaxed text-white/75">{p.body}</p>
             </motion.div>
           ))}
         </div>
@@ -343,69 +320,250 @@ function HowItWorks() {
   );
 }
 
-function Pricing() {
+/* ---------------- SOLUTION ---------------- */
+
+function SolutionSection() {
+  const steps = [
+    {
+      n: "١",
+      icon: Search,
+      title: "تحليل متجرك (مجاني!)",
+      body: "الذكاء الاصطناعي يفحص منتجاتك ويعطيك تقرير نقاط القوة والضعف.",
+    },
+    {
+      n: "٢",
+      icon: Users,
+      title: "دراسة المنافسين والسوق",
+      body: "٥-١٠ متاجر منافسة + ترندات تيك توك وسناب السعودية.",
+    },
+    {
+      n: "٣",
+      icon: ClipboardList,
+      title: "خطة ٣٠ يوم كاملة",
+      body: "محتوى + جدول نشر + استراتيجية. تشوف الخطة كاملة قبل ما تدفع!",
+    },
+    {
+      n: "٤",
+      icon: CreditCard,
+      title: "أنت توافق وتدفع",
+      body: "٩٩٩ ريال لحملة ٣٠ يوم. تحويل بنكي أو PayPal.",
+    },
+    {
+      n: "٥",
+      icon: Send,
+      title: "التنفيذ والتقارير",
+      body: "نشر تلقائي على تيك توك وسناب + تقارير أسبوعية + تقرير نهائي.",
+    },
+  ];
+
+  return (
+    <section id="solution" className="py-24">
+      <div className="mx-auto max-w-6xl px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mx-auto max-w-2xl text-center"
+        >
+          <span className="inline-block rounded-full bg-accent px-4 py-1 text-xs font-semibold text-primary">
+            الحل الصادق
+          </span>
+          <h2 className="mt-4 font-display text-3xl font-bold md:text-5xl">
+            الحل: <span className="text-gradient-primary">مسوق ذكي يشتغل بصدق</span>
+          </h2>
+        </motion.div>
+
+        {/* Core Promise Box */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          className="mx-auto mt-12 max-w-3xl"
+        >
+          <div className="relative overflow-hidden rounded-3xl border-2 border-primary/20 bg-gradient-to-br from-accent to-background p-8 md:p-10 shadow-glow">
+            <div className="absolute -top-3 right-8 rounded-full bg-gradient-gold px-4 py-1 text-xs font-bold">
+              وعد المؤسس
+            </div>
+            <p className="font-display text-lg leading-loose md:text-xl">
+              «أعطني عنوان متجرك وسأقوم بدراسته ومعرفة نقاط القوة والضعف في التسويق، ومن ثم سأضع لك
+              خطة تسويق متكاملة بناءً على دراستي للسوق والمتاجر المنافسة.
+              <br />
+              <br />
+              <span className="font-bold text-primary">
+                لا أضمن النتائج، لكنني أضمن سعراً منافساً وتنفيذاً محكماً للخطة المرسومة وتقارير
+                واضحة.»
+              </span>
+            </p>
+          </div>
+        </motion.div>
+
+        {/* 5-Step Process */}
+        <div className="mt-16 grid gap-6 md:grid-cols-3 lg:grid-cols-5">
+          {steps.map((s, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.08 }}
+              whileHover={{ scale: 1.03 }}
+              className="relative rounded-2xl border border-border bg-card p-6 shadow-soft transition"
+            >
+              <div className="absolute -top-4 right-4 grid h-10 w-10 place-items-center rounded-xl bg-gradient-gold font-display text-lg font-bold text-gold-foreground shadow-gold">
+                {s.n}
+              </div>
+              <div className="mt-3 grid h-12 w-12 place-items-center rounded-xl bg-accent text-primary">
+                <s.icon className="h-6 w-6" />
+              </div>
+              <h3 className="mt-4 font-display text-base font-bold">{s.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- COMPARISON ---------------- */
+
+function ComparisonSection() {
+  const rows = [
+    { label: "السعر", others: "٣٬٠٠٠ - ١٠٬٠٠٠ ريال/شهر", us: "٩٩٩ ريال لحملة ٣٠ يوم" },
+    { label: "الالتزام", others: "عقود ٦-١٢ شهر", us: "٣٠ يوم فقط، بدون عقود" },
+    { label: "الشفافية", others: "ما تشوف الخطة قبل الدفع", us: "توافق على الخطة قبل الدفع!" },
+    { label: "الوعود", others: "«نضمن لك مبيعات!» (كذب)", us: "صادقين: نضمن التنفيذ" },
+    { label: "التقارير", others: "شهرياً (وأحياناً ما في)", us: "أسبوعياً + تقرير نهائي" },
+  ];
+
+  return (
+    <section className="bg-secondary py-24">
+      <div className="mx-auto max-w-5xl px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mx-auto max-w-2xl text-center"
+        >
+          <h2 className="font-display text-3xl font-bold md:text-5xl">
+            ليش <span className="text-gradient-primary">المسوق الذكي</span> مختلف عن الباقي؟
+          </h2>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-12 overflow-hidden rounded-3xl border border-border bg-card shadow-soft"
+        >
+          <div className="grid grid-cols-3 gap-0 border-b border-border bg-muted/40">
+            <div className="p-5 text-sm font-bold text-muted-foreground">المقارنة</div>
+            <div className="p-5 text-center text-sm font-bold text-muted-foreground">
+              المسوقين العاديين
+            </div>
+            <div className="bg-gradient-primary p-5 text-center text-sm font-bold text-white">
+              المسوق الذكي
+            </div>
+          </div>
+          {rows.map((r, i) => (
+            <div
+              key={i}
+              className={`grid grid-cols-3 gap-0 border-b border-border last:border-b-0 ${
+                i % 2 === 0 ? "bg-card" : "bg-muted/30"
+              }`}
+            >
+              <div className="p-5 font-bold">{r.label}</div>
+              <div className="flex items-center justify-center gap-2 p-5 text-center text-sm text-muted-foreground">
+                <XCircle className="h-4 w-4 shrink-0 text-destructive" />
+                <span>{r.others}</span>
+              </div>
+              <div className="flex items-center justify-center gap-2 bg-accent/40 p-5 text-center text-sm font-semibold text-foreground">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
+                <span>{r.us}</span>
+              </div>
+            </div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- PRICING ---------------- */
+
+function PricingSection() {
   const features = [
-    "تحليل كامل لمتجرك ومنافسيك",
-    "خطة تسويق ٣٠ يوماً مفصّلة",
-    "محتوى احترافي باللهجة السعودية",
-    "تصاميم منشورات بالذكاء الاصطناعي",
-    "ريلز تيك توك تلقائية",
-    "نشر آلي على تيك توك + سناب شات",
-    "تقارير أسبوعية شفافة",
-    "دعم فني طوال مدة الحملة",
+    "تحليل متجرك مجاناً",
+    "دراسة ٥-١٠ منافسين",
+    "خطة تسويق ٣٠ يوم مفصلة",
+    "٣٠+ تصميم ومقطع فيديو (عربي)",
+    "نشر تلقائي على تيك توك وسناب شات",
+    "٤ تقارير أسبوعية",
+    "تقرير نهائي شامل بنهاية الحملة",
+    "دعم فني طوال الحملة",
   ];
 
   return (
     <section id="pricing" className="py-24">
       <div className="mx-auto max-w-4xl px-6">
-        <div className="mx-auto max-w-2xl text-center">
-          <span className="text-sm font-semibold uppercase tracking-widest text-gold">
-            باقة واحدة. سعر واحد.
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mx-auto max-w-2xl text-center"
+        >
+          <span className="inline-block rounded-full bg-gold/15 px-4 py-1 text-xs font-bold text-foreground">
+            باقة واحدة. سعر واضح.
           </span>
-          <h2 className="mt-3 font-display text-3xl font-bold md:text-4xl">
-            بدلاً من ٣٬٠٠٠ ريال شهرياً
+          <h2 className="mt-4 font-display text-3xl font-bold md:text-5xl">
+            سعر واحد، واضح، <span className="text-gradient-gold">بدون مفاجآت</span>
           </h2>
-        </div>
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="mt-12 overflow-hidden rounded-3xl border border-gold/40 bg-card shadow-glow"
+          className="mt-12 overflow-hidden rounded-3xl border-2 border-gold/40 bg-card shadow-gold"
         >
-          <div className="bg-gradient-emerald p-8 text-center">
-            <div className="inline-flex items-center gap-2 rounded-full bg-background/30 px-4 py-1 text-xs font-semibold backdrop-blur">
-              <ShieldCheck className="h-3.5 w-3.5" />
-              الباقة التأسيسية
+          <div className="relative overflow-hidden bg-gradient-primary p-10 text-center text-white">
+            <div className="absolute inset-0 bg-hero-radial opacity-30" />
+            <div className="relative">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1 text-xs font-bold backdrop-blur">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                الباقة التأسيسية
+              </div>
+              <div className="mt-6 flex items-baseline justify-center gap-2">
+                <span className="font-display text-7xl font-bold">٩٩٩</span>
+                <span className="text-2xl opacity-90">ريال فقط</span>
+              </div>
+              <p className="mt-2 text-sm opacity-90">لحملة تسويقية كاملة ٣٠ يوم</p>
             </div>
-            <div className="mt-6 flex items-baseline justify-center gap-2">
-              <span className="font-display text-6xl font-bold text-gradient-gold">٩٩٩</span>
-              <span className="text-xl text-muted-foreground">ر.س</span>
-            </div>
-            <p className="mt-2 text-sm text-muted-foreground">
-              دفعة واحدة • حملة ٣٠ يوماً كاملة
-            </p>
           </div>
 
-          <div className="p-8">
+          <div className="p-8 md:p-10">
             <ul className="grid gap-4 sm:grid-cols-2">
               {features.map((f, i) => (
                 <li key={i} className="flex items-start gap-3 text-sm">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-gold" />
+                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-success text-white">
+                    <Check className="h-3 w-3" strokeWidth={3} />
+                  </span>
                   <span>{f}</span>
                 </li>
               ))}
             </ul>
 
             <a
-              href="#"
-              className="mt-8 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-gold px-7 py-4 text-base font-bold text-gold-foreground shadow-gold transition hover:scale-[1.01]"
+              href="#final-cta"
+              className="btn-gold mt-8 flex w-full items-center justify-center gap-2 rounded-2xl px-7 py-4 text-base font-bold"
             >
-              <FileText className="h-5 w-5" />
-              ابدأ بتحليل متجري — مجاناً
+              احجز مكانك في القائمة المبكرة
+              <ArrowLeft className="h-5 w-5" />
             </a>
-            <p className="mt-3 text-center text-xs text-muted-foreground">
-              التحليل والخطة مجاناً. ادفع فقط إذا اعتمدت الخطة.
+            <p className="mt-4 text-center text-sm text-muted-foreground">
+              قارن: المسوقين يطلبون{" "}
+              <span className="font-bold text-destructive line-through">٣٬٠٠٠ - ١٠٬٠٠٠ ريال</span>{" "}
+              شهرياً!
             </p>
           </div>
         </motion.div>
@@ -414,20 +572,339 @@ function Pricing() {
   );
 }
 
+/* ---------------- SOCIAL PROOF ---------------- */
+
+function SocialProofSection() {
+  return (
+    <section className="relative overflow-hidden bg-primary py-24 text-primary-foreground">
+      <div
+        className="absolute inset-0 opacity-[0.06]"
+        style={{
+          backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
+          backgroundSize: "28px 28px",
+        }}
+      />
+      <div className="relative mx-auto max-w-3xl px-6 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <span className="inline-block rounded-full bg-gold/20 px-4 py-1 text-xs font-bold text-gold">
+            ٢٠٢٦ — إطلاق قريب
+          </span>
+          <h2 className="mt-4 font-display text-3xl font-bold md:text-5xl">
+            انضم لقائمة الانتظار
+          </h2>
+          <p className="mt-4 text-lg opacity-90">
+            احجز مكانك الآن واحصل على تحليل متجرك مجاناً عند الإطلاق.
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mx-auto mt-10 max-w-xl rounded-3xl border border-white/20 bg-white/10 p-6 backdrop-blur-md md:p-8"
+        >
+          <SignupForm cta="أريد تحليل متجري مجاناً!" onDark />
+          <p className="mt-4 text-center text-sm opacity-80">
+            سنرسل لك تحليل متجرك المجاني خلال ٢٤ ساعة من الإطلاق
+          </p>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- FAQ ---------------- */
+
+function FAQSection() {
+  const faqs = [
+    {
+      q: "هل تضمنون زيادة المبيعات؟",
+      a: "لا. نحن صادقون معك: التسويق علم وليس سحراً. ما نضمن لك «مبيعات مضمونة» أو «فايرل مضمون» — هذي كلها وعود كاذبة. اللي نضمنه: تنفيذ محكم، محتوى احترافي، وتقارير واضحة.",
+    },
+    {
+      q: "ليش ما تضمنون النتائج؟",
+      a: "لأننا صادقين. النتائج تعتمد على عوامل كثيرة (منتجاتك، أسعارك، السوق). اللي نقدر نتحكم فيه: جودة التنفيذ. وهذا اللي نضمنه.",
+    },
+    {
+      q: "كيف أعرف إن المحتوى راح يكون جيد؟",
+      a: "راح تشوف الخطة كاملة (٣٠ يوم من المحتوى) قبل ما تدفع ريال واحد. ما عجبتك؟ لا تدفع. بسيطة.",
+    },
+    {
+      q: "هل أقدر أشوف الخطة قبل ما أدفع؟",
+      a: "نعم! هذا الفرق الأساسي بيننا وبين الباقي. راح نعطيك خطة كاملة ٣٠ يوم. توافق عليها؟ تدفع. ما توافق؟ لا تدفع.",
+    },
+    {
+      q: "إيش الفرق بينكم وبين المسوقين العاديين؟",
+      a: "١) السعر: ٩٩٩ ريال مقابل ٣-١٠ آلاف ريال شهرياً. ٢) الشفافية: تشوف كل شي قبل الدفع. ٣) الصدق: ما نعدك بالمستحيل. ٤) التقارير: أسبوعياً مو شهرياً.",
+    },
+    {
+      q: "هل المحتوى راح يكون بالعربي؟",
+      a: "١٠٠٪ عربي سعودي. مو ترجمة من الإنجليزي. محتوى مفهوم للسوق السعودي بالضبط.",
+    },
+    {
+      q: "كم تاخذ الحملة؟",
+      a: "٣٠ يوم بالضبط. يوم واحد = منشور واحد. بعد ٣٠ يوم، تقدر تجدد (أو لا تجدد). قرارك.",
+    },
+    {
+      q: "إيش لو ما عجبتني النتائج؟",
+      a: "راح تحصل على تقرير نهائي شامل يوضح إيش اشتغل وإيش ما اشتغل. تقدر تستفيد منه حتى لو ما جددت معنا.",
+    },
+  ];
+
+  return (
+    <section id="faq" className="bg-secondary py-24">
+      <div className="mx-auto max-w-3xl px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center"
+        >
+          <span className="inline-block rounded-full bg-accent px-4 py-1 text-xs font-bold text-primary">
+            FAQ
+          </span>
+          <h2 className="mt-4 font-display text-3xl font-bold md:text-5xl">
+            الأسئلة الشائعة
+          </h2>
+        </motion.div>
+
+        <Accordion type="single" collapsible className="mt-10 space-y-3">
+          {faqs.map((f, i) => (
+            <AccordionItem
+              key={i}
+              value={`item-${i}`}
+              className="overflow-hidden rounded-2xl border border-border bg-card px-6 shadow-soft data-[state=open]:border-primary/30"
+            >
+              <AccordionTrigger className="py-5 text-right font-display text-base font-bold hover:no-underline md:text-lg [&>svg]:hidden">
+                <span className="flex w-full items-center justify-between gap-4">
+                  <span>{f.q}</span>
+                  <ChevronDown className="h-5 w-5 shrink-0 text-primary transition-transform duration-200" />
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-5 text-base leading-relaxed text-muted-foreground">
+                {f.a}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- FINAL CTA ---------------- */
+
+function FinalCTA() {
+  return (
+    <section
+      id="final-cta"
+      className="relative overflow-hidden bg-ink py-24 text-ink-foreground"
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-transparent to-gold/20" />
+      <div className="relative mx-auto max-w-3xl px-6 text-center">
+        <motion.h2
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="font-display text-4xl font-bold md:text-6xl"
+        >
+          جاهز تجرب
+          <br />
+          <span className="text-gradient-gold">تسويق صادق؟</span>
+        </motion.h2>
+        <p className="mt-6 text-lg text-white/80 md:text-xl">
+          احصل على تحليل متجرك مجاناً — بدون التزام، بدون دفع.
+        </p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mx-auto mt-10 max-w-xl rounded-3xl border border-white/15 bg-white/[0.06] p-6 backdrop-blur-md md:p-8"
+        >
+          <SignupForm cta="سجّل في القائمة المبكرة" onDark />
+        </motion.div>
+
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm">
+          <TrustBadge>بدون عقود طويلة</TrustBadge>
+          <TrustBadge>توقف متى ما تبي</TrustBadge>
+          <TrustBadge>شفافية ١٠٠٪</TrustBadge>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TrustBadge({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2 text-white/85">
+      <span className="grid h-5 w-5 place-items-center rounded-full bg-success text-white">
+        <Check className="h-3 w-3" strokeWidth={3} />
+      </span>
+      {children}
+    </div>
+  );
+}
+
+/* ---------------- SIGNUP FORM ---------------- */
+
+function SignupForm({
+  cta,
+  compact,
+  onDark,
+}: {
+  cta: string;
+  compact?: boolean;
+  onDark?: boolean;
+}) {
+  const [email, setEmail] = useState("");
+  const [shop, setShop] = useState("");
+  const [status, setStatus] = useState<"idle" | "ok" | "error">("idle");
+
+  const inputBase = onDark
+    ? "w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3.5 text-base text-white placeholder:text-white/60 outline-none transition focus:border-gold focus:bg-white/15"
+    : "w-full rounded-xl border border-border bg-card px-4 py-3.5 text-base outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10";
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+    if (!valid) {
+      setStatus("error");
+      return;
+    }
+    // TODO(v.1): persist to Lovable Cloud
+    setStatus("ok");
+    setEmail("");
+    setShop("");
+  }
+
+  if (status === "ok") {
+    return (
+      <div
+        className={`flex items-center gap-3 rounded-2xl border p-5 ${
+          onDark
+            ? "border-gold/40 bg-white/10 text-white"
+            : "border-success/30 bg-success/10 text-foreground"
+        }`}
+      >
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-success text-white">
+          <Check className="h-5 w-5" strokeWidth={3} />
+        </span>
+        <div className="text-right">
+          <div className="font-display font-bold">تم التسجيل بنجاح!</div>
+          <div className="text-sm opacity-80">شكراً! راح نراسلك بمجرد الإطلاق.</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={submit} className="space-y-3">
+      <div className="relative">
+        <Mail
+          className={`pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 ${
+            onDark ? "text-white/60" : "text-muted-foreground"
+          }`}
+        />
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (status === "error") setStatus("idle");
+          }}
+          placeholder="بريدك الإلكتروني"
+          className={`${inputBase} pr-12`}
+          maxLength={255}
+        />
+      </div>
+
+      {!compact && (
+        <div className="relative">
+          <LinkIcon
+            className={`pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 ${
+              onDark ? "text-white/60" : "text-muted-foreground"
+            }`}
+          />
+          <input
+            type="url"
+            value={shop}
+            onChange={(e) => setShop(e.target.value)}
+            placeholder="رابط متجرك على زد أو سلة (اختياري)"
+            className={`${inputBase} pr-12`}
+            maxLength={500}
+          />
+        </div>
+      )}
+
+      <button
+        type="submit"
+        className={`flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-base font-bold transition ${
+          onDark ? "btn-gold" : "btn-primary"
+        }`}
+      >
+        {cta}
+        <ArrowLeft className="h-5 w-5" />
+      </button>
+
+      {status === "error" && (
+        <p className={`text-sm ${onDark ? "text-gold" : "text-destructive"}`}>
+          الرجاء إدخال بريد إلكتروني صحيح
+        </p>
+      )}
+    </form>
+  );
+}
+
+/* ---------------- FOOTER ---------------- */
+
 function Footer() {
   return (
-    <footer className="border-t border-border/60 bg-card/30 py-10">
-      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 text-sm text-muted-foreground md:flex-row">
-        <div className="flex items-center gap-2">
-          <div className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-gold text-gold-foreground">
-            <Sparkles className="h-4 w-4" />
+    <footer className="border-t border-border bg-background py-12">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="flex flex-col items-center gap-8 md:flex-row md:items-start md:justify-between">
+          <div className="text-center md:text-right">
+            <div className="flex items-center justify-center gap-2 md:justify-start">
+              <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-primary text-white">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <span className="font-display text-xl font-bold">المسوق الذكي</span>
+            </div>
+            <p className="mt-3 text-sm text-muted-foreground">
+              تسويق صادق للمتاجر السعودية 🇸🇦
+            </p>
           </div>
-          <span>© {new Date().getFullYear()} المسوق الذكي — صُنع بصدق في السعودية 🇸🇦</span>
+
+          <div className="flex items-center gap-3">
+            <a
+              href="#"
+              aria-label="Twitter"
+              className="grid h-10 w-10 place-items-center rounded-xl border border-border text-muted-foreground transition hover:border-primary hover:text-primary"
+            >
+              <Twitter className="h-4 w-4" />
+            </a>
+            <a
+              href="#"
+              aria-label="LinkedIn"
+              className="grid h-10 w-10 place-items-center rounded-xl border border-border text-muted-foreground transition hover:border-primary hover:text-primary"
+            >
+              <Linkedin className="h-4 w-4" />
+            </a>
+          </div>
+
+          <div className="flex gap-6 text-sm text-muted-foreground">
+            <a href="#" className="transition hover:text-primary">سياسة الخصوصية</a>
+            <a href="#" className="transition hover:text-primary">شروط الاستخدام</a>
+          </div>
         </div>
-        <div className="flex gap-6">
-          <a href="#" className="hover:text-foreground">سياسة الخصوصية</a>
-          <a href="#" className="hover:text-foreground">الشروط</a>
-          <a href="#" className="hover:text-foreground">تواصل</a>
+
+        <div className="mt-8 border-t border-border pt-6 text-center text-xs text-muted-foreground">
+          © ٢٠٢٦ المسوق الذكي. جميع الحقوق محفوظة.
         </div>
       </div>
     </footer>
