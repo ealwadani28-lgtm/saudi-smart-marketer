@@ -43,41 +43,42 @@
 :root {
   --radius: 0.875rem;
 
-  /* Deep emerald + desert gold luxury palette */
-  --background: oklch(0.16 0.03 160);
-  --foreground: oklch(0.97 0.01 90);
+  /* Inspired by the hero: rich emerald + warm amber gold */
+  --background: oklch(0.19 0.055 158);
+  --foreground: oklch(0.97 0.015 85);
 
-  --card: oklch(0.21 0.035 160);
-  --card-foreground: oklch(0.97 0.01 90);
+  --card: oklch(0.24 0.07 158);
+  --card-foreground: oklch(0.97 0.015 85);
 
-  --popover: oklch(0.19 0.03 160);
-  --popover-foreground: oklch(0.97 0.01 90);
+  --popover: oklch(0.22 0.06 158);
+  --popover-foreground: oklch(0.97 0.015 85);
 
-  --primary: oklch(0.55 0.13 155);
-  --primary-foreground: oklch(0.98 0.01 90);
+  --primary: oklch(0.5 0.15 158);
+  --primary-foreground: oklch(0.98 0.01 85);
 
-  --secondary: oklch(0.26 0.04 160);
-  --secondary-foreground: oklch(0.97 0.01 90);
+  --secondary: oklch(0.29 0.08 158);
+  --secondary-foreground: oklch(0.97 0.015 85);
 
-  --muted: oklch(0.24 0.025 160);
-  --muted-foreground: oklch(0.72 0.02 100);
+  --muted: oklch(0.27 0.06 158);
+  --muted-foreground: oklch(0.8 0.035 90);
 
-  --accent: oklch(0.32 0.06 160);
-  --accent-foreground: oklch(0.97 0.01 90);
+  --accent: oklch(0.36 0.1 158);
+  --accent-foreground: oklch(0.97 0.015 85);
 
-  --gold: oklch(0.78 0.14 75);
-  --gold-foreground: oklch(0.18 0.04 90);
+  --gold: oklch(0.78 0.17 68);
+  --gold-foreground: oklch(0.2 0.05 80);
 
-  --destructive: oklch(0.6 0.22 25);
-  --destructive-foreground: oklch(0.98 0.01 90);
+  --destructive: oklch(0.62 0.22 25);
+  --destructive-foreground: oklch(0.98 0.01 85);
 
-  --border: oklch(0.32 0.04 160 / 60%);
-  --input: oklch(0.3 0.04 160);
-  --ring: oklch(0.78 0.14 75);
+  --border: oklch(0.4 0.08 158 / 55%);
+  --input: oklch(0.32 0.07 158);
+  --ring: oklch(0.78 0.17 68);
 
-  --gradient-hero: linear-gradient(135deg, oklch(0.16 0.03 160) 0%, oklch(0.22 0.07 155) 55%, oklch(0.32 0.1 90) 100%);
-  --gradient-gold: linear-gradient(135deg, oklch(0.82 0.14 80), oklch(0.68 0.16 60));
-  --gradient-emerald: linear-gradient(135deg, oklch(0.45 0.14 155), oklch(0.3 0.09 160));
+  --gradient-hero: linear-gradient(135deg, oklch(0.18 0.05 158) 0%, oklch(0.3 0.11 155) 55%, oklch(0.65 0.18 72) 100%);
+  --gradient-gold: linear-gradient(135deg, oklch(0.84 0.17 78), oklch(0.65 0.18 55));
+  --gradient-emerald: linear-gradient(135deg, oklch(0.45 0.15 158), oklch(0.28 0.09 158));
+
 }
 
 .dark {
