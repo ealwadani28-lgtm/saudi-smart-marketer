@@ -87,14 +87,20 @@ function Hero() {
   return (
     <section className="relative overflow-hidden">
       <div
-        className="absolute inset-0 -z-10 opacity-60"
+        className="absolute inset-0 -z-10"
         style={{
           backgroundImage: `url(${heroBg})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
       />
-      <div className="absolute inset-0 -z-10 bg-gradient-hero opacity-80" />
+      <div
+        className="absolute inset-0 -z-10"
+        style={{
+          background:
+            "linear-gradient(180deg, transparent 0%, color-mix(in oklab, var(--background) 30%, transparent) 60%, var(--background) 100%)",
+        }}
+      />
 
       <div className="mx-auto max-w-7xl px-6 pt-24 pb-32 md:pt-32 md:pb-40">
         <motion.div
