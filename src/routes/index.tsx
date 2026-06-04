@@ -313,12 +313,12 @@ function ProblemSection() {
           {pains.map((p, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              whileHover={{ scale: 1.02 }}
-              className="glass-card-dark rounded-2xl p-7"
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.6, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.25 } }}
+              className="glass-card-dark rounded-2xl p-7 transition-shadow hover:shadow-glow"
             >
               <div className="mb-4 text-4xl">{p.emoji}</div>
               <h3 className="font-display text-xl font-bold">{p.title}</h3>
@@ -413,12 +413,12 @@ function SolutionSection() {
           {steps.map((s, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
-              whileHover={{ scale: 1.03 }}
-              className="relative rounded-2xl border border-border bg-card p-6 shadow-soft transition"
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.55, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -6, scale: 1.03, transition: { duration: 0.25 } }}
+              className="relative rounded-2xl border border-border bg-card p-6 shadow-soft transition-shadow hover:shadow-glow"
             >
               <div className="absolute -top-4 right-4 grid h-10 w-10 place-items-center rounded-xl bg-gradient-gold font-display text-lg font-bold text-gold-foreground shadow-gold">
                 {s.n}
