@@ -294,10 +294,10 @@ function ProblemSection() {
       />
       <div className="relative mx-auto max-w-6xl px-6">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.15 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto max-w-2xl text-center"
         >
           <span className="inline-block rounded-full bg-destructive/20 px-4 py-1 text-xs font-semibold text-destructive-foreground">
@@ -314,10 +314,10 @@ function ProblemSection() {
           {pains.map((p, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.6, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0, y: 80, filter: "blur(8px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 1.0, delay: i * 0.25, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.25 } }}
               className="glass-card-dark rounded-2xl p-7 transition-shadow hover:shadow-glow"
             >
@@ -372,10 +372,10 @@ function SolutionSection() {
     <section id="solution" className="py-24">
       <div className="mx-auto max-w-6xl px-6">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.15 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto max-w-2xl text-center"
         >
           <span className="inline-block rounded-full bg-accent px-4 py-1 text-xs font-semibold text-primary">
@@ -388,10 +388,10 @@ function SolutionSection() {
 
         {/* Core Promise Box */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.94, y: 20 }}
-          whileInView={{ opacity: 1, scale: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.15 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, scale: 0.9, y: 40, filter: "blur(8px)" }}
+          whileInView={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto mt-12 max-w-3xl"
         >
           <div className="relative overflow-hidden rounded-3xl border-2 border-primary/20 bg-gradient-to-br from-accent to-background p-8 md:p-10 shadow-glow">
@@ -416,10 +416,10 @@ function SolutionSection() {
           {steps.map((s, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.55, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0, y: 80, filter: "blur(8px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: true, amount: 0.25 }}
+              transition={{ duration: 0.9, delay: i * 0.18, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -6, scale: 1.03, transition: { duration: 0.25 } }}
               className="relative rounded-2xl border border-border bg-card p-6 shadow-soft transition-shadow hover:shadow-glow"
             >
@@ -454,10 +454,10 @@ function ComparisonSection() {
     <section className="bg-secondary py-24">
       <div className="mx-auto max-w-5xl px-6">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.15 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto max-w-2xl text-center"
         >
           <h2 className="font-display text-3xl font-bold md:text-5xl">
@@ -466,10 +466,10 @@ function ComparisonSection() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.15 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
           className="mt-12 overflow-hidden rounded-3xl border border-border bg-card shadow-soft"
         >
           <div className="grid grid-cols-3 gap-0 border-b border-border bg-muted/40">
@@ -523,10 +523,10 @@ function PricingSection() {
     <section id="pricing" className="py-24">
       <div className="mx-auto max-w-4xl px-6">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.15 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto max-w-2xl text-center"
         >
           <span className="inline-block rounded-full bg-gold/15 px-4 py-1 text-xs font-bold text-foreground">
@@ -538,10 +538,10 @@ function PricingSection() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.94, y: 20 }}
-          whileInView={{ opacity: 1, scale: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.15 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, scale: 0.9, y: 40, filter: "blur(8px)" }}
+          whileInView={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
           className="mt-12 overflow-hidden rounded-3xl border-2 border-gold/40 bg-card shadow-gold"
         >
           <div className="relative overflow-hidden bg-gradient-primary p-10 text-center text-white">
@@ -604,10 +604,10 @@ function SocialProofSection() {
       />
       <div className="relative mx-auto max-w-3xl px-6 text-center">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.15 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
         >
           <span className="inline-block rounded-full bg-gold/20 px-4 py-1 text-xs font-bold text-gold">
             ٢٠٢٦ — إطلاق قريب
@@ -621,10 +621,10 @@ function SocialProofSection() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.15 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto mt-10 max-w-xl rounded-3xl border border-white/20 bg-white/10 p-6 backdrop-blur-md md:p-8"
         >
           <SignupForm cta="أريد تحليل متجري مجاناً!" onDark />
@@ -679,10 +679,10 @@ function FAQSection() {
     <section id="faq" className="bg-secondary py-24">
       <div className="mx-auto max-w-3xl px-6">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.15 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
           className="text-center"
         >
           <span className="inline-block rounded-full bg-accent px-4 py-1 text-xs font-bold text-primary">
@@ -728,10 +728,10 @@ function FinalCTA() {
       <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-transparent to-gold/20" />
       <div className="relative mx-auto max-w-3xl px-6 text-center">
         <motion.h2
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.15 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
           className="font-display text-4xl font-bold md:text-6xl"
         >
           جاهز تجرب
@@ -743,10 +743,10 @@ function FinalCTA() {
         </p>
 
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.15 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto mt-10 max-w-xl rounded-3xl border border-white/15 bg-white/[0.06] p-6 backdrop-blur-md md:p-8"
         >
           <SignupForm cta="سجّل في القائمة المبكرة" onDark />
