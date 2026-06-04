@@ -474,33 +474,61 @@ function ComparisonSection() {
           transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
           className="mt-12 overflow-hidden rounded-3xl border border-border bg-card shadow-soft"
         >
-          <div className="grid grid-cols-3 gap-0 border-b border-border bg-muted/40">
-            <div className="p-5 text-sm font-bold text-muted-foreground">المقارنة</div>
-            <div className="p-5 text-center text-sm font-bold text-muted-foreground">
-              المسوقين العاديين
+          {/* Desktop / tablet table */}
+          <div className="hidden sm:block">
+            <div className="grid grid-cols-3 gap-0 border-b border-border bg-muted/40">
+              <div className="p-5 text-sm font-bold text-muted-foreground">المقارنة</div>
+              <div className="p-5 text-center text-sm font-bold text-muted-foreground">
+                المسوقين العاديين
+              </div>
+              <div className="bg-gradient-primary p-5 text-center text-sm font-bold text-white">
+                المسوق الذكي
+              </div>
             </div>
-            <div className="bg-gradient-primary p-5 text-center text-sm font-bold text-white">
-              المسوق الذكي
-            </div>
+            {rows.map((r, i) => (
+              <div
+                key={i}
+                className={`grid grid-cols-3 gap-0 border-b border-border last:border-b-0 ${
+                  i % 2 === 0 ? "bg-card" : "bg-muted/30"
+                }`}
+              >
+                <div className="p-5 font-bold">{r.label}</div>
+                <div className="flex items-center justify-center gap-2 p-5 text-center text-sm text-muted-foreground">
+                  <XCircle className="h-4 w-4 shrink-0 text-destructive" />
+                  <span>{r.others}</span>
+                </div>
+                <div className="flex items-center justify-center gap-2 bg-accent/40 p-5 text-center text-sm font-semibold text-foreground">
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
+                  <span>{r.us}</span>
+                </div>
+              </div>
+            ))}
           </div>
-          {rows.map((r, i) => (
-            <div
-              key={i}
-              className={`grid grid-cols-3 gap-0 border-b border-border last:border-b-0 ${
-                i % 2 === 0 ? "bg-card" : "bg-muted/30"
-              }`}
-            >
-              <div className="p-5 font-bold">{r.label}</div>
-              <div className="flex items-center justify-center gap-2 p-5 text-center text-sm text-muted-foreground">
-                <XCircle className="h-4 w-4 shrink-0 text-destructive" />
-                <span>{r.others}</span>
+
+          {/* Mobile stacked cards */}
+          <div className="divide-y divide-border sm:hidden">
+            {rows.map((r, i) => (
+              <div key={i} className="p-5">
+                <div className="mb-3 font-display text-lg font-bold">{r.label}</div>
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2 rounded-xl bg-muted/40 p-3 text-sm text-muted-foreground">
+                    <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+                    <div>
+                      <div className="mb-0.5 text-[11px] font-bold">المسوقين العاديين</div>
+                      <span>{r.others}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 rounded-xl bg-accent/40 p-3 text-sm font-semibold text-foreground">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+                    <div>
+                      <div className="mb-0.5 text-[11px] font-bold text-primary">المسوق الذكي</div>
+                      <span>{r.us}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center justify-center gap-2 bg-accent/40 p-5 text-center text-sm font-semibold text-foreground">
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-success" />
-                <span>{r.us}</span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </motion.div>
       </div>
     </section>
