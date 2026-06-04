@@ -16,21 +16,24 @@ const TONE_STYLE: Record<string, string> = {
 const CLASSIFIER_SYSTEM = `You are a visual ad-direction expert. Given a product description (in Arabic or English), classify it and produce an ENGLISH image-generation prompt tailored to its type.
 
 Categories:
-- "website" / "saas": laptop or browser mockup on a clean desk, abstract UI elements (cards, charts, dashboard shapes — NO readable text), modern tech aesthetic, soft gradients
-- "mobile_app": smartphone mockup with abstract app UI on screen (NO readable text), floating UI cards, app store vibes
-- "physical_product": clean studio product photography of the actual item, soft shadows, premium background
-- "service": lifestyle scene representing the OUTCOME of the service (happy customer, result, transformation)
-- "food": appetizing food photography, top-down or 45deg, natural light
-- "fashion": editorial fashion photo, model or flat-lay
-- "course/education": symbolic learning scene (books, laptop, graduation symbols, abstract knowledge visuals)
+- "website" / "saas": laptop or browser-window mockup. The website's URL/brand name MUST appear in the browser tab and/or as the on-screen logo so viewers know what's being advertised. Surround with modern clean desk setup.
+- "mobile_app": smartphone mockup. The app's name/logo MUST appear on the phone screen and/or as a splash. Clean modern background.
+- "physical_product": clean studio product photography of the actual item. No text needed.
+- "service": lifestyle scene representing the OUTCOME of the service.
+- "food": appetizing food photography, top-down or 45deg, natural light.
+- "fashion": editorial fashion photo, model or flat-lay.
+- "course/education": symbolic learning scene with subject hints.
 
-CRITICAL RULES:
-- NO text, NO words, NO letters, NO logos, NO watermarks in the image
-- Square 1:1 composition
-- Photorealistic, commercial-grade
-- Match the requested tone/style
+EXTRACTION:
+- Extract the brand name OR domain (e.g. "justlator.com", "Nike", "MyApp") from the product description if present. If you find one, include it explicitly in the prompt as the text that should appear on the browser/phone screen.
+- For website/app categories: REQUIRE the brand text on screen. Do NOT add "no text" instructions.
+- For other categories: keep "no text overlays, no logos" to avoid garbled words.
 
-Return ONLY valid JSON: {"category": "<cat>", "prompt": "<english image prompt, 2-4 sentences>"}`;
+CRITICAL:
+- Square 1:1, photorealistic, commercial-grade.
+- Match the requested tone/style.
+
+Return ONLY valid JSON: {"category": "<cat>", "brand": "<extracted brand or null>", "prompt": "<english image prompt, 3-5 sentences, very specific>"}`;
 
 async function buildSmartPrompt(apiKey: string, product: string, tone: string): Promise<string> {
   const style = TONE_STYLE[tone];
@@ -50,9 +53,9 @@ async function buildSmartPrompt(apiKey: string, product: string, tone: string): 
     if (!res.ok) throw new Error(`classifier ${res.status}`);
     const json = await res.json();
     const content = json.choices?.[0]?.message?.content ?? "{}";
-    const parsedC = JSON.parse(content) as { category?: string; prompt?: string };
+    const parsedC = JSON.parse(content) as { category?: string; brand?: string; prompt?: string };
     if (parsedC.prompt && parsedC.prompt.length > 20) {
-      return `${parsedC.prompt} Style mood: ${style}. Square 1:1, photorealistic, commercial quality, absolutely no text or letters or logos anywhere in the image.`;
+      return `${parsedC.prompt}\n\nStyle mood: ${style}. Square 1:1 composition, photorealistic, commercial advertising quality.`;
     }
   } catch (e) {
     console.error("smart prompt failed, falling back:", e);
@@ -60,8 +63,9 @@ async function buildSmartPrompt(apiKey: string, product: string, tone: string): 
   return `Professional social media ad image for: ${product}.
 Style: ${style}.
 Square 1:1 composition, clean modern aesthetic.
-High quality commercial photography, no text overlays, no watermarks, photorealistic.`;
+High quality commercial photography, photorealistic.`;
 }
+
 
 export const Route = createFileRoute("/api/generate-image")({
   server: {
