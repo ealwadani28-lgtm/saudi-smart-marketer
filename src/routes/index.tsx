@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -820,6 +820,7 @@ function SignupForm({
   compact?: boolean;
   onDark?: boolean;
 }) {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [shop, setShop] = useState("");
   const [status, setStatus] = useState<"idle" | "ok" | "error">("idle");
@@ -863,6 +864,7 @@ function SignupForm({
     setEmail("");
     setShop("");
     toast.success("تم التسجيل بنجاح!");
+    navigate({ to: "/thank-you" });
   }
 
   if (status === "ok") {

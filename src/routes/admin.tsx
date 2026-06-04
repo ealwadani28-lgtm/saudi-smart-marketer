@@ -1,0 +1,259 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useState } from "react";
+import { Lock, Download, RefreshCw, Users, Mail, ExternalLink, LogOut } from "lucide-react";
+import { adminListSignups } from "@/lib/admin.functions";
+
+export const Route = createFileRoute("/admin")({
+  head: () => ({
+    meta: [
+      { title: "لوحة الإدارة — المسوق الذكي" },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
+  component: AdminPage,
+});
+
+type Signup = {
+  id: string;
+  email: string;
+  shop_url: string | null;
+  source: string;
+  created_at: string;
+};
+
+const STORAGE_KEY = "admin_pw";
+
+function AdminPage() {
+  const listFn = useServerFn(adminListSignups);
+  const [password, setPassword] = useState("");
+  const [authed, setAuthed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [signups, setSignups] = useState<Signup[]>([]);
+
+  async function tryLoad(pw: string) {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await listFn({ data: { password: pw } });
+      setSignups(res.signups as Signup[]);
+      setAuthed(true);
+      sessionStorage.setItem(STORAGE_KEY, pw);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "خطأ غير معروف";
+      setError(msg.includes("Unauthorized") || msg.includes("كلمة المرور") ? "كلمة المرور غير صحيحة" : msg);
+      setAuthed(false);
+      sessionStorage.removeItem(STORAGE_KEY);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      setPassword(saved);
+      tryLoad(saved);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function logout() {
+    sessionStorage.removeItem(STORAGE_KEY);
+    setAuthed(false);
+    setPassword("");
+    setSignups([]);
+  }
+
+  function exportCSV() {
+    const header = ["id", "email", "shop_url", "source", "created_at"];
+    const rows = signups.map((s) =>
+      header.map((k) => {
+        const v = (s as any)[k] ?? "";
+        const str = String(v).replace(/"/g, '""');
+        return `"${str}"`;
+      }).join(",")
+    );
+    const csv = "\uFEFF" + [header.join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `signups-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  if (!authed) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background px-6" dir="rtl">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            tryLoad(password);
+          }}
+          className="w-full max-w-md rounded-3xl border border-border bg-card p-8 shadow-xl"
+        >
+          <div className="mb-6 flex flex-col items-center text-center">
+            <div className="grid h-14 w-14 place-items-center rounded-2xl bg-primary/10 text-primary">
+              <Lock className="h-7 w-7" />
+            </div>
+            <h1 className="mt-4 font-display text-2xl font-bold">لوحة الإدارة</h1>
+            <p className="mt-2 text-sm text-muted-foreground">منطقة محمية — أدخل كلمة المرور للوصول</p>
+          </div>
+          <label className="block text-sm font-medium">كلمة المرور</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoFocus
+            className="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3 text-base outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+            placeholder="••••••••"
+          />
+          {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
+          <button
+            type="submit"
+            disabled={loading || !password}
+            className="mt-6 w-full rounded-xl bg-primary px-4 py-3 font-medium text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
+          >
+            {loading ? "جاري التحقق..." : "دخول"}
+          </button>
+        </form>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background text-foreground" dir="rtl">
+      <header className="border-b border-border bg-card/40 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
+              <Users className="h-5 w-5" />
+            </div>
+            <div>
+              <h1 className="font-display text-lg font-bold">لوحة الإدارة</h1>
+              <p className="text-xs text-muted-foreground">المسجلين المبكرين</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => tryLoad(password)}
+              disabled={loading}
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm transition hover:bg-accent disabled:opacity-50"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+              تحديث
+            </button>
+            <button
+              onClick={exportCSV}
+              disabled={signups.length === 0}
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
+            >
+              <Download className="h-4 w-4" />
+              تصدير CSV
+            </button>
+            <button
+              onClick={logout}
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm transition hover:bg-accent"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-6xl px-6 py-8">
+        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+          <StatCard label="إجمالي المسجلين" value={signups.length.toString()} icon={<Users className="h-5 w-5" />} />
+          <StatCard
+            label="اليوم"
+            value={signups.filter((s) => isSameDay(new Date(s.created_at), new Date())).length.toString()}
+            icon={<Mail className="h-5 w-5" />}
+          />
+          <StatCard
+            label="هذا الأسبوع"
+            value={signups.filter((s) => daysAgo(new Date(s.created_at)) < 7).length.toString()}
+            icon={<Mail className="h-5 w-5" />}
+          />
+        </div>
+
+        <div className="overflow-hidden rounded-2xl border border-border bg-card">
+          <div className="overflow-x-auto">
+            <table className="w-full text-right text-sm">
+              <thead className="border-b border-border bg-muted/30">
+                <tr>
+                  <th className="px-4 py-3 font-medium">#</th>
+                  <th className="px-4 py-3 font-medium">البريد</th>
+                  <th className="px-4 py-3 font-medium">رابط المتجر</th>
+                  <th className="px-4 py-3 font-medium">المصدر</th>
+                  <th className="px-4 py-3 font-medium">التاريخ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {signups.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-12 text-center text-muted-foreground">
+                      لا يوجد مسجلين بعد
+                    </td>
+                  </tr>
+                ) : (
+                  signups.map((s, i) => (
+                    <tr key={s.id} className="border-b border-border last:border-0 transition hover:bg-muted/20">
+                      <td className="px-4 py-3 text-muted-foreground">{i + 1}</td>
+                      <td className="px-4 py-3 font-medium">
+                        <a href={`mailto:${s.email}`} className="text-primary hover:underline">{s.email}</a>
+                      </td>
+                      <td className="px-4 py-3">
+                        {s.shop_url ? (
+                          <a
+                            href={s.shop_url.startsWith("http") ? s.shop_url : `https://${s.shop_url}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-primary hover:underline"
+                          >
+                            {truncate(s.shop_url, 30)}
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground">{s.source}</td>
+                      <td className="px-4 py-3 text-muted-foreground" dir="ltr">
+                        {new Date(s.created_at).toLocaleString("ar-SA")}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+function StatCard({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-5">
+      <div>
+        <p className="text-sm text-muted-foreground">{label}</p>
+        <p className="mt-1 font-display text-3xl font-bold">{value}</p>
+      </div>
+      <div className="grid h-12 w-12 place-items-center rounded-xl bg-primary/10 text-primary">{icon}</div>
+    </div>
+  );
+}
+
+function isSameDay(a: Date, b: Date) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+function daysAgo(d: Date) {
+  return (Date.now() - d.getTime()) / (1000 * 60 * 60 * 24);
+}
+function truncate(s: string, n: number) {
+  return s.length > n ? s.slice(0, n) + "…" : s;
+}
