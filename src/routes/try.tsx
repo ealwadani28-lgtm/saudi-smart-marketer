@@ -47,6 +47,29 @@ function TryPage() {
   const [error, setError] = useState("");
   const [posts, setPosts] = useState<Post[]>([]);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+  const [imgUrl, setImgUrl] = useState<string | null>(null);
+  const [imgFinal, setImgFinal] = useState(false);
+  const [imgLoading, setImgLoading] = useState(false);
+  const [imgError, setImgError] = useState("");
+
+  async function generateImage() {
+    if (!product) return;
+    setImgError("");
+    setImgLoading(true);
+    setImgUrl(null);
+    setImgFinal(false);
+    try {
+      await streamImage("/api/generate-image", { product, tone }, (url, final) => {
+        setImgUrl(url);
+        if (final) setImgFinal(true);
+      });
+    } catch (e) {
+      setImgError(e instanceof Error ? e.message : "خطأ في توليد الصورة");
+    } finally {
+      setImgLoading(false);
+    }
+  }
+
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
