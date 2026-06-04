@@ -78,6 +78,7 @@ function Landing() {
       <FAQSection />
       <FinalCTA />
       <Footer />
+      <ExitIntentPopup />
     </div>
   );
 }
