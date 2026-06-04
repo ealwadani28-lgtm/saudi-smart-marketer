@@ -269,9 +269,83 @@ function TryPage() {
                 ))}
               </div>
 
+              {/* Image generation section */}
+              <div className="mt-12 rounded-3xl border border-border bg-card p-6 shadow-md md:p-8">
+                <div className="flex flex-col items-center text-center">
+                  <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-primary to-primary/60 text-primary-foreground">
+                    <ImageIcon className="h-7 w-7" />
+                  </div>
+                  <h3 className="mt-4 font-display text-2xl font-bold md:text-3xl">
+                    🎨 تبي صورة إعلانية احترافية؟
+                  </h3>
+                  <p className="mt-2 max-w-md text-sm text-muted-foreground md:text-base">
+                    ولّد صورة إعلانية مربعة جاهزة للنشر — مبنية على وصف منتجك ونبرتك.
+                  </p>
+
+                  {!imgUrl && !imgLoading && (
+                    <button
+                      onClick={generateImage}
+                      className="mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-base font-bold text-primary-foreground transition hover:opacity-90"
+                    >
+                      <Wand2 className="h-5 w-5" />
+                      ولّد صورة إعلانية الآن
+                    </button>
+                  )}
+
+                  {imgLoading && !imgUrl && (
+                    <div className="mt-6 inline-flex items-center gap-2 text-sm text-muted-foreground">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      جاري بناء الصورة...
+                    </div>
+                  )}
+
+                  {imgError && (
+                    <div className="mt-4 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive">
+                      {imgError}
+                    </div>
+                  )}
+
+                  {imgUrl && (
+                    <div className="mt-6 w-full max-w-md">
+                      <div className="relative overflow-hidden rounded-2xl border border-border bg-muted">
+                        <img
+                          src={imgUrl}
+                          alt="صورة إعلانية مولّدة"
+                          className={`w-full transition-[filter] duration-500 ${imgFinal ? "blur-0" : "blur-2xl"}`}
+                        />
+                        {!imgFinal && (
+                          <div className="absolute inset-0 grid place-items-center bg-background/30 backdrop-blur-sm">
+                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-center">
+                        <a
+                          href={imgUrl}
+                          download="ad-image.png"
+                          className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+                        >
+                          <Download className="h-4 w-4" />
+                          تحميل الصورة
+                        </a>
+                        <button
+                          onClick={generateImage}
+                          disabled={imgLoading}
+                          className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium transition hover:border-primary hover:text-primary disabled:opacity-50"
+                        >
+                          <RefreshCw className={`h-4 w-4 ${imgLoading ? "animate-spin" : ""}`} />
+                          ولّد نسخة جديدة
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               <p className="mt-8 text-center text-sm text-muted-foreground">
                 عجبتك التجربة؟ <Link to="/" className="font-bold text-primary hover:underline">سجّل في قائمة الأوائل</Link> وكن أول من يستخدم النسخة الكاملة.
               </p>
+
             </motion.div>
           )}
         </AnimatePresence>
