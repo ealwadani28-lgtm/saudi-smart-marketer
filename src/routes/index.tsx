@@ -982,9 +982,10 @@ function Footer() {
           </div>
 
           <div className="flex gap-6 text-sm text-muted-foreground">
-            <a href="#" className="transition hover:text-primary">سياسة الخصوصية</a>
-            <a href="#" className="transition hover:text-primary">شروط الاستخدام</a>
+            <a href="/privacy" className="transition hover:text-primary">سياسة الخصوصية</a>
+            <a href="/terms" className="transition hover:text-primary">شروط الاستخدام</a>
           </div>
+
         </div>
 
         <div className="mt-8 border-t border-border pt-6 text-center text-xs text-muted-foreground">
