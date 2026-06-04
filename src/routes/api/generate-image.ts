@@ -7,11 +7,61 @@ const Body = z.object({
 });
 
 const TONE_STYLE: Record<string, string> = {
-  friendly: "warm, inviting, natural lighting, lifestyle photography",
+  friendly: "warm, inviting, natural lighting, approachable mood",
   fun: "vibrant colors, playful composition, energetic, eye-catching",
-  luxury: "elegant, premium, gold accents, soft dramatic lighting, high-end product photography",
+  luxury: "elegant, premium, gold/dark accents, soft dramatic lighting, high-end aesthetic",
   urgent: "bold colors, dynamic composition, sale vibes, attention-grabbing",
 };
+
+const CLASSIFIER_SYSTEM = `You are a visual ad-direction expert. Given a product description (in Arabic or English), classify it and produce an ENGLISH image-generation prompt tailored to its type.
+
+Categories:
+- "website" / "saas": laptop or browser mockup on a clean desk, abstract UI elements (cards, charts, dashboard shapes — NO readable text), modern tech aesthetic, soft gradients
+- "mobile_app": smartphone mockup with abstract app UI on screen (NO readable text), floating UI cards, app store vibes
+- "physical_product": clean studio product photography of the actual item, soft shadows, premium background
+- "service": lifestyle scene representing the OUTCOME of the service (happy customer, result, transformation)
+- "food": appetizing food photography, top-down or 45deg, natural light
+- "fashion": editorial fashion photo, model or flat-lay
+- "course/education": symbolic learning scene (books, laptop, graduation symbols, abstract knowledge visuals)
+
+CRITICAL RULES:
+- NO text, NO words, NO letters, NO logos, NO watermarks in the image
+- Square 1:1 composition
+- Photorealistic, commercial-grade
+- Match the requested tone/style
+
+Return ONLY valid JSON: {"category": "<cat>", "prompt": "<english image prompt, 2-4 sentences>"}`;
+
+async function buildSmartPrompt(apiKey: string, product: string, tone: string): Promise<string> {
+  const style = TONE_STYLE[tone];
+  try {
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-lite",
+        messages: [
+          { role: "system", content: CLASSIFIER_SYSTEM },
+          { role: "user", content: `Product: ${product}\nTone: ${tone} (${style})` },
+        ],
+        response_format: { type: "json_object" },
+      }),
+    });
+    if (!res.ok) throw new Error(`classifier ${res.status}`);
+    const json = await res.json();
+    const content = json.choices?.[0]?.message?.content ?? "{}";
+    const parsedC = JSON.parse(content) as { category?: string; prompt?: string };
+    if (parsedC.prompt && parsedC.prompt.length > 20) {
+      return `${parsedC.prompt} Style mood: ${style}. Square 1:1, photorealistic, commercial quality, absolutely no text or letters or logos anywhere in the image.`;
+    }
+  } catch (e) {
+    console.error("smart prompt failed, falling back:", e);
+  }
+  return `Professional social media ad image for: ${product}.
+Style: ${style}.
+Square 1:1 composition, clean modern aesthetic.
+High quality commercial photography, no text overlays, no watermarks, photorealistic.`;
+}
 
 export const Route = createFileRoute("/api/generate-image")({
   server: {
@@ -27,11 +77,7 @@ export const Route = createFileRoute("/api/generate-image")({
           return new Response("Invalid body", { status: 400 });
         }
 
-        const style = TONE_STYLE[parsed.tone];
-        const prompt = `Professional social media ad image for: ${parsed.product}.
-Style: ${style}.
-Square 1:1 composition, clean modern aesthetic, suitable for TikTok/Instagram/Snapchat advertising.
-High quality commercial photography, no text overlays, no watermarks, photorealistic.`;
+        const prompt = await buildSmartPrompt(apiKey, parsed.product, parsed.tone);
 
         const upstream = await fetch(
           "https://ai.gateway.lovable.dev/v1/images/generations",
@@ -49,6 +95,7 @@ High quality commercial photography, no text overlays, no watermarks, photoreali
             }),
           }
         );
+
 
         if (!upstream.ok || !upstream.body) {
           const txt = await upstream.text().catch(() => "");
