@@ -110,6 +110,8 @@
 
   html {
     direction: rtl;
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
   }
 
   body {
