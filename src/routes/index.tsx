@@ -893,17 +893,18 @@ function SignupForm({
 
       <button
         type="submit"
-        className={`flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-base font-bold transition ${
+        disabled={loading}
+        className={`flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-base font-bold transition disabled:opacity-60 ${
           onDark ? "btn-gold" : "btn-primary"
         }`}
       >
-        {cta}
-        <ArrowLeft className="h-5 w-5" />
+        {loading ? "جاري التسجيل..." : cta}
+        {!loading && <ArrowLeft className="h-5 w-5" />}
       </button>
 
       {status === "error" && (
         <p className={`text-sm ${onDark ? "text-gold" : "text-destructive"}`}>
-          الرجاء إدخال بريد إلكتروني صحيح
+          {errorMsg}
         </p>
       )}
     </form>
