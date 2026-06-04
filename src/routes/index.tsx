@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -144,14 +144,24 @@ function Hero() {
             ما نعدك بالنتائج، لكن نعدك بالتنفيذ المحكم والتقارير الواضحة.
           </p>
 
-          <div className="mt-8 max-w-xl">
-            <SignupForm cta="احصل على تحليل متجرك مجاناً" compact />
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <Link
+              to="/try"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground shadow-lg transition hover:opacity-90"
+            >
+              <Sparkles className="h-5 w-5" />
+              جرّب المسوّق الذكي الآن — مجاناً
+            </Link>
+            <a href="#waitlist" className="inline-flex items-center justify-center rounded-xl border-2 border-border bg-background px-6 py-4 text-base font-medium transition hover:border-primary hover:text-primary">
+              سجّل في قائمة الأوائل
+            </a>
           </div>
 
           <div className="mt-6 inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-primary">
             <ShieldCheck className="h-4 w-4" />
-            ٩٩٩ ريال فقط لحملة ٣٠ يوم — بدون عقود طويلة
+            تجربة مباشرة — بدون تسجيل، بدون التزام
           </div>
+
         </motion.div>
 
         {/* Left side (40%) — Visual */}
