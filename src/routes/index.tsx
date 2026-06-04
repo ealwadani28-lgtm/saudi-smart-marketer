@@ -30,6 +30,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import ogImage from "@/assets/og-image.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -43,13 +44,23 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "المسوق الذكي — تسويق صادق للمتاجر السعودية" },
       {
         property: "og:description",
-        content: "دفعت ٢٠ ألف ريال للمسوقين وما استفدت شي. قررت أبني الحل بنفسي.",
+        content: "حملة تسويقية كاملة ٣٠ يوم بـ ٩٩٩ ريال فقط. شفافية كاملة، بدون عقود، بدون وعود كاذبة.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: ogImage.url },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:locale", content: "ar_SA" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "المسوق الذكي — تسويق صادق للمتاجر السعودية" },
+      { name: "twitter:description", content: "حملة تسويقية كاملة ٣٠ يوم بـ ٩٩٩ ريال فقط" },
+      { name: "twitter:image", content: ogImage.url },
     ],
+    links: [{ rel: "canonical", href: "/" }],
   }),
   component: Landing,
 });
+
 
 function Landing() {
   return (
