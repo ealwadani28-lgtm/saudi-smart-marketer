@@ -679,9 +679,10 @@ function SocialProofSection() {
               <span><span className="font-bold">دعوة حصرية</span> لتجربة الـ Beta مجاناً قبل الإطلاق الرسمي.</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-2xl">💰</span>
-              <span><span className="font-bold">سعر المؤسسين</span> — أرخص سعر، مدى الحياة.</span>
+              <span className="text-2xl">🤝</span>
+              <span><span className="font-bold">شفافية كاملة</span> — نشاركك القرارات والتحديثات أول بأول، بدون وعود ما نقدر نلتزم فيها.</span>
             </li>
+
           </ul>
 
           <SignupForm cta="سجّلني في قائمة الأوائل" onDark />
