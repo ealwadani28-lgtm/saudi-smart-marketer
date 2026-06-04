@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import {
   Sparkles,
   ShieldCheck,
@@ -787,22 +789,46 @@ function SignupForm({
   const [email, setEmail] = useState("");
   const [shop, setShop] = useState("");
   const [status, setStatus] = useState<"idle" | "ok" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("الرجاء إدخال بريد إلكتروني صحيح");
+  const [loading, setLoading] = useState(false);
 
   const inputBase = onDark
     ? "w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3.5 text-base text-white placeholder:text-white/60 outline-none transition focus:border-gold focus:bg-white/15"
     : "w-full rounded-xl border border-border bg-card px-4 py-3.5 text-base outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10";
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+    const cleanEmail = email.trim().toLowerCase();
+    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail);
     if (!valid) {
+      setErrorMsg("الرجاء إدخال بريد إلكتروني صحيح");
       setStatus("error");
       return;
     }
-    // TODO(v.1): persist to Lovable Cloud
+
+    setLoading(true);
+    const { error } = await supabase.from("early_signups").insert({
+      email: cleanEmail,
+      shop_url: shop.trim() || null,
+      source: "landing_page",
+    });
+    setLoading(false);
+
+    if (error) {
+      if (error.code === "23505") {
+        setErrorMsg("هذا البريد مسجل مسبقاً!");
+      } else {
+        setErrorMsg("حدث خطأ، الرجاء المحاولة مرة أخرى");
+      }
+      setStatus("error");
+      toast.error(errorMsg);
+      return;
+    }
+
     setStatus("ok");
     setEmail("");
     setShop("");
+    toast.success("تم التسجيل بنجاح!");
   }
 
   if (status === "ok") {
