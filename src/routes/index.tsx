@@ -161,6 +161,17 @@ function Hero() {
 function DashboardMockup() {
   return (
     <div className="relative mx-auto max-w-md">
+      {/* Glow halos behind mockup */}
+      <motion.div
+        aria-hidden
+        animate={{ opacity: [0.55, 0.85, 0.55], scale: [1, 1.06, 1] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        className="pointer-events-none absolute -inset-10 -z-10 rounded-[3rem] blur-3xl"
+        style={{
+          background:
+            "radial-gradient(60% 60% at 70% 30%, rgba(0,168,89,0.45), transparent 70%), radial-gradient(55% 55% at 20% 80%, rgba(212,175,55,0.40), transparent 70%)",
+        }}
+      />
       {/* Main mockup */}
       <div className="relative rounded-3xl border border-border bg-card p-6 shadow-glow">
         <div className="mb-4 flex items-center justify-between">
