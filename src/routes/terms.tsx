@@ -130,8 +130,8 @@ function TermsPage() {
           <Section title="١٢. التواصل معنا">
             <p>
               لأي استفسار يخص هذه الشروط:{" "}
-              <a href="mailto:legal@almusawiq.sa" className="text-primary underline">
-                legal@almusawiq.sa
+              <a href="mailto:info@almusawiq.com" className="text-primary underline">
+                info@almusawiq.com
               </a>
             </p>
           </Section>
