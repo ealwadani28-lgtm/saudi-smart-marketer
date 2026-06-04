@@ -2,8 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Copy, Check, RefreshCw, ArrowLeft, Loader2, Wand2 } from "lucide-react";
+import { Sparkles, Copy, Check, RefreshCw, ArrowLeft, Loader2, Wand2, ImageIcon, Download } from "lucide-react";
 import { generatePosts } from "@/lib/generate.functions";
+import { streamImage } from "@/lib/streamImage";
+
 
 export const Route = createFileRoute("/try")({
   head: () => ({
