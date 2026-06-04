@@ -191,7 +191,7 @@ function DashboardMockup() {
             <motion.div
               initial={{ width: 0 }}
               whileInView={{ width: "46%" }}
-              viewport={{ once: true }}
+              viewport={{ amount: 0.6 }}
               transition={{ duration: 1.2, ease: "easeOut" }}
               className="h-full rounded-full bg-gold"
             />
@@ -296,7 +296,7 @@ function ProblemSection() {
         <motion.div
           initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={{ amount: 0.3 }}
           transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto max-w-2xl text-center"
         >
@@ -316,7 +316,7 @@ function ProblemSection() {
               key={i}
               initial={{ opacity: 0, y: 80, filter: "blur(8px)" }}
               whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              viewport={{ once: true, amount: 0.3 }}
+              viewport={{ amount: 0.3 }}
               transition={{ duration: 1.0, delay: i * 0.25, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.25 } }}
               className="glass-card-dark rounded-2xl p-7 transition-shadow hover:shadow-glow"
@@ -374,7 +374,7 @@ function SolutionSection() {
         <motion.div
           initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={{ amount: 0.3 }}
           transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto max-w-2xl text-center"
         >
@@ -390,7 +390,7 @@ function SolutionSection() {
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 40, filter: "blur(8px)" }}
           whileInView={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, amount: 0.25 }}
+          viewport={{ amount: 0.25 }}
           transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto mt-12 max-w-3xl"
         >
@@ -418,7 +418,7 @@ function SolutionSection() {
               key={i}
               initial={{ opacity: 0, y: 80, filter: "blur(8px)" }}
               whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              viewport={{ once: true, amount: 0.25 }}
+              viewport={{ amount: 0.25 }}
               transition={{ duration: 0.9, delay: i * 0.18, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -6, scale: 1.03, transition: { duration: 0.25 } }}
               className="relative rounded-2xl border border-border bg-card p-6 shadow-soft transition-shadow hover:shadow-glow"
@@ -456,7 +456,7 @@ function ComparisonSection() {
         <motion.div
           initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={{ amount: 0.3 }}
           transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto max-w-2xl text-center"
         >
@@ -468,7 +468,7 @@ function ComparisonSection() {
         <motion.div
           initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={{ amount: 0.3 }}
           transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
           className="mt-12 overflow-hidden rounded-3xl border border-border bg-card shadow-soft"
         >
@@ -525,7 +525,7 @@ function PricingSection() {
         <motion.div
           initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={{ amount: 0.3 }}
           transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto max-w-2xl text-center"
         >
@@ -540,7 +540,7 @@ function PricingSection() {
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 40, filter: "blur(8px)" }}
           whileInView={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, amount: 0.25 }}
+          viewport={{ amount: 0.25 }}
           transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
           className="mt-12 overflow-hidden rounded-3xl border-2 border-gold/40 bg-card shadow-gold"
         >
@@ -606,7 +606,7 @@ function SocialProofSection() {
         <motion.div
           initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={{ amount: 0.3 }}
           transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
         >
           <span className="inline-block rounded-full bg-gold/20 px-4 py-1 text-xs font-bold text-gold">
@@ -623,7 +623,7 @@ function SocialProofSection() {
         <motion.div
           initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={{ amount: 0.3 }}
           transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto mt-10 max-w-xl rounded-3xl border border-white/20 bg-white/10 p-6 backdrop-blur-md md:p-8"
         >
@@ -681,7 +681,7 @@ function FAQSection() {
         <motion.div
           initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={{ amount: 0.3 }}
           transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
           className="text-center"
         >
@@ -730,7 +730,7 @@ function FinalCTA() {
         <motion.h2
           initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={{ amount: 0.3 }}
           transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
           className="font-display text-4xl font-bold md:text-6xl"
         >
@@ -745,7 +745,7 @@ function FinalCTA() {
         <motion.div
           initial={{ opacity: 0, y: 50, filter: "blur(6px)" }}
           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={{ amount: 0.3 }}
           transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
           className="mx-auto mt-10 max-w-xl rounded-3xl border border-white/15 bg-white/[0.06] p-6 backdrop-blur-md md:p-8"
         >
