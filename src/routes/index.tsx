@@ -648,13 +648,14 @@ function SocialProofSection() {
           transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
         >
           <span className="inline-block rounded-full bg-gold/20 px-4 py-1 text-xs font-bold text-gold">
-            ٢٠٢٦ — إطلاق قريب
+            ٢٠٢٦ — قائمة الأوائل
           </span>
           <h2 className="mt-4 font-display text-3xl font-bold md:text-5xl">
-            انضم لقائمة الانتظار
+            شكراً إنك من الأوائل المهتمين 🌱
           </h2>
-          <p className="mt-4 text-lg opacity-90">
-            احجز مكانك الآن واحصل على تحليل متجرك مجاناً عند الإطلاق.
+          <p className="mt-6 text-base leading-relaxed opacity-90 md:text-lg">
+            بصراحة كاملة: إحنا حالياً في مرحلة بناء وتجربة فعلية على متاجر حقيقية،
+            عشان لما نطلق لك المنتج يكون <span className="font-bold text-gold">مجرّب ومضمون</span> — مش مجرد وعود.
           </p>
         </motion.div>
 
@@ -663,12 +664,34 @@ function SocialProofSection() {
           whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           viewport={{ amount: 0.3 }}
           transition={{ duration: 1.0, ease: [0.22, 1, 0.36, 1] }}
-          className="mx-auto mt-10 max-w-xl rounded-3xl border border-white/20 bg-white/10 p-6 backdrop-blur-md md:p-8"
+          className="mx-auto mt-10 max-w-2xl rounded-3xl border border-white/20 bg-white/10 p-6 backdrop-blur-md md:p-8"
         >
-          <SignupForm cta="أريد تحليل متجري مجاناً!" onDark />
-          <p className="mt-4 text-center text-sm opacity-80">
-            سنرسل لك تحليل متجرك المجاني خلال ٢٤ ساعة من الإطلاق
+          <h3 className="mb-4 text-center font-display text-xl font-bold md:text-2xl">
+            وش راح يوصلك؟
+          </h3>
+          <ul className="mb-8 space-y-4 text-right text-sm md:text-base">
+            <li className="flex items-start gap-3">
+              <span className="text-2xl">📊</span>
+              <span><span className="font-bold">تقرير أسبوعي</span> بنتائج التجارب الفعلية — أرقام حقيقية، تكاليف حقيقية، بدون فلترة.</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-2xl">🎁</span>
+              <span><span className="font-bold">دعوة حصرية</span> لتجربة الـ Beta مجاناً قبل الإطلاق الرسمي.</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-2xl">💰</span>
+              <span><span className="font-bold">سعر المؤسسين</span> — أرخص سعر، مدى الحياة.</span>
+            </li>
+          </ul>
+
+          <SignupForm cta="سجّلني في قائمة الأوائل" onDark />
+
+          <p className="mt-5 text-center text-xs leading-relaxed opacity-80 md:text-sm">
+            <span className="font-bold">متى الإطلاق؟</span> بنبلغك أول بأول — ما راح نطلق إلا لما نتأكد إن المنتج يستحق فلوسك.
+            <br />
+            <span className="opacity-70">— فريق المسوق الذكي</span>
           </p>
+
         </motion.div>
       </div>
     </section>
