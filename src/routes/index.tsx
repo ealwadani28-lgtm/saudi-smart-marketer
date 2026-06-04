@@ -31,6 +31,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import ogImage from "@/assets/og-image.jpg.asset.json";
+import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -77,6 +78,7 @@ function Landing() {
       <FAQSection />
       <FinalCTA />
       <Footer />
+      <ExitIntentPopup />
     </div>
   );
 }
