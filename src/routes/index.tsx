@@ -94,9 +94,10 @@ function Nav() {
           <div className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-primary text-white">
             <Sparkles className="h-5 w-5" />
           </div>
-          <div className="flex flex-col leading-tight">
-            <span className="font-display text-lg font-bold">JustMarketing</span>
-            <span className="text-[11px] text-muted-foreground">المسوّق الذكي</span>
+          <div className="flex items-center gap-2 leading-tight">
+            <span className="font-display text-lg font-bold text-primary">JustMarketing</span>
+            <span className="text-muted-foreground/60">—</span>
+            <span className="font-display text-lg font-bold text-primary">المسوّق الذكي</span>
           </div>
         </div>
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
