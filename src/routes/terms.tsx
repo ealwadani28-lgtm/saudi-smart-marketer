@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, FileText } from "lucide-react";
+import { JustlatorFooter } from "@/components/JustlatorFooter";
 
 export const Route = createFileRoute("/terms")({
   head: () => ({
@@ -141,6 +142,7 @@ function TermsPage() {
           هذه الشروط تخضع لأنظمة المملكة العربية السعودية 🇸🇦
         </div>
       </main>
+      <JustlatorFooter />
     </div>
   );
 }

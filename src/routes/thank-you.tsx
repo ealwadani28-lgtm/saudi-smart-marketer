@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2, Share2, MessageCircle, Twitter, Mail, ArrowLeft } from "lucide-react";
 import { useState } from "react";
+import { JustlatorFooter } from "@/components/JustlatorFooter";
 
 export const Route = createFileRoute("/thank-you")({
   head: () => ({
@@ -113,6 +114,7 @@ function ThankYouPage() {
           العودة للرئيسية
         </Link>
       </main>
+      <JustlatorFooter />
     </div>
   );
 }

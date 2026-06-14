@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Shield } from "lucide-react";
+import { JustlatorFooter } from "@/components/JustlatorFooter";
 
 export const Route = createFileRoute("/privacy")({
   head: () => ({
@@ -124,6 +125,7 @@ function PrivacyPage() {
           هذه السياسة تخضع لأنظمة المملكة العربية السعودية 🇸🇦
         </div>
       </main>
+      <JustlatorFooter />
     </div>
   );
 }
