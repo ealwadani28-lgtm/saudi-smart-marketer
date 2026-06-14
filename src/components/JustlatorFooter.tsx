@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { Brain } from "lucide-react";
+
+const LOGO_URL =
+  "https://justlator.com/__l5e/assets-v1/ba8c8d6c-29a5-4b43-9b01-8ae6a0ddd2a0/justlator-emblem.png";
 
 type ProductStatus = "live" | "soon";
 type Product = { name: string; sub?: string; href?: string; status: ProductStatus };
@@ -27,9 +29,12 @@ export function JustlatorFooter() {
     >
       {/* Signature block */}
       <div className="mx-auto max-w-6xl px-6 pt-16 pb-10 text-center">
-        <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-primary/15 to-gold/15 text-primary">
-          <Brain className="h-7 w-7" />
-        </div>
+        <img
+          src={LOGO_URL}
+          alt="Justlator Technologies"
+          className="mx-auto h-16 w-auto"
+          loading="lazy"
+        />
 
         <h2
           className="mt-5 font-display text-3xl font-bold tracking-[0.3em] text-foreground md:text-4xl"
