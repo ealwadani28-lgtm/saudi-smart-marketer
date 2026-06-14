@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Copy, Check, RefreshCw, ArrowLeft, Loader2, Wand2, ImageIcon, Download } from "lucide-react";
 import { generatePosts } from "@/lib/generate.functions";
 import { streamImage } from "@/lib/streamImage";
+import { JustlatorFooter } from "@/components/JustlatorFooter";
 
 
 export const Route = createFileRoute("/try")({
@@ -111,7 +112,7 @@ function TryPage() {
       <main className="mx-auto max-w-5xl px-6 py-10 md:py-16">
         <div className="text-center">
           <h1 className="font-display text-3xl font-bold leading-tight md:text-5xl">
-            جرّب المسوّق الذكي — مجاناً 🚀
+            جرّب <span className="text-primary">JustMarketing</span> — المسوّق الذكي مجاناً 🚀
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground md:text-lg">
             أدخل تفاصيل منتجك، وراح نولّد لك <span className="font-bold text-foreground">3 منشورات تسويقية</span> جاهزة للنشر — باللهجة السعودية، في ثوانٍ.
