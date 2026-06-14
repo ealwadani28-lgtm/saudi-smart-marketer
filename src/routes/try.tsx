@@ -351,6 +351,7 @@ function TryPage() {
           )}
         </AnimatePresence>
       </main>
+      <JustlatorFooter />
     </div>
   );
 }
