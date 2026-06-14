@@ -33,6 +33,8 @@ import {
 import ogImage from "@/assets/og-image.jpg.asset.json";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { JustlatorFooter } from "@/components/JustlatorFooter";
+import { MagicLampToggle } from "@/components/portable/MagicLampToggle";
+import { useTheme } from "@/hooks/use-theme";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -65,9 +67,10 @@ export const Route = createFileRoute("/")({
 
 
 function Landing() {
+  const { theme, toggleTheme } = useTheme();
   return (
     <div className="min-h-screen bg-background text-foreground" dir="rtl">
-
+      <MagicLampToggle theme={theme} onToggle={toggleTheme} variant="emerald" position="top-right" />
 
       <Nav />
       <Hero />
