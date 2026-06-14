@@ -112,7 +112,7 @@ function TryPage() {
       <main className="mx-auto max-w-5xl px-6 py-10 md:py-16">
         <div className="text-center">
           <h1 className="font-display text-3xl font-bold leading-tight md:text-5xl">
-            جرّب <span className="text-primary">JustMarketing</span> — المسوّق الذكي مجاناً 🚀
+            <span className="text-primary">JustMarketing</span> — <span className="text-primary">المسوّق الذكي</span> 🚀
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground md:text-lg">
             أدخل تفاصيل منتجك، وراح نولّد لك <span className="font-bold text-foreground">3 منشورات تسويقية</span> جاهزة للنشر — باللهجة السعودية، في ثوانٍ.
