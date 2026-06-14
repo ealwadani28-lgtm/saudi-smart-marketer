@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, FileText } from "lucide-react";
+import { JustlatorFooter } from "@/components/JustlatorFooter";
 
 export const Route = createFileRoute("/terms")({
   head: () => ({

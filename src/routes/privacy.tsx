@@ -125,6 +125,7 @@ function PrivacyPage() {
           هذه السياسة تخضع لأنظمة المملكة العربية السعودية 🇸🇦
         </div>
       </main>
+      <JustlatorFooter />
     </div>
   );
 }
