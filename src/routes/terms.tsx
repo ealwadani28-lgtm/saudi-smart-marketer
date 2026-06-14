@@ -142,6 +142,7 @@ function TermsPage() {
           هذه الشروط تخضع لأنظمة المملكة العربية السعودية 🇸🇦
         </div>
       </main>
+      <JustlatorFooter />
     </div>
   );
 }
