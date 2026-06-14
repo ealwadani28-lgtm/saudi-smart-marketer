@@ -104,51 +104,53 @@
 }
 
 .dark {
-  --background: #0a0f0d;
-  --foreground: #f5f5f5;
+  /* Saudi identity in dark — deep ink with brand green that stays Saudi */
+  --background: #050b08;
+  --foreground: #f1f5f3;
 
-  --card: #111815;
-  --card-foreground: #f5f5f5;
+  --card: #0c1612;
+  --card-foreground: #f1f5f3;
 
-  --popover: #111815;
-  --popover-foreground: #f5f5f5;
+  --popover: #0c1612;
+  --popover-foreground: #f1f5f3;
 
-  --primary: #10b981;
-  --primary-foreground: #0a0f0d;
+  /* Brighter Saudi green for AA contrast on dark, same hue family as #006C35 */
+  --primary: #00a859;
+  --primary-foreground: #ffffff;
 
-  --secondary: #161d1a;
-  --secondary-foreground: #f5f5f5;
+  --secondary: #101a16;
+  --secondary-foreground: #f1f5f3;
 
-  --muted: #161d1a;
-  --muted-foreground: #9ca3af;
+  --muted: #101a16;
+  --muted-foreground: #a3b1ab;
 
-  --accent: #0f2a1f;
-  --accent-foreground: #10b981;
+  --accent: #0d2419;
+  --accent-foreground: #4ade80;
 
   --gold: #e6c252;
-  --gold-foreground: #0a0f0d;
+  --gold-foreground: #050b08;
 
-  --success: #10b981;
-  --success-foreground: #0a0f0d;
+  --success: #00c46a;
+  --success-foreground: #050b08;
 
   --warning: #fbbf24;
-  --warning-foreground: #0a0f0d;
+  --warning-foreground: #050b08;
 
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
 
-  --border: #1f2a26;
-  --input: #1f2a26;
-  --ring: #10b981;
+  --border: #182722;
+  --input: #182722;
+  --ring: #00a859;
 
-  --ink: #f5f5f5;
-  --ink-foreground: #0a0f0d;
+  --ink: #f1f5f3;
+  --ink-foreground: #050b08;
 
-  --gradient-primary: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-  --gradient-gold: linear-gradient(135deg, #e6c252 0%, #fbbf24 100%);
-  --gradient-ink: linear-gradient(135deg, #f5f5f5 0%, #d1fae5 100%);
-  --gradient-hero-radial: radial-gradient(ellipse at 70% 20%, rgba(16, 185, 129, 0.18), transparent 60%),
-    radial-gradient(ellipse at 10% 80%, rgba(230, 194, 82, 0.14), transparent 55%);
+  --gradient-primary: linear-gradient(135deg, #006c35 0%, #00a859 100%);
+  --gradient-gold: linear-gradient(135deg, #d4af37 0%, #f59e0b 100%);
+  --gradient-ink: linear-gradient(135deg, #0c1612 0%, #050b08 100%);
+  --gradient-hero-radial: radial-gradient(ellipse at 70% 20%, rgba(0, 168, 89, 0.18), transparent 60%),
+    radial-gradient(ellipse at 10% 80%, rgba(212, 175, 55, 0.10), transparent 55%);
 }
 
 @layer base {
