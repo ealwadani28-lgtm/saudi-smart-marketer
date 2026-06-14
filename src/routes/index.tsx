@@ -96,7 +96,7 @@ function Nav() {
           </div>
           <div className="flex flex-col items-end gap-1.5 leading-none">
             <span className="font-display text-base font-bold text-primary leading-none">المسوّق الذكي</span>
-            <span className="font-display text-base font-bold text-primary leading-none tracking-tight">JustMarketing</span>
+            <span className="font-display text-[15px] font-bold text-primary leading-none tracking-tight">JustMarketing</span>
           </div>
         </div>
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
