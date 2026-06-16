@@ -483,6 +483,8 @@ function groupBy<T, K extends string>(arr: T[], key: (x: T) => K): Record<K, T[]
   await rpcTests();
   await endpointTests();
   await serverFnAuditCatalog();
+  await sslCertCheck();
+
 
   const md = buildMarkdownReport();
   const html = buildHtmlReport(md);
