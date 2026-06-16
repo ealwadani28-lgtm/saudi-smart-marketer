@@ -107,8 +107,8 @@ function PrivacyPage() {
               لأي استفسار يخص الخصوصية أو لممارسة حقوقك، تواصل معنا عبر:
             </p>
             <p className="mt-2">
-              <a href="mailto:info@almusawiq.com" className="text-primary underline">
-                info@almusawiq.com
+              <a href="mailto:contact@justlator.tech" className="text-primary underline">
+                contact@justlator.tech
               </a>
             </p>
           </Section>
