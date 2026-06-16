@@ -245,7 +245,42 @@ function AdminPage() {
       </header>
 
       <main className="mx-auto max-w-6xl px-6 py-8">
-        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+        {alerts.filter((a) => !a.resolved_at).length > 0 && (
+          <div className="mb-6 space-y-3">
+            {alerts.filter((a) => !a.resolved_at).map((a) => (
+              <div
+                key={a.id}
+                className={`flex items-start justify-between gap-4 rounded-2xl border p-4 ${
+                  a.severity === "critical"
+                    ? "border-destructive/40 bg-destructive/10"
+                    : "border-amber-500/40 bg-amber-500/10"
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <AlertTriangle
+                    className={`mt-0.5 h-5 w-5 ${a.severity === "critical" ? "text-destructive" : "text-amber-600"}`}
+                  />
+                  <div>
+                    <p className="font-medium">{a.message}</p>
+                    <p className="mt-1 text-xs text-muted-foreground" dir="ltr">
+                      {new Date(a.created_at).toLocaleString("ar-SA")} · {a.kind} · {a.severity}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => resolveAlert(a.id)}
+                  className="shrink-0 rounded-lg border border-border bg-background px-3 py-1.5 text-xs transition hover:bg-accent"
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    <ShieldCheck className="h-3.5 w-3.5" /> تمت المعالجة
+                  </span>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
           <StatCard label="إجمالي المسجلين" value={signups.length.toString()} icon={<Users className="h-5 w-5" />} />
           <StatCard
             label="اليوم"
@@ -253,9 +288,15 @@ function AdminPage() {
             icon={<Mail className="h-5 w-5" />}
           />
           <StatCard
-            label="هذا الأسبوع"
-            value={signups.filter((s) => daysAgo(new Date(s.created_at)) < 7).length.toString()}
-            icon={<Mail className="h-5 w-5" />}
+            label="محاولات (24س)"
+            value={attemptStats?.last24h.toString() ?? "—"}
+            icon={<Activity className="h-5 w-5" />}
+            hint={attemptStats ? `${attemptStats.rejectedLast24h} مرفوضة` : undefined}
+          />
+          <StatCard
+            label="آخر 10 دقائق"
+            value={attemptStats?.last10min.toString() ?? "—"}
+            icon={<Activity className="h-5 w-5" />}
           />
         </div>
 
