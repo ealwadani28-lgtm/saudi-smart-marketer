@@ -20,8 +20,17 @@ export async function streamImage(
     body: JSON.stringify(body),
   });
   if (!res.ok || !res.body) {
-    throw new Error(`فشل توليد الصورة (${res.status})`);
+    // محاولة قراءة رسالة الخطأ الودية من الـ JSON اللي يرجعه السيرفر
+    let friendly = "تعذّر توليد الصورة الآن، حاول مرة أخرى بعد قليل.";
+    try {
+      const data = await res.json();
+      if (data?.error && typeof data.error === "string") friendly = data.error;
+    } catch {
+      /* ignore */
+    }
+    throw new Error(friendly);
   }
+
 
   let sawCompleted = false;
   const parser = createParser({
