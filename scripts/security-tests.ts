@@ -366,7 +366,7 @@ function buildMarkdownReport(): string {
     md += `| # | Target | Role | Attempt | Expected | Observed | Severity | Result |\n`;
     md += `|---|---|---|---|---|---|---|---|\n`;
     items.forEach((r, i) => {
-      md += `| ${i + 1} | \`${r.target}\` | ${r.role} | ${escapeMd(r.attempt)} | ${escapeMd(r.expected)} | ${escapeMd(r.observed)} | ${r.severity} | ${r.pass ? "✅ PASS" : "❌ FAIL"} |\n`;
+      md += `| ${i + 1} | \`${r.target}\` | ${r.role} | ${escapeMd(r.attempt)} | ${escapeMd(r.expected)} | ${escapeMd(r.observed)} | ${r.severity} | ${r.skipped ? "⏭️ SKIP" : r.pass ? "✅ PASS" : "❌ FAIL"} |\n`;
     });
     md += `\n`;
     const notes = items.filter((r) => r.note);
