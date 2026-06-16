@@ -66,16 +66,17 @@ Square 1:1 composition, clean modern aesthetic.
 High quality commercial photography, photorealistic.`;
 }
 
-// Allow same-origin (no Origin header), the dev/preview/published Lovable hosts,
-// and any registered custom domain via env override.
+// Origin allowlist for browser callers. Returns false when no Origin header is
+// sent — non-browser clients must instead authenticate via the X-App-Token
+// header (see APP_TOKEN). This prevents the previous bypass where omitting
+// the Origin header granted access.
 function isAllowedOrigin(origin: string | null): boolean {
-  if (!origin) return true; // same-origin POST has no Origin header in some browsers; let CORS-less server-side calls through
+  if (!origin) return false;
   try {
     const u = new URL(origin);
     const host = u.hostname;
     if (host === "localhost" || host === "127.0.0.1") return true;
     if (host.endsWith(".lovable.app") || host.endsWith(".lovable.dev")) return true;
-    // Justlator family domains (root + any subdomain)
     if (host === "justlator.com" || host.endsWith(".justlator.com")) return true;
     if (host === "justlator.tech" || host.endsWith(".justlator.tech")) return true;
     const extra = (process.env.ALLOWED_ORIGINS ?? "")
@@ -96,9 +97,17 @@ export const Route = createFileRoute("/api/generate-image")({
         const apiKey = process.env.LOVABLE_API_KEY;
         if (!apiKey) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
 
+        // Access control: require EITHER a valid Origin (browser call from an
+        // allowed host) OR the opaque app token header baked into the client
+        // bundle. This blocks anonymous curl/script calls that omit Origin
+        // and rely on CORS being a no-op server-side.
+        const { APP_TOKEN, APP_TOKEN_HEADER } = await import("@/lib/app-token");
         const origin = request.headers.get("origin");
-        if (!isAllowedOrigin(origin)) {
-          return new Response("Forbidden origin", { status: 403, headers: { "X-Robots-Tag": "noindex" } });
+        const appToken = request.headers.get(APP_TOKEN_HEADER);
+        const originOk = isAllowedOrigin(origin);
+        const tokenOk = appToken === APP_TOKEN;
+        if (!originOk && !tokenOk) {
+          return new Response("Forbidden", { status: 403, headers: { "X-Robots-Tag": "noindex" } });
         }
 
         // Per-IP rate limit: 10 / 10 min
