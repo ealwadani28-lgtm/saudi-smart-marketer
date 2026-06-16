@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   Lock, Download, RefreshCw, Users, Mail, ExternalLink, LogOut,
   AlertTriangle, ShieldCheck, Activity, CreditCard, Check, X, MessageCircle,
+  FileDown, FileText,
 } from "lucide-react";
 import { adminListSignups, adminLogin } from "@/lib/admin.functions";
 import { adminGetAlerts, adminResolveAlert, adminGetSignupAttempts } from "@/lib/telemetry.functions";
