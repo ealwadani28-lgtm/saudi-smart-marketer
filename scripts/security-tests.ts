@@ -37,6 +37,7 @@ interface TestResult {
   expected: string;
   observed: string;
   pass: boolean;
+  skipped?: boolean;
   severity: Severity;
   note?: string;
 }
@@ -45,7 +46,7 @@ const results: TestResult[] = [];
 
 function record(r: TestResult) {
   results.push(r);
-  const icon = r.pass ? "✅" : "❌";
+  const icon = r.skipped ? "⏭️ " : r.pass ? "✅" : "❌";
   console.log(`${icon} [${r.category}] ${r.target} — ${r.attempt}`);
   console.log(`   expected: ${r.expected}`);
   console.log(`   observed: ${r.observed}`);
