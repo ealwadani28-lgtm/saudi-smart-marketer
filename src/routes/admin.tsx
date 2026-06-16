@@ -375,9 +375,6 @@ function StatCard({
 function isSameDay(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
 }
-function daysAgo(d: Date) {
-  return (Date.now() - d.getTime()) / (1000 * 60 * 60 * 24);
-}
 function truncate(s: string, n: number) {
   return s.length > n ? s.slice(0, n) + "…" : s;
 }
