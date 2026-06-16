@@ -30,6 +30,14 @@ export const generatePosts = createServerFn({ method: "POST" })
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY غير مهيأ");
 
+    // Per-IP rate limit: 10 requests / 10 min
+    const { rateLimit, getClientIp } = await import("./rate-limit.server");
+    const ip = getClientIp();
+    const rl = await rateLimit("gen:posts", ip, 10, 600);
+    if (!rl.allowed) {
+      throw new Error(`طلبات كثيرة — حاول بعد ${Math.ceil(rl.retryAfter / 60)} دقيقة`);
+    }
+
     const userMsg = `المنتج/الخدمة: ${data.product}
 الجمهور المستهدف: ${data.audience}
 المنصة: ${data.platform}
