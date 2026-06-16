@@ -10,7 +10,30 @@
  *   • /mnt/documents/security-report.html
  */
 import { createClient } from "@supabase/supabase-js";
-import { mkdirSync, writeFileSync } from "fs";
+import { mkdirSync, writeFileSync, appendFileSync, existsSync, readFileSync } from "fs";
+import { execSync } from "child_process";
+
+function gitInfo() {
+  try {
+    const sha = execSync("git rev-parse HEAD", { stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
+    const short = sha.slice(0, 7);
+    const branch = execSync("git rev-parse --abbrev-ref HEAD", { stdio: ["ignore", "pipe", "ignore"] })
+      .toString().trim();
+    const subject = execSync("git log -1 --pretty=%s", { stdio: ["ignore", "pipe", "ignore"] })
+      .toString().trim();
+    const dirty = execSync("git status --porcelain", { stdio: ["ignore", "pipe", "ignore"] })
+      .toString().trim().length > 0;
+    return { sha, short, branch, subject, dirty };
+  } catch {
+    return { sha: "unknown", short: "nogit", branch: "unknown", subject: "", dirty: false };
+  }
+}
+
+const GIT = gitInfo();
+const RAN_AT = new Date();
+const STAMP = RAN_AT.toISOString().replace(/[:.]/g, "-").replace("T", "_").slice(0, 19);
+const OUT_DIR = "/mnt/documents/security-reports";
+
 
 const BASE_URL =
   process.env.BASE_URL ??
