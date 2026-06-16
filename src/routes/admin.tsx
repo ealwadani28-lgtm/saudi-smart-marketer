@@ -208,6 +208,105 @@ function AdminPage() {
     URL.revokeObjectURL(url);
   }
 
+  function exportSubsCSV() {
+    const header = [
+      "id", "full_name", "email", "phone", "payment_method",
+      "reference", "amount_sar", "status", "created_at", "reviewed_at", "notes",
+    ];
+    const rows = subRequests.map((r) =>
+      header.map((k) => {
+        const v = (r as unknown as Record<string, unknown>)[k] ?? "";
+        const str = String(v).replace(/"/g, '""');
+        return `"${str}"`;
+      }).join(",")
+    );
+    const csv = "\uFEFF" + [header.join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `subscription-requests-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function downloadInvoice(r: SubRequest) {
+    const date = new Date(r.created_at).toLocaleDateString("ar-SA");
+    const invoiceNo = r.id.slice(0, 8).toUpperCase();
+    const payment = r.payment_method === "paypal" ? "PayPal" : "تحويل بنكي";
+    const amount = r.amount_sar.toLocaleString("ar-SA");
+    const html = `<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8" />
+<title>فاتورة ${invoiceNo} — Justlator</title>
+<style>
+  *{box-sizing:border-box} body{font-family:-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;color:#0f172a;margin:0;padding:48px;background:#fff}
+  .wrap{max-width:720px;margin:0 auto;border:1px solid #e2e8f0;border-radius:16px;padding:40px}
+  .head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #0f172a;padding-bottom:20px;margin-bottom:24px}
+  .brand{font-size:28px;font-weight:800;letter-spacing:-0.5px}
+  .muted{color:#64748b;font-size:13px}
+  .meta{text-align:left;font-size:13px;line-height:1.8}
+  h2{font-size:14px;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin:24px 0 8px}
+  .box{border:1px solid #e2e8f0;border-radius:12px;padding:16px;background:#f8fafc}
+  table{width:100%;border-collapse:collapse;margin-top:8px}
+  th,td{text-align:right;padding:12px;border-bottom:1px solid #e2e8f0;font-size:14px}
+  th{background:#f1f5f9;font-weight:600}
+  .total{display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding:18px 20px;background:#0f172a;color:#fff;border-radius:12px;font-size:18px;font-weight:700}
+  .total .amt{font-size:24px}
+  .foot{margin-top:32px;font-size:12px;color:#64748b;text-align:center;line-height:1.7}
+  @media print{body{padding:0} .wrap{border:none}}
+</style></head><body>
+<div class="wrap">
+  <div class="head">
+    <div>
+      <div class="brand">Justlator</div>
+      <div class="muted">justlator.tech</div>
+    </div>
+    <div class="meta">
+      <div><strong>فاتورة #</strong> ${invoiceNo}</div>
+      <div><strong>التاريخ:</strong> ${date}</div>
+      <div><strong>الحالة:</strong> ${r.status === "approved" ? "مدفوعة" : r.status === "rejected" ? "ملغاة" : "بانتظار المراجعة"}</div>
+    </div>
+  </div>
+
+  <h2>بيانات العميل</h2>
+  <div class="box">
+    <div><strong>الاسم:</strong> ${escapeHtml(r.full_name)}</div>
+    <div><strong>البريد:</strong> ${escapeHtml(r.email)}</div>
+    ${r.phone ? `<div><strong>الجوال:</strong> ${escapeHtml(r.phone)}</div>` : ""}
+  </div>
+
+  <h2>تفاصيل الاشتراك</h2>
+  <table>
+    <thead><tr><th>الوصف</th><th>طريقة الدفع</th><th>المبلغ</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>اشتراك Justlator الشهري</td>
+        <td>${payment}</td>
+        <td><strong>${amount} ر.س</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="total">
+    <span>الإجمالي المستحق</span>
+    <span class="amt">${amount} ريال سعودي</span>
+  </div>
+
+  ${r.reference ? `<p class="muted" style="margin-top:16px"><strong>رقم العملية:</strong> ${escapeHtml(r.reference)}</p>` : ""}
+
+  <div class="foot">
+    شكراً لاشتراكك في Justlator. لأي استفسار راسلنا على contact@justlator.tech
+  </div>
+</div>
+<script>window.onload=()=>setTimeout(()=>window.print(),300)</script>
+</body></html>`;
+    const w = window.open("", "_blank");
+    if (!w) return;
+    w.document.write(html);
+    w.document.close();
+  }
+
+
   if (!authed) {
     return (
       <div className="grid min-h-screen place-items-center bg-background px-6" dir="rtl">
