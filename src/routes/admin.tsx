@@ -1,8 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
-import { Lock, Download, RefreshCw, Users, Mail, ExternalLink, LogOut } from "lucide-react";
+import {
+  Lock, Download, RefreshCw, Users, Mail, ExternalLink, LogOut,
+  AlertTriangle, ShieldCheck, Activity,
+} from "lucide-react";
 import { adminListSignups, adminLogin } from "@/lib/admin.functions";
+import { adminGetAlerts, adminResolveAlert, adminGetSignupAttempts } from "@/lib/telemetry.functions";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
