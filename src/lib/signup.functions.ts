@@ -12,13 +12,39 @@ export const submitEarlySignup = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     // Lazy server-only imports — keep client bundle clean.
     const { rateLimit, getClientIp } = await import("./rate-limit.server");
+    const { hashWithSalt } = await import("./hash.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { getRequestHeader } = await import("@tanstack/react-start/server");
 
     const ip = getClientIp();
+    const ipHash = hashWithSalt(ip);
+    const emailHash = hashWithSalt(data.email);
+    let userAgent = "";
+    try {
+      userAgent = (getRequestHeader("user-agent") ?? "").slice(0, 500);
+    } catch {
+      /* outside request ctx */
+    }
+
+    async function audit(status: "success" | "rejected", reason: string | null) {
+      try {
+        await supabaseAdmin.rpc("log_signup_attempt", {
+          _ip_hash: ipHash,
+          _email_hash: emailHash,
+          _user_agent: userAgent,
+          _source: data.source,
+          _status: status,
+          _reason: reason ?? "",
+        });
+      } catch {
+        // Audit must never break the user flow.
+      }
+    }
 
     // 5 attempts / 10 min per IP
     const ipLimit = await rateLimit("signup:ip", ip, 5, 600);
     if (!ipLimit.allowed) {
+      await audit("rejected", "rate_limited");
       throw new Error("محاولات كثيرة، حاول بعد قليل");
     }
 
@@ -32,10 +58,13 @@ export const submitEarlySignup = createServerFn({ method: "POST" })
     if (error) {
       // 23505 = unique_violation on lower(email). Treat as success — no enumeration leak.
       if ((error as { code?: string }).code === "23505") {
+        await audit("rejected", "duplicate_email");
         return { ok: true, duplicate: true };
       }
+      await audit("rejected", "db_error");
       throw new Error("حدث خطأ، حاول مرة أخرى");
     }
 
+    await audit("success", null);
     return { ok: true, duplicate: false };
   });
