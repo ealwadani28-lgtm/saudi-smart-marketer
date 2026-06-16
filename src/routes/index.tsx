@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { motion } from "motion/react";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { submitEarlySignup } from "@/lib/signup.functions";
 import { toast } from "sonner";
 import {
   Sparkles,
@@ -864,6 +865,7 @@ function SignupForm({
   onDark?: boolean;
 }) {
   const navigate = useNavigate();
+  const submitSignup = useServerFn(submitEarlySignup);
   const [email, setEmail] = useState("");
   const [shop, setShop] = useState("");
   const [status, setStatus] = useState<"idle" | "ok" | "error">("idle");

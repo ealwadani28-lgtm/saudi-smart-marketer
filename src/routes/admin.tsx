@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { Lock, Download, RefreshCw, Users, Mail, ExternalLink, LogOut } from "lucide-react";
-import { adminListSignups } from "@/lib/admin.functions";
+import { adminListSignups, adminLogin } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -22,46 +22,68 @@ type Signup = {
   created_at: string;
 };
 
-const STORAGE_KEY = "admin_pw";
+const TOKEN_KEY = "admin_token_v2";
+const LEGACY_PW_KEY = "admin_pw";
 
 function AdminPage() {
   const listFn = useServerFn(adminListSignups);
+  const loginFn = useServerFn(adminLogin);
   const [password, setPassword] = useState("");
+  const [token, setToken] = useState<string | null>(null);
   const [authed, setAuthed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [signups, setSignups] = useState<Signup[]>([]);
 
-  async function tryLoad(pw: string) {
+  async function loadWithToken(tk: string) {
     setLoading(true);
     setError("");
     try {
-      const res = await listFn({ data: { password: pw } });
+      const res = await listFn({ data: { token: tk } });
       setSignups(res.signups as Signup[]);
       setAuthed(true);
-      sessionStorage.setItem(STORAGE_KEY, pw);
+      setToken(tk);
+      sessionStorage.setItem(TOKEN_KEY, tk);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "خطأ غير معروف";
-      setError(msg.includes("Unauthorized") || msg.includes("كلمة المرور") ? "كلمة المرور غير صحيحة" : msg);
+      setError(msg.includes("Unauthorized") ? "انتهت الجلسة، الرجاء تسجيل الدخول مجدداً" : msg);
       setAuthed(false);
-      sessionStorage.removeItem(STORAGE_KEY);
+      setToken(null);
+      sessionStorage.removeItem(TOKEN_KEY);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function login(pw: string) {
+    setLoading(true);
+    setError("");
+    try {
+      const { token: tk } = await loginFn({ data: { password: pw } });
+      await loadWithToken(tk);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "خطأ غير معروف";
+      setError(msg.includes("كلمة المرور") || msg.includes("Unauthorized") ? "كلمة المرور غير صحيحة" : msg);
+      setAuthed(false);
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    const saved = sessionStorage.getItem(STORAGE_KEY);
+    // Migrate away from the old password-in-sessionStorage scheme.
+    sessionStorage.removeItem(LEGACY_PW_KEY);
+    const saved = sessionStorage.getItem(TOKEN_KEY);
     if (saved) {
-      setPassword(saved);
-      tryLoad(saved);
+      loadWithToken(saved);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function logout() {
-    sessionStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
     setAuthed(false);
+    setToken(null);
     setPassword("");
     setSignups([]);
   }
@@ -70,7 +92,7 @@ function AdminPage() {
     const header = ["id", "email", "shop_url", "source", "created_at"];
     const rows = signups.map((s) =>
       header.map((k) => {
-        const v = (s as any)[k] ?? "";
+        const v = (s as unknown as Record<string, unknown>)[k] ?? "";
         const str = String(v).replace(/"/g, '""');
         return `"${str}"`;
       }).join(",")
@@ -91,7 +113,7 @@ function AdminPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            tryLoad(password);
+            login(password);
           }}
           className="w-full max-w-md rounded-3xl border border-border bg-card p-8 shadow-xl"
         >
@@ -139,7 +161,7 @@ function AdminPage() {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => tryLoad(password)}
+              onClick={() => token && loadWithToken(token)}
               disabled={loading}
               className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm transition hover:bg-accent disabled:opacity-50"
             >

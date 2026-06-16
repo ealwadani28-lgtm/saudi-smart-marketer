@@ -66,6 +66,25 @@ Square 1:1 composition, clean modern aesthetic.
 High quality commercial photography, photorealistic.`;
 }
 
+// Allow same-origin (no Origin header), the dev/preview/published Lovable hosts,
+// and any registered custom domain via env override.
+function isAllowedOrigin(origin: string | null): boolean {
+  if (!origin) return true; // same-origin POST has no Origin header in some browsers; let CORS-less server-side calls through
+  try {
+    const u = new URL(origin);
+    const host = u.hostname;
+    if (host === "localhost" || host === "127.0.0.1") return true;
+    if (host.endsWith(".lovable.app") || host.endsWith(".lovable.dev")) return true;
+    const extra = (process.env.ALLOWED_ORIGINS ?? "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (extra.includes(host)) return true;
+  } catch {
+    return false;
+  }
+  return false;
+}
 
 export const Route = createFileRoute("/api/generate-image")({
   server: {
@@ -74,11 +93,34 @@ export const Route = createFileRoute("/api/generate-image")({
         const apiKey = process.env.LOVABLE_API_KEY;
         if (!apiKey) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
 
+        const origin = request.headers.get("origin");
+        if (!isAllowedOrigin(origin)) {
+          return new Response("Forbidden origin", { status: 403, headers: { "X-Robots-Tag": "noindex" } });
+        }
+
+        // Per-IP rate limit: 10 / 10 min
+        const { rateLimit, getClientIp } = await import("@/lib/rate-limit.server");
+        const ip = getClientIp();
+        const rl = await rateLimit("gen:image", ip, 10, 600);
+        if (!rl.allowed) {
+          return new Response(
+            JSON.stringify({ error: `طلبات كثيرة — حاول بعد ${Math.ceil(rl.retryAfter / 60)} دقيقة` }),
+            {
+              status: 429,
+              headers: {
+                "Content-Type": "application/json",
+                "Retry-After": String(rl.retryAfter),
+                "X-Robots-Tag": "noindex",
+              },
+            },
+          );
+        }
+
         let parsed;
         try {
           parsed = Body.parse(await request.json());
-        } catch (e) {
-          return new Response("Invalid body", { status: 400 });
+        } catch {
+          return new Response("Invalid body", { status: 400, headers: { "X-Robots-Tag": "noindex" } });
         }
 
         const prompt = await buildSmartPrompt(apiKey, parsed.product, parsed.tone);
@@ -97,19 +139,22 @@ export const Route = createFileRoute("/api/generate-image")({
               modalities: ["image", "text"],
               stream: true,
             }),
-          }
+          },
         );
-
 
         if (!upstream.ok || !upstream.body) {
           const txt = await upstream.text().catch(() => "");
-          return new Response(txt || "Upstream error", { status: upstream.status });
+          return new Response(txt || "Upstream error", {
+            status: upstream.status,
+            headers: { "X-Robots-Tag": "noindex" },
+          });
         }
 
         return new Response(upstream.body, {
           headers: {
             "Content-Type": "text/event-stream",
             "Cache-Control": "no-cache",
+            "X-Robots-Tag": "noindex",
           },
         });
       },
