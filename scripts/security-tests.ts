@@ -91,7 +91,9 @@ async function rlsTests() {
   for (const t of tableOps) {
     const res = await t.run();
     const err = res.error as { message?: string; code?: string } | null;
-    const blocked = err !== null || (Array.isArray(res.data) && res.data.length === 0 && t.op === "select");
+    // "Blocked" = error from PostgREST, OR zero rows affected/returned (RLS USING false silently no-ops writes)
+    const rowCount = Array.isArray(res.data) ? res.data.length : 0;
+    const blocked = err !== null || rowCount === 0;
     record({
       category: "RLS / Data API",
       target: `public.${t.table}`,
