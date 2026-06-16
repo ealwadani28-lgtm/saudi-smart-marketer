@@ -24,16 +24,20 @@ Categories:
 - "fashion": editorial fashion photo, model or flat-lay.
 - "course/education": symbolic learning scene with subject hints.
 
-EXTRACTION:
-- Extract the brand name OR domain (e.g. "justlator.com", "Nike", "MyApp") from the product description if present. If you find one, include it explicitly in the prompt as the text that should appear on the browser/phone screen.
-- For website/app categories: REQUIRE the brand text on screen. Do NOT add "no text" instructions.
+EXTRACTION (CRITICAL — this is the most important step):
+- Identify the REAL product/brand name from the description, NOT any platform/preview/hosting URL.
+- IGNORE and NEVER use as the brand: any URL containing "lovable.app", "lovable.dev", "vercel.app", "netlify.app", "github.io", "preview--", "id-preview--", "localhost", subdomains like "*--*.lovable.app", or generic dev/staging hosts. These are NOT the product.
+- If the description contains BOTH a real brand and a preview URL, use ONLY the real brand. Example: "متجر نون noon.com على preview--xyz.lovable.app" → brand is "noon.com", NOT "lovable.app".
+- If NO real brand is found and only a preview/dev URL is present, set brand to null and DO NOT put any URL on the screen — use a generic clean dashboard mockup instead.
+- For website/app categories with a valid brand: REQUIRE that exact brand text on screen. Do NOT add "no text" instructions.
 - For other categories: keep "no text overlays, no logos" to avoid garbled words.
 
 CRITICAL:
 - Square 1:1, photorealistic, commercial-grade.
 - Match the requested tone/style.
 
-Return ONLY valid JSON: {"category": "<cat>", "brand": "<extracted brand or null>", "prompt": "<english image prompt, 3-5 sentences, very specific>"}`;
+Return ONLY valid JSON: {"category": "<cat>", "brand": "<extracted real brand or null — NEVER a preview URL>", "prompt": "<english image prompt, 3-5 sentences, very specific>"}`;
+
 
 async function buildSmartPrompt(apiKey: string, product: string, tone: string): Promise<string> {
   const style = TONE_STYLE[tone];
