@@ -7,7 +7,7 @@ type ProductStatus = "live" | "soon";
 type Product = { name: string; sub?: string; href?: string; status: ProductStatus };
 
 const PRODUCTS: Product[] = [
-  { name: "JustMarketing", sub: "المسوّق الذكي", status: "live", href: "https://justmarketing.sa" },
+  { name: "JustMarketing", sub: "المسوّق الذكي", status: "live", href: "https://justmarketing.justlator.com" },
   { name: "Justlator Tools", status: "live", href: "https://www.justlator.com" },
   { name: "JustSecure", sub: "حصين", status: "soon" },
   { name: "JustSyncFlow", status: "soon" },

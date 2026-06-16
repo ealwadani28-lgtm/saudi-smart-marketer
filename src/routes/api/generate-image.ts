@@ -75,6 +75,9 @@ function isAllowedOrigin(origin: string | null): boolean {
     const host = u.hostname;
     if (host === "localhost" || host === "127.0.0.1") return true;
     if (host.endsWith(".lovable.app") || host.endsWith(".lovable.dev")) return true;
+    // Justlator family domains (root + any subdomain)
+    if (host === "justlator.com" || host.endsWith(".justlator.com")) return true;
+    if (host === "justlator.tech" || host.endsWith(".justlator.tech")) return true;
     const extra = (process.env.ALLOWED_ORIGINS ?? "")
       .split(",")
       .map((s) => s.trim())
