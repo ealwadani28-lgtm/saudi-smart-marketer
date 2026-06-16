@@ -41,7 +41,7 @@ const BANK = {
   name: "البنك الأهلي السعودي (SNB)",
   iban: "SA9710000023800000395800",
   swift: "NCBKSAJE",
-  beneficiary: "Justlator",
+  beneficiary: "Essa Alwadani",
 };
 
 function buildWhatsappLink(method: "paypal" | "bank") {
