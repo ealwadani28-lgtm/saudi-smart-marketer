@@ -312,6 +312,67 @@ function plannedEndpointTests(): Omit<TestResult, "observed" | "pass">[] {
  *   - the underlying DB (RLS + rl_hit RPC) — verified above
  *   - the admin token HMAC verification (unit-style check below)
  */
+/* ───────────────────────── SSL / HTTPS cert monitoring ───────────────────────── */
+async function sslCertCheck() {
+  console.log("\n══ SSL / HTTPS certificate ══");
+  const tls = await import("tls");
+  const url = new URL(BASE_URL);
+  if (url.protocol !== "https:") {
+    record({
+      category: "HTTP endpoint (/api/*)",
+      target: BASE_URL,
+      role: "public",
+      attempt: "Target served over HTTPS",
+      expected: "https:// scheme",
+      observed: `scheme = ${url.protocol}`,
+      pass: false,
+      severity: "critical",
+    });
+    return;
+  }
+
+  await new Promise<void>((resolve) => {
+    const socket = tls.connect(
+      { host: url.hostname, port: 443, servername: url.hostname, timeout: 10_000 },
+      () => {
+        const cert = socket.getPeerCertificate();
+        const validTo = new Date(cert.valid_to);
+        const daysLeft = Math.floor((validTo.getTime() - Date.now()) / 86_400_000);
+        const issuer = cert.issuer?.O ?? "unknown";
+        const subject = cert.subject?.CN ?? cert.subjectaltname ?? "unknown";
+        const authorized = (socket as any).authorized as boolean;
+
+        record({
+          category: "HTTP endpoint (/api/*)",
+          target: url.hostname,
+          role: "public",
+          attempt: "TLS handshake & certificate chain",
+          expected: "trusted chain, hostname matches, >14 days until expiry",
+          observed: `authorized=${authorized}, issuer="${issuer}", CN="${subject}", expires ${cert.valid_to} (${daysLeft}d)`,
+          pass: authorized && daysLeft > 14,
+          severity: daysLeft <= 0 ? "critical" : daysLeft <= 14 ? "high" : "info",
+          note: daysLeft <= 14 ? `⚠️ Certificate expires in ${daysLeft} days — check Project Settings → Domains` : undefined,
+        });
+        socket.end();
+        resolve();
+      },
+    );
+    socket.on("error", (err) => {
+      record({
+        category: "HTTP endpoint (/api/*)",
+        target: url.hostname,
+        role: "public",
+        attempt: "TLS handshake",
+        expected: "successful TLS handshake",
+        observed: `TLS error: ${err.message}`,
+        pass: false,
+        severity: "critical",
+      });
+      resolve();
+    });
+  });
+}
+
 async function serverFnAuditCatalog() {
   console.log("\n══ Server function audit (catalog) ══");
   const catalog: Array<Omit<TestResult, "observed" | "pass"> & { observed: string; pass: boolean }> = [
@@ -483,6 +544,8 @@ function groupBy<T, K extends string>(arr: T[], key: (x: T) => K): Record<K, T[]
   await rpcTests();
   await endpointTests();
   await serverFnAuditCatalog();
+  await sslCertCheck();
+
 
   const md = buildMarkdownReport();
   const html = buildHtmlReport(md);
