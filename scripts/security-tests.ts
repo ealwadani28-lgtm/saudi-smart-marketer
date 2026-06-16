@@ -10,7 +10,30 @@
  *   • /mnt/documents/security-report.html
  */
 import { createClient } from "@supabase/supabase-js";
-import { mkdirSync, writeFileSync } from "fs";
+import { mkdirSync, writeFileSync, appendFileSync, existsSync } from "fs";
+import { execSync } from "child_process";
+
+function gitInfo() {
+  try {
+    const sha = execSync("git rev-parse HEAD", { stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
+    const short = sha.slice(0, 7);
+    const branch = execSync("git rev-parse --abbrev-ref HEAD", { stdio: ["ignore", "pipe", "ignore"] })
+      .toString().trim();
+    const subject = execSync("git log -1 --pretty=%s", { stdio: ["ignore", "pipe", "ignore"] })
+      .toString().trim();
+    const dirty = execSync("git status --porcelain", { stdio: ["ignore", "pipe", "ignore"] })
+      .toString().trim().length > 0;
+    return { sha, short, branch, subject, dirty };
+  } catch {
+    return { sha: "unknown", short: "nogit", branch: "unknown", subject: "", dirty: false };
+  }
+}
+
+const GIT = gitInfo();
+const RAN_AT = new Date();
+const STAMP = RAN_AT.toISOString().replace(/[:.]/g, "-").replace("T", "_").slice(0, 19);
+const OUT_DIR = "/mnt/documents/security-reports";
+
 
 const BASE_URL =
   process.env.BASE_URL ??
@@ -338,17 +361,20 @@ async function serverFnAuditCatalog() {
 
 /* ───────────────────────── Report generation ───────────────────────── */
 function buildMarkdownReport(): string {
-  const now = new Date().toISOString();
   const skipped = results.filter((r) => r.skipped).length;
   const passed = results.filter((r) => r.pass && !r.skipped).length;
   const failed = results.filter((r) => !r.pass).length;
   const groups = groupBy(results, (r) => r.category);
 
   let md = `# Security Audit Report\n\n`;
-  md += `- **Date:** ${now}\n`;
+  md += `- **Run at:** ${RAN_AT.toISOString()}\n`;
+  md += `- **Git commit:** \`${GIT.short}\`${GIT.dirty ? " ⚠️ *(working tree dirty)*" : ""} on \`${GIT.branch}\`\n`;
+  md += `- **Commit message:** ${GIT.subject || "_(unavailable)_"}\n`;
+  md += `- **Full SHA:** \`${GIT.sha}\`\n`;
   md += `- **Target:** \`${BASE_URL}\`\n`;
   md += `- **Database:** \`${SUPABASE_URL}\`\n`;
   md += `- **Result:** ${passed} passed · ${failed} failed · ${skipped} skipped (of ${results.length})\n\n`;
+
 
   md += `## Sensitive surfaces covered\n\n`;
   md += `| Surface | Roles tested | Tests |\n|---|---|---|\n`;
@@ -461,17 +487,40 @@ function groupBy<T, K extends string>(arr: T[], key: (x: T) => K): Record<K, T[]
   const md = buildMarkdownReport();
   const html = buildHtmlReport(md);
 
-  mkdirSync("/mnt/documents", { recursive: true });
+  mkdirSync(OUT_DIR, { recursive: true });
+
+  const dirtyTag = GIT.dirty ? "-dirty" : "";
+  const base = `${STAMP}__${GIT.short}${dirtyTag}`;
+  const mdPath = `${OUT_DIR}/${base}.md`;
+  const htmlPath = `${OUT_DIR}/${base}.html`;
+  writeFileSync(mdPath, md);
+  writeFileSync(htmlPath, html);
+
   writeFileSync("/mnt/documents/security-report.md", md);
   writeFileSync("/mnt/documents/security-report.html", html);
 
   const skipped = results.filter((r) => r.skipped).length;
   const passed = results.filter((r) => r.pass && !r.skipped).length;
   const failed = results.filter((r) => !r.pass).length;
+
+  const indexPath = `${OUT_DIR}/index.md`;
+  if (!existsSync(indexPath)) {
+    writeFileSync(
+      indexPath,
+      `# Security Audit History\n\n| Run at (UTC) | Commit | Branch | Pass | Fail | Skip | Report |\n|---|---|---|---|---|---|---|\n`,
+    );
+  }
+  appendFileSync(
+    indexPath,
+    `| ${RAN_AT.toISOString()} | \`${GIT.short}\`${GIT.dirty ? " ⚠️" : ""} | ${GIT.branch} | ${passed} | ${failed} | ${skipped} | [md](./${base}.md) · [html](./${base}.html) |\n`,
+  );
+
   console.log(`\n══════════════════════════════════════════════`);
+  console.log(`Git: ${GIT.short}${GIT.dirty ? " (dirty)" : ""} on ${GIT.branch}`);
   console.log(`Summary: ${passed} passed · ${failed} failed · ${skipped} skipped (of ${results.length})`);
-  console.log(`Reports written:`);
-  console.log(`  • /mnt/documents/security-report.md`);
-  console.log(`  • /mnt/documents/security-report.html`);
+  console.log(`Reports:`);
+  console.log(`  • ${mdPath}`);
+  console.log(`  • ${htmlPath}`);
+  console.log(`  • ${indexPath} (history)`);
   if (failed > 0) process.exit(1);
 })();
