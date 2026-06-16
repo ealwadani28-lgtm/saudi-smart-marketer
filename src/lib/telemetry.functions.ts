@@ -29,7 +29,7 @@ export const pingVisitor = createServerFn({ method: "POST" })
     try {
       const { data: rows, error } = await supabaseAdmin.rpc("record_visitor_ping", {
         _ip_hash: ipHash,
-        _path: data.path ?? null,
+        _path: data.path ?? "",
       });
       if (error || !rows || !Array.isArray(rows) || rows.length === 0) {
         return { activeNow: 0, todayTotal: 0 };
