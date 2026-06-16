@@ -174,11 +174,19 @@ export const Route = createFileRoute("/api/generate-image")({
 
         if (!upstream.ok || !upstream.body) {
           const txt = await upstream.text().catch(() => "");
-          return new Response(txt || "Upstream error", {
-            status: upstream.status,
-            headers: { "X-Robots-Tag": "noindex" },
+          console.error("[generate-image] upstream error", upstream.status, txt.slice(0, 500));
+          const friendly =
+            upstream.status === 402
+              ? "الخدمة مشغولة حالياً، جرّب بعد قليل أو تواصل معنا عبر واتساب."
+              : upstream.status === 429
+              ? "طلبات كثيرة الآن — جرّب بعد دقيقة من فضلك."
+              : "تعذّر توليد الصورة الآن، حاول مرة أخرى بعد قليل.";
+          return new Response(JSON.stringify({ error: friendly }), {
+            status: upstream.status === 402 ? 503 : upstream.status,
+            headers: { "Content-Type": "application/json", "X-Robots-Tag": "noindex" },
           });
         }
+
 
         return new Response(upstream.body, {
           headers: {
