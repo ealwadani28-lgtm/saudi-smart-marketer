@@ -171,6 +171,23 @@ function AdminPage() {
     setSignups([]);
     setAlerts([]);
     setAttemptStats(null);
+    setSubRequests([]);
+  }
+
+  async function updateSubStatus(id: string, status: "approved" | "rejected" | "pending") {
+    if (!token) return;
+    try {
+      await updateSubFn({ data: { token, id, status } });
+      setSubRequests((prev) =>
+        prev.map((r) =>
+          r.id === id
+            ? { ...r, status, reviewed_at: status === "pending" ? null : new Date().toISOString() }
+            : r,
+        ),
+      );
+    } catch {
+      /* ignore */
+    }
   }
 
   function exportCSV() {
