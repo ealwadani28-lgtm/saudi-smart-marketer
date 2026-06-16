@@ -34,6 +34,7 @@ import {
 import ogImage from "@/assets/og-image.jpg.asset.json";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { JustlatorFooter } from "@/components/JustlatorFooter";
+import { LiveVisitorCounter } from "@/components/LiveVisitorCounter";
 import { MagicLampToggle } from "@/components/portable/MagicLampToggle";
 import { useTheme } from "@/hooks/use-theme";
 
@@ -84,6 +85,11 @@ function Landing() {
       <FinalCTA />
       <JustlatorFooter />
       <ExitIntentPopup />
+      <div className="pointer-events-none fixed bottom-4 left-4 z-40 sm:bottom-6 sm:left-6">
+        <div className="pointer-events-auto">
+          <LiveVisitorCounter path="/" />
+        </div>
+      </div>
     </div>
   );
 }

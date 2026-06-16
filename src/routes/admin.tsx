@@ -1,8 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
-import { Lock, Download, RefreshCw, Users, Mail, ExternalLink, LogOut } from "lucide-react";
+import {
+  Lock, Download, RefreshCw, Users, Mail, ExternalLink, LogOut,
+  AlertTriangle, ShieldCheck, Activity,
+} from "lucide-react";
 import { adminListSignups, adminLogin } from "@/lib/admin.functions";
+import { adminGetAlerts, adminResolveAlert, adminGetSignupAttempts } from "@/lib/telemetry.functions";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -25,15 +29,50 @@ type Signup = {
 const TOKEN_KEY = "admin_token_v2";
 const LEGACY_PW_KEY = "admin_pw";
 
+type Alert = {
+  id: string;
+  kind: string;
+  severity: "info" | "warn" | "critical";
+  message: string;
+  metadata: Record<string, unknown>;
+  resolved_at: string | null;
+  created_at: string;
+};
+
+type AttemptStats = {
+  last24h: number;
+  last10min: number;
+  successLast24h: number;
+  rejectedLast24h: number;
+};
+
 function AdminPage() {
   const listFn = useServerFn(adminListSignups);
   const loginFn = useServerFn(adminLogin);
+  const alertsFn = useServerFn(adminGetAlerts);
+  const resolveFn = useServerFn(adminResolveAlert);
+  const attemptsFn = useServerFn(adminGetSignupAttempts);
   const [password, setPassword] = useState("");
   const [token, setToken] = useState<string | null>(null);
   const [authed, setAuthed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [signups, setSignups] = useState<Signup[]>([]);
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [attemptStats, setAttemptStats] = useState<AttemptStats | null>(null);
+
+  async function loadAlertsAndStats(tk: string) {
+    try {
+      const [a, s] = await Promise.all([
+        alertsFn({ data: { token: tk } }),
+        attemptsFn({ data: { token: tk } }),
+      ]);
+      setAlerts(a.alerts as Alert[]);
+      setAttemptStats(s.stats);
+    } catch {
+      // non-fatal
+    }
+  }
 
   async function loadWithToken(tk: string) {
     setLoading(true);
@@ -44,6 +83,7 @@ function AdminPage() {
       setAuthed(true);
       setToken(tk);
       sessionStorage.setItem(TOKEN_KEY, tk);
+      await loadAlertsAndStats(tk);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "خطأ غير معروف";
       setError(msg.includes("Unauthorized") ? "انتهت الجلسة، الرجاء تسجيل الدخول مجدداً" : msg);
@@ -52,6 +92,24 @@ function AdminPage() {
       sessionStorage.removeItem(TOKEN_KEY);
     } finally {
       setLoading(false);
+    }
+  }
+
+  // Auto-refresh alerts every 30s while authed
+  useEffect(() => {
+    if (!authed || !token) return;
+    const id = setInterval(() => loadAlertsAndStats(token), 30_000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authed, token]);
+
+  async function resolveAlert(id: string) {
+    if (!token) return;
+    try {
+      await resolveFn({ data: { token, alertId: id } });
+      setAlerts((prev) => prev.map((a) => (a.id === id ? { ...a, resolved_at: new Date().toISOString() } : a)));
+    } catch {
+      /* ignore */
     }
   }
 
@@ -86,6 +144,8 @@ function AdminPage() {
     setToken(null);
     setPassword("");
     setSignups([]);
+    setAlerts([]);
+    setAttemptStats(null);
   }
 
   function exportCSV() {
@@ -187,7 +247,42 @@ function AdminPage() {
       </header>
 
       <main className="mx-auto max-w-6xl px-6 py-8">
-        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+        {alerts.filter((a) => !a.resolved_at).length > 0 && (
+          <div className="mb-6 space-y-3">
+            {alerts.filter((a) => !a.resolved_at).map((a) => (
+              <div
+                key={a.id}
+                className={`flex items-start justify-between gap-4 rounded-2xl border p-4 ${
+                  a.severity === "critical"
+                    ? "border-destructive/40 bg-destructive/10"
+                    : "border-amber-500/40 bg-amber-500/10"
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <AlertTriangle
+                    className={`mt-0.5 h-5 w-5 ${a.severity === "critical" ? "text-destructive" : "text-amber-600"}`}
+                  />
+                  <div>
+                    <p className="font-medium">{a.message}</p>
+                    <p className="mt-1 text-xs text-muted-foreground" dir="ltr">
+                      {new Date(a.created_at).toLocaleString("ar-SA")} · {a.kind} · {a.severity}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => resolveAlert(a.id)}
+                  className="shrink-0 rounded-lg border border-border bg-background px-3 py-1.5 text-xs transition hover:bg-accent"
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    <ShieldCheck className="h-3.5 w-3.5" /> تمت المعالجة
+                  </span>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
           <StatCard label="إجمالي المسجلين" value={signups.length.toString()} icon={<Users className="h-5 w-5" />} />
           <StatCard
             label="اليوم"
@@ -195,9 +290,15 @@ function AdminPage() {
             icon={<Mail className="h-5 w-5" />}
           />
           <StatCard
-            label="هذا الأسبوع"
-            value={signups.filter((s) => daysAgo(new Date(s.created_at)) < 7).length.toString()}
-            icon={<Mail className="h-5 w-5" />}
+            label="محاولات (24س)"
+            value={attemptStats?.last24h.toString() ?? "—"}
+            icon={<Activity className="h-5 w-5" />}
+            hint={attemptStats ? `${attemptStats.rejectedLast24h} مرفوضة` : undefined}
+          />
+          <StatCard
+            label="آخر 10 دقائق"
+            value={attemptStats?.last10min.toString() ?? "—"}
+            icon={<Activity className="h-5 w-5" />}
           />
         </div>
 
@@ -258,12 +359,15 @@ function AdminPage() {
   );
 }
 
-function StatCard({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) {
+function StatCard({
+  label, value, icon, hint,
+}: { label: string; value: string; icon: React.ReactNode; hint?: string }) {
   return (
     <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-5">
       <div>
         <p className="text-sm text-muted-foreground">{label}</p>
         <p className="mt-1 font-display text-3xl font-bold">{value}</p>
+        {hint && <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>}
       </div>
       <div className="grid h-12 w-12 place-items-center rounded-xl bg-primary/10 text-primary">{icon}</div>
     </div>
@@ -272,9 +376,6 @@ function StatCard({ label, value, icon }: { label: string; value: string; icon: 
 
 function isSameDay(a: Date, b: Date) {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-}
-function daysAgo(d: Date) {
-  return (Date.now() - d.getTime()) / (1000 * 60 * 60 * 24);
 }
 function truncate(s: string, n: number) {
   return s.length > n ? s.slice(0, n) + "…" : s;

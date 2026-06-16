@@ -62,11 +62,115 @@ export type Database = {
         }
         Relationships: []
       }
+      security_alerts: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          message: string
+          metadata: Json
+          resolved_at: string | null
+          severity: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          message: string
+          metadata?: Json
+          resolved_at?: string | null
+          severity: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          message?: string
+          metadata?: Json
+          resolved_at?: string | null
+          severity?: string
+        }
+        Relationships: []
+      }
+      signup_attempts: {
+        Row: {
+          created_at: string
+          email_hash: string | null
+          id: string
+          ip_hash: string | null
+          reason: string | null
+          source: string | null
+          status: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          email_hash?: string | null
+          id?: string
+          ip_hash?: string | null
+          reason?: string | null
+          source?: string | null
+          status: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          email_hash?: string | null
+          id?: string
+          ip_hash?: string | null
+          reason?: string | null
+          source?: string | null
+          status?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      visitor_pings: {
+        Row: {
+          created_at: string
+          id: string
+          ip_hash: string
+          path: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_hash: string
+          path?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_hash?: string
+          path?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      cleanup_old_telemetry: { Args: never; Returns: undefined }
+      detect_signup_spike: { Args: never; Returns: undefined }
+      log_signup_attempt: {
+        Args: {
+          _email_hash: string
+          _ip_hash: string
+          _reason: string
+          _source: string
+          _status: string
+          _user_agent: string
+        }
+        Returns: undefined
+      }
+      record_visitor_ping: {
+        Args: { _ip_hash: string; _path: string }
+        Returns: {
+          active_now: number
+          today_total: number
+        }[]
+      }
       rl_hit: {
         Args: { _key: string; _limit: number; _window_seconds: number }
         Returns: {
