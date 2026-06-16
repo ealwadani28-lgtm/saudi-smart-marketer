@@ -39,17 +39,30 @@ CRITICAL:
 Return ONLY valid JSON: {"category": "<cat>", "brand": "<extracted real brand or null — NEVER a preview URL>", "prompt": "<english image prompt, 3-5 sentences, very specific>"}`;
 
 
+// Strip preview/dev hosting URLs from the user's product description before
+// the classifier sees them. Belt-and-braces with the system prompt above.
+function sanitizeProduct(input: string): string {
+  const HOST_BLOCKLIST = /\b(?:[a-z0-9-]+(?:--[a-z0-9-]+)?\.)?(?:lovable\.app|lovable\.dev|vercel\.app|netlify\.app|github\.io|pages\.dev|onrender\.com|fly\.dev|railway\.app|repl\.co|localhost(?::\d+)?)\b\S*/gi;
+  const PREVIEW_PREFIX = /\b(?:id-)?preview--[a-z0-9-]+\.[a-z0-9.-]+\b/gi;
+  return input
+    .replace(PREVIEW_PREFIX, "")
+    .replace(HOST_BLOCKLIST, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 async function buildSmartPrompt(apiKey: string, product: string, tone: string): Promise<string> {
   const style = TONE_STYLE[tone];
+  const cleanProduct = sanitizeProduct(product);
   try {
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: CLASSIFIER_SYSTEM },
-          { role: "user", content: `Product: ${product}\nTone: ${tone} (${style})` },
+          { role: "user", content: `Product: ${cleanProduct}\nTone: ${tone} (${style})` },
         ],
         response_format: { type: "json_object" },
       }),
@@ -64,11 +77,12 @@ async function buildSmartPrompt(apiKey: string, product: string, tone: string): 
   } catch (e) {
     console.error("smart prompt failed, falling back:", e);
   }
-  return `Professional social media ad image for: ${product}.
+  return `Professional social media ad image for: ${cleanProduct}.
 Style: ${style}.
 Square 1:1 composition, clean modern aesthetic.
 High quality commercial photography, photorealistic.`;
 }
+
 
 // Origin allowlist for browser callers. Returns false when no Origin header is
 // sent — non-browser clients must instead authenticate via the X-App-Token
