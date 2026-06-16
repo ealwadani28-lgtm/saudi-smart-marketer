@@ -62,11 +62,13 @@ export const generatePosts = createServerFn({ method: "POST" })
     });
 
     if (!res.ok) {
-      const txt = await res.text();
-      if (res.status === 429) throw new Error("الطلبات كثيرة الآن — جرب بعد لحظات");
-      if (res.status === 402) throw new Error("الرصيد غير كافٍ — تواصل مع الفريق");
-      throw new Error(`فشل التوليد (${res.status}): ${txt.slice(0, 200)}`);
+      const txt = await res.text().catch(() => "");
+      console.error("[generate] upstream error", res.status, txt.slice(0, 500));
+      if (res.status === 429) throw new Error("طلبات كثيرة الآن — جرّب بعد دقيقة من فضلك.");
+      if (res.status === 402) throw new Error("الخدمة مشغولة حالياً، تواصل معنا عبر واتساب.");
+      throw new Error("تعذّر توليد المنشورات الآن، حاول مرة أخرى بعد قليل.");
     }
+
 
     const json = await res.json();
     const content = json.choices?.[0]?.message?.content ?? "{}";
