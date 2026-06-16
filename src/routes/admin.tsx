@@ -396,6 +396,134 @@ function AdminPage() {
             </table>
           </div>
         </div>
+
+        {/* Subscription Requests */}
+        <div className="mt-10">
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-primary" />
+              <h2 className="font-display text-lg font-bold">طلبات الاشتراك</h2>
+              {subRequests.filter((r) => r.status === "pending").length > 0 && (
+                <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold text-amber-700 dark:text-amber-400">
+                  {subRequests.filter((r) => r.status === "pending").length} بانتظار المراجعة
+                </span>
+              )}
+            </div>
+            <span className="text-xs text-muted-foreground">إجمالي: {subRequests.length}</span>
+          </div>
+
+          <div className="overflow-hidden rounded-2xl border border-border bg-card">
+            <div className="overflow-x-auto">
+              <table className="w-full text-right text-sm">
+                <thead className="border-b border-border bg-muted/30">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">العميل</th>
+                    <th className="px-4 py-3 font-medium">الدفع</th>
+                    <th className="px-4 py-3 font-medium">المرجع</th>
+                    <th className="px-4 py-3 font-medium">التاريخ</th>
+                    <th className="px-4 py-3 font-medium">الحالة</th>
+                    <th className="px-4 py-3 font-medium">إجراءات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {subRequests.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">
+                        لا توجد طلبات اشتراك بعد
+                      </td>
+                    </tr>
+                  ) : (
+                    subRequests.map((r) => (
+                      <tr
+                        key={r.id}
+                        className="border-b border-border last:border-0 transition hover:bg-muted/20"
+                      >
+                        <td className="px-4 py-3">
+                          <div className="font-medium">{r.full_name}</div>
+                          <a
+                            href={`mailto:${r.email}`}
+                            className="text-xs text-primary hover:underline"
+                          >
+                            {r.email}
+                          </a>
+                          {r.phone && (
+                            <div className="text-xs text-muted-foreground" dir="ltr">
+                              {r.phone}
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium ${
+                              r.payment_method === "paypal"
+                                ? "bg-blue-500/10 text-blue-700 dark:text-blue-400"
+                                : "bg-primary/10 text-primary"
+                            }`}
+                          >
+                            {r.payment_method === "paypal" ? "PayPal" : "بنكي"}
+                          </span>
+                          <div className="mt-1 text-xs text-muted-foreground">
+                            {r.amount_sar} ر.س
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-muted-foreground" dir="ltr">
+                          {r.reference || "—"}
+                        </td>
+                        <td className="px-4 py-3 text-xs text-muted-foreground" dir="ltr">
+                          {new Date(r.created_at).toLocaleString("ar-SA")}
+                        </td>
+                        <td className="px-4 py-3">
+                          <StatusBadge status={r.status} />
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            {r.phone && (
+                              <a
+                                href={`https://wa.me/${normalizePhone(r.phone)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="grid h-7 w-7 place-items-center rounded-md bg-[#25D366]/15 text-[#128C4E] transition hover:bg-[#25D366]/25"
+                                title="واتساب"
+                              >
+                                <MessageCircle className="h-3.5 w-3.5" />
+                              </a>
+                            )}
+                            {r.status !== "approved" && (
+                              <button
+                                onClick={() => updateSubStatus(r.id, "approved")}
+                                className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-1 text-xs font-medium text-emerald-700 transition hover:bg-emerald-500/25 dark:text-emerald-400"
+                                title="موافقة"
+                              >
+                                <Check className="h-3 w-3" /> فعّل
+                              </button>
+                            )}
+                            {r.status !== "rejected" && (
+                              <button
+                                onClick={() => updateSubStatus(r.id, "rejected")}
+                                className="inline-flex items-center gap-1 rounded-md bg-destructive/15 px-2 py-1 text-xs font-medium text-destructive transition hover:bg-destructive/25"
+                                title="رفض"
+                              >
+                                <X className="h-3 w-3" /> ارفض
+                              </button>
+                            )}
+                          </div>
+                          {r.notes && (
+                            <div
+                              className="mt-1 max-w-[220px] truncate text-[11px] text-muted-foreground"
+                              title={r.notes}
+                            >
+                              📝 {r.notes}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );
