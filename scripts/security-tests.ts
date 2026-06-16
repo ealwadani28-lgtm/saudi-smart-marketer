@@ -465,10 +465,11 @@ function groupBy<T, K extends string>(arr: T[], key: (x: T) => K): Record<K, T[]
   writeFileSync("/mnt/documents/security-report.md", md);
   writeFileSync("/mnt/documents/security-report.html", html);
 
-  const passed = results.filter((r) => r.pass).length;
-  const failed = results.length - passed;
+  const skipped = results.filter((r) => r.skipped).length;
+  const passed = results.filter((r) => r.pass && !r.skipped).length;
+  const failed = results.filter((r) => !r.pass).length;
   console.log(`\n══════════════════════════════════════════════`);
-  console.log(`Summary: ${passed}/${results.length} passed${failed > 0 ? `  ❌ ${failed} failed` : "  ✅"}`);
+  console.log(`Summary: ${passed} passed · ${failed} failed · ${skipped} skipped (of ${results.length})`);
   console.log(`Reports written:`);
   console.log(`  • /mnt/documents/security-report.md`);
   console.log(`  • /mnt/documents/security-report.html`);
