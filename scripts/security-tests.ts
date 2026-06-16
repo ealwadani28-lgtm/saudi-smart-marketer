@@ -339,15 +339,16 @@ async function serverFnAuditCatalog() {
 /* ───────────────────────── Report generation ───────────────────────── */
 function buildMarkdownReport(): string {
   const now = new Date().toISOString();
-  const passed = results.filter((r) => r.pass).length;
-  const failed = results.length - passed;
+  const skipped = results.filter((r) => r.skipped).length;
+  const passed = results.filter((r) => r.pass && !r.skipped).length;
+  const failed = results.filter((r) => !r.pass).length;
   const groups = groupBy(results, (r) => r.category);
 
   let md = `# Security Audit Report\n\n`;
   md += `- **Date:** ${now}\n`;
   md += `- **Target:** \`${BASE_URL}\`\n`;
   md += `- **Database:** \`${SUPABASE_URL}\`\n`;
-  md += `- **Result:** ${passed}/${results.length} passed${failed > 0 ? ` — **${failed} failed**` : ""}\n\n`;
+  md += `- **Result:** ${passed} passed · ${failed} failed · ${skipped} skipped (of ${results.length})\n\n`;
 
   md += `## Sensitive surfaces covered\n\n`;
   md += `| Surface | Roles tested | Tests |\n|---|---|---|\n`;
