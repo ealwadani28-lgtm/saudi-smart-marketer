@@ -361,17 +361,20 @@ async function serverFnAuditCatalog() {
 
 /* ───────────────────────── Report generation ───────────────────────── */
 function buildMarkdownReport(): string {
-  const now = new Date().toISOString();
   const skipped = results.filter((r) => r.skipped).length;
   const passed = results.filter((r) => r.pass && !r.skipped).length;
   const failed = results.filter((r) => !r.pass).length;
   const groups = groupBy(results, (r) => r.category);
 
   let md = `# Security Audit Report\n\n`;
-  md += `- **Date:** ${now}\n`;
+  md += `- **Run at:** ${RAN_AT.toISOString()}\n`;
+  md += `- **Git commit:** \`${GIT.short}\`${GIT.dirty ? " ⚠️ *(working tree dirty)*" : ""} on \`${GIT.branch}\`\n`;
+  md += `- **Commit message:** ${GIT.subject || "_(unavailable)_"}\n`;
+  md += `- **Full SHA:** \`${GIT.sha}\`\n`;
   md += `- **Target:** \`${BASE_URL}\`\n`;
   md += `- **Database:** \`${SUPABASE_URL}\`\n`;
   md += `- **Result:** ${passed} passed · ${failed} failed · ${skipped} skipped (of ${results.length})\n\n`;
+
 
   md += `## Sensitive surfaces covered\n\n`;
   md += `| Surface | Roles tested | Tests |\n|---|---|---|\n`;
