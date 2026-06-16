@@ -64,7 +64,6 @@ type SubRequest = {
   reviewed_at: string | null;
 };
 
-const SUBSCRIBE_WHATSAPP_NUMBER = "96654681368";
 
 function AdminPage() {
   const listFn = useServerFn(adminListSignups);
