@@ -508,7 +508,17 @@ function AdminPage() {
                 </span>
               )}
             </div>
-            <span className="text-xs text-muted-foreground">إجمالي: {subRequests.length}</span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-muted-foreground">إجمالي: {subRequests.length}</span>
+              <button
+                onClick={exportSubsCSV}
+                disabled={subRequests.length === 0}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium transition hover:bg-accent disabled:opacity-50"
+              >
+                <FileDown className="h-3.5 w-3.5" />
+                تصدير CSV
+              </button>
+            </div>
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-border bg-card">
