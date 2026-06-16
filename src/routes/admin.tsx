@@ -144,6 +144,8 @@ function AdminPage() {
     setToken(null);
     setPassword("");
     setSignups([]);
+    setAlerts([]);
+    setAttemptStats(null);
   }
 
   function exportCSV() {
