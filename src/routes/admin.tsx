@@ -29,15 +29,37 @@ type Signup = {
 const TOKEN_KEY = "admin_token_v2";
 const LEGACY_PW_KEY = "admin_pw";
 
+type Alert = {
+  id: string;
+  kind: string;
+  severity: "info" | "warn" | "critical";
+  message: string;
+  metadata: Record<string, unknown>;
+  resolved_at: string | null;
+  created_at: string;
+};
+
+type AttemptStats = {
+  last24h: number;
+  last10min: number;
+  successLast24h: number;
+  rejectedLast24h: number;
+};
+
 function AdminPage() {
   const listFn = useServerFn(adminListSignups);
   const loginFn = useServerFn(adminLogin);
+  const alertsFn = useServerFn(adminGetAlerts);
+  const resolveFn = useServerFn(adminResolveAlert);
+  const attemptsFn = useServerFn(adminGetSignupAttempts);
   const [password, setPassword] = useState("");
   const [token, setToken] = useState<string | null>(null);
   const [authed, setAuthed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [signups, setSignups] = useState<Signup[]>([]);
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [attemptStats, setAttemptStats] = useState<AttemptStats | null>(null);
 
   async function loadWithToken(tk: string) {
     setLoading(true);
