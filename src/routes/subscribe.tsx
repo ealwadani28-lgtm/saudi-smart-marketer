@@ -216,7 +216,7 @@ function SubscribePage() {
                     <div>
                       <div className="text-sm font-semibold">paypal.me/justlator</div>
                       <div className="text-xs text-muted-foreground">
-                        ادفع مباشرة من حسابك
+                        المستفيد: Essa Alwadani
                       </div>
                     </div>
                   </div>
