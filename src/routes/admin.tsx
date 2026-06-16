@@ -550,3 +550,24 @@ function isSameDay(a: Date, b: Date) {
 function truncate(s: string, n: number) {
   return s.length > n ? s.slice(0, n) + "…" : s;
 }
+
+function normalizePhone(p: string) {
+  const digits = p.replace(/\D/g, "");
+  if (digits.startsWith("00")) return digits.slice(2);
+  if (digits.startsWith("0")) return "966" + digits.slice(1);
+  return digits;
+}
+
+function StatusBadge({ status }: { status: "pending" | "approved" | "rejected" }) {
+  const map = {
+    pending: { label: "بانتظار المراجعة", cls: "bg-amber-500/15 text-amber-700 dark:text-amber-400" },
+    approved: { label: "مفعّل", cls: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400" },
+    rejected: { label: "مرفوض", cls: "bg-destructive/15 text-destructive" },
+  } as const;
+  const s = map[status];
+  return (
+    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${s.cls}`}>
+      {s.label}
+    </span>
+  );
+}
