@@ -85,6 +85,11 @@ function Landing() {
       <FinalCTA />
       <JustlatorFooter />
       <ExitIntentPopup />
+      <div className="pointer-events-none fixed bottom-4 left-4 z-40 sm:bottom-6 sm:left-6">
+        <div className="pointer-events-auto">
+          <LiveVisitorCounter path="/" />
+        </div>
+      </div>
     </div>
   );
 }
