@@ -3,10 +3,14 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import {
   Lock, Download, RefreshCw, Users, Mail, ExternalLink, LogOut,
-  AlertTriangle, ShieldCheck, Activity,
+  AlertTriangle, ShieldCheck, Activity, CreditCard, Check, X, MessageCircle,
 } from "lucide-react";
 import { adminListSignups, adminLogin } from "@/lib/admin.functions";
 import { adminGetAlerts, adminResolveAlert, adminGetSignupAttempts } from "@/lib/telemetry.functions";
+import {
+  adminListSubscriptionRequests,
+  adminUpdateSubscriptionStatus,
+} from "@/lib/subscription.functions";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -46,12 +50,29 @@ type AttemptStats = {
   rejectedLast24h: number;
 };
 
+type SubRequest = {
+  id: string;
+  full_name: string;
+  email: string;
+  phone: string | null;
+  payment_method: "bank" | "paypal";
+  reference: string | null;
+  notes: string | null;
+  amount_sar: number;
+  status: "pending" | "approved" | "rejected";
+  created_at: string;
+  reviewed_at: string | null;
+};
+
+
 function AdminPage() {
   const listFn = useServerFn(adminListSignups);
   const loginFn = useServerFn(adminLogin);
   const alertsFn = useServerFn(adminGetAlerts);
   const resolveFn = useServerFn(adminResolveAlert);
   const attemptsFn = useServerFn(adminGetSignupAttempts);
+  const listSubsFn = useServerFn(adminListSubscriptionRequests);
+  const updateSubFn = useServerFn(adminUpdateSubscriptionStatus);
   const [password, setPassword] = useState("");
   const [token, setToken] = useState<string | null>(null);
   const [authed, setAuthed] = useState(false);
@@ -60,15 +81,18 @@ function AdminPage() {
   const [signups, setSignups] = useState<Signup[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [attemptStats, setAttemptStats] = useState<AttemptStats | null>(null);
+  const [subRequests, setSubRequests] = useState<SubRequest[]>([]);
 
   async function loadAlertsAndStats(tk: string) {
     try {
-      const [a, s] = await Promise.all([
+      const [a, s, r] = await Promise.all([
         alertsFn({ data: { token: tk } }),
         attemptsFn({ data: { token: tk } }),
+        listSubsFn({ data: { token: tk } }),
       ]);
       setAlerts(a.alerts as Alert[]);
       setAttemptStats(s.stats);
+      setSubRequests(r.requests as SubRequest[]);
     } catch {
       // non-fatal
     }
@@ -146,6 +170,23 @@ function AdminPage() {
     setSignups([]);
     setAlerts([]);
     setAttemptStats(null);
+    setSubRequests([]);
+  }
+
+  async function updateSubStatus(id: string, status: "approved" | "rejected" | "pending") {
+    if (!token) return;
+    try {
+      await updateSubFn({ data: { token, id, status } });
+      setSubRequests((prev) =>
+        prev.map((r) =>
+          r.id === id
+            ? { ...r, status, reviewed_at: status === "pending" ? null : new Date().toISOString() }
+            : r,
+        ),
+      );
+    } catch {
+      /* ignore */
+    }
   }
 
   function exportCSV() {
@@ -354,6 +395,134 @@ function AdminPage() {
             </table>
           </div>
         </div>
+
+        {/* Subscription Requests */}
+        <div className="mt-10">
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-primary" />
+              <h2 className="font-display text-lg font-bold">طلبات الاشتراك</h2>
+              {subRequests.filter((r) => r.status === "pending").length > 0 && (
+                <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold text-amber-700 dark:text-amber-400">
+                  {subRequests.filter((r) => r.status === "pending").length} بانتظار المراجعة
+                </span>
+              )}
+            </div>
+            <span className="text-xs text-muted-foreground">إجمالي: {subRequests.length}</span>
+          </div>
+
+          <div className="overflow-hidden rounded-2xl border border-border bg-card">
+            <div className="overflow-x-auto">
+              <table className="w-full text-right text-sm">
+                <thead className="border-b border-border bg-muted/30">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">العميل</th>
+                    <th className="px-4 py-3 font-medium">الدفع</th>
+                    <th className="px-4 py-3 font-medium">المرجع</th>
+                    <th className="px-4 py-3 font-medium">التاريخ</th>
+                    <th className="px-4 py-3 font-medium">الحالة</th>
+                    <th className="px-4 py-3 font-medium">إجراءات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {subRequests.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">
+                        لا توجد طلبات اشتراك بعد
+                      </td>
+                    </tr>
+                  ) : (
+                    subRequests.map((r) => (
+                      <tr
+                        key={r.id}
+                        className="border-b border-border last:border-0 transition hover:bg-muted/20"
+                      >
+                        <td className="px-4 py-3">
+                          <div className="font-medium">{r.full_name}</div>
+                          <a
+                            href={`mailto:${r.email}`}
+                            className="text-xs text-primary hover:underline"
+                          >
+                            {r.email}
+                          </a>
+                          {r.phone && (
+                            <div className="text-xs text-muted-foreground" dir="ltr">
+                              {r.phone}
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium ${
+                              r.payment_method === "paypal"
+                                ? "bg-blue-500/10 text-blue-700 dark:text-blue-400"
+                                : "bg-primary/10 text-primary"
+                            }`}
+                          >
+                            {r.payment_method === "paypal" ? "PayPal" : "بنكي"}
+                          </span>
+                          <div className="mt-1 text-xs text-muted-foreground">
+                            {r.amount_sar} ر.س
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-muted-foreground" dir="ltr">
+                          {r.reference || "—"}
+                        </td>
+                        <td className="px-4 py-3 text-xs text-muted-foreground" dir="ltr">
+                          {new Date(r.created_at).toLocaleString("ar-SA")}
+                        </td>
+                        <td className="px-4 py-3">
+                          <StatusBadge status={r.status} />
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            {r.phone && (
+                              <a
+                                href={`https://wa.me/${normalizePhone(r.phone)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="grid h-7 w-7 place-items-center rounded-md bg-[#25D366]/15 text-[#128C4E] transition hover:bg-[#25D366]/25"
+                                title="واتساب"
+                              >
+                                <MessageCircle className="h-3.5 w-3.5" />
+                              </a>
+                            )}
+                            {r.status !== "approved" && (
+                              <button
+                                onClick={() => updateSubStatus(r.id, "approved")}
+                                className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-1 text-xs font-medium text-emerald-700 transition hover:bg-emerald-500/25 dark:text-emerald-400"
+                                title="موافقة"
+                              >
+                                <Check className="h-3 w-3" /> فعّل
+                              </button>
+                            )}
+                            {r.status !== "rejected" && (
+                              <button
+                                onClick={() => updateSubStatus(r.id, "rejected")}
+                                className="inline-flex items-center gap-1 rounded-md bg-destructive/15 px-2 py-1 text-xs font-medium text-destructive transition hover:bg-destructive/25"
+                                title="رفض"
+                              >
+                                <X className="h-3 w-3" /> ارفض
+                              </button>
+                            )}
+                          </div>
+                          {r.notes && (
+                            <div
+                              className="mt-1 max-w-[220px] truncate text-[11px] text-muted-foreground"
+                              title={r.notes}
+                            >
+                              📝 {r.notes}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );
@@ -379,4 +548,25 @@ function isSameDay(a: Date, b: Date) {
 }
 function truncate(s: string, n: number) {
   return s.length > n ? s.slice(0, n) + "…" : s;
+}
+
+function normalizePhone(p: string) {
+  const digits = p.replace(/\D/g, "");
+  if (digits.startsWith("00")) return digits.slice(2);
+  if (digits.startsWith("0")) return "966" + digits.slice(1);
+  return digits;
+}
+
+function StatusBadge({ status }: { status: "pending" | "approved" | "rejected" }) {
+  const map = {
+    pending: { label: "بانتظار المراجعة", cls: "bg-amber-500/15 text-amber-700 dark:text-amber-400" },
+    approved: { label: "مفعّل", cls: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400" },
+    rejected: { label: "مرفوض", cls: "bg-destructive/15 text-destructive" },
+  } as const;
+  const s = map[status];
+  return (
+    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${s.cls}`}>
+      {s.label}
+    </span>
+  );
 }

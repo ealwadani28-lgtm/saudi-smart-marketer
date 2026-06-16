@@ -125,6 +125,57 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_requests: {
+        Row: {
+          amount_sar: number
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          ip_hash: string | null
+          notes: string | null
+          payment_method: string
+          phone: string | null
+          reference: string | null
+          reviewed_at: string | null
+          status: string
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          amount_sar?: number
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          ip_hash?: string | null
+          notes?: string | null
+          payment_method: string
+          phone?: string | null
+          reference?: string | null
+          reviewed_at?: string | null
+          status?: string
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          amount_sar?: number
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          ip_hash?: string | null
+          notes?: string | null
+          payment_method?: string
+          phone?: string | null
+          reference?: string | null
+          reviewed_at?: string | null
+          status?: string
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       visitor_pings: {
         Row: {
           created_at: string
