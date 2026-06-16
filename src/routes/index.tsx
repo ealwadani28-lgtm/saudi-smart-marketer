@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { motion } from "motion/react";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { submitEarlySignup } from "@/lib/signup.functions";
 import { toast } from "sonner";
 import {
   Sparkles,
@@ -864,6 +865,7 @@ function SignupForm({
   onDark?: boolean;
 }) {
   const navigate = useNavigate();
+  const submitSignup = useServerFn(submitEarlySignup);
   const [email, setEmail] = useState("");
   const [shop, setShop] = useState("");
   const [status, setStatus] = useState<"idle" | "ok" | "error">("idle");
@@ -885,29 +887,27 @@ function SignupForm({
     }
 
     setLoading(true);
-    const { error } = await supabase.from("early_signups").insert({
-      email: cleanEmail,
-      shop_url: shop.trim() || null,
-      source: "landing_page",
-    });
-    setLoading(false);
-
-    if (error) {
-      if (error.code === "23505") {
-        setErrorMsg("هذا البريد مسجل مسبقاً!");
-      } else {
-        setErrorMsg("حدث خطأ، الرجاء المحاولة مرة أخرى");
-      }
+    try {
+      await submitSignup({
+        data: {
+          email: cleanEmail,
+          shop_url: shop.trim() || null,
+          source: "landing_page",
+        },
+      });
+      setStatus("ok");
+      setEmail("");
+      setShop("");
+      toast.success("تم التسجيل بنجاح!");
+      navigate({ to: "/thank-you" });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "حدث خطأ، الرجاء المحاولة مرة أخرى";
+      setErrorMsg(msg);
       setStatus("error");
-      toast.error(errorMsg);
-      return;
+      toast.error(msg);
+    } finally {
+      setLoading(false);
     }
-
-    setStatus("ok");
-    setEmail("");
-    setShop("");
-    toast.success("تم التسجيل بنجاح!");
-    navigate({ to: "/thank-you" });
   }
 
   if (status === "ok") {

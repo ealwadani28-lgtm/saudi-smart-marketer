@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, Gift, Sparkles, Loader2 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { submitEarlySignup } from "@/lib/signup.functions";
 import { toast } from "sonner";
 
 const STORAGE_KEY = "exit_intent_shown_v1";
@@ -12,6 +13,7 @@ export function ExitIntentPopup() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const signupFn = useServerFn(submitEarlySignup);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -55,16 +57,16 @@ export function ExitIntentPopup() {
       return;
     }
     setLoading(true);
-    const { error } = await supabase
-      .from("early_signups")
-      .insert({ email, source: "exit_intent" });
-    setLoading(false);
-    if (error && !error.message.toLowerCase().includes("duplicate")) {
-      toast.error("حدث خطأ، حاول مرة أخرى");
-      return;
+    try {
+      await signupFn({ data: { email, source: "exit_intent" } });
+      setOpen(false);
+      navigate({ to: "/thank-you" });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "حدث خطأ، حاول مرة أخرى";
+      toast.error(msg);
+    } finally {
+      setLoading(false);
     }
-    setOpen(false);
-    navigate({ to: "/thank-you" });
   }
 
   return (

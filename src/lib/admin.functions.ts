@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { timingSafeEqual } from "crypto";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 function checkPassword(provided: string) {
   const expected = process.env.ADMIN_PASSWORD;
@@ -12,14 +11,39 @@ function checkPassword(provided: string) {
   return timingSafeEqual(a, b);
 }
 
-const PasswordInput = z.object({ password: z.string().min(1).max(256) });
+const LoginInput = z.object({ password: z.string().min(1).max(256) });
+const TokenInput = z.object({ token: z.string().min(8).max(512) });
 
-export const adminListSignups = createServerFn({ method: "POST" })
-  .inputValidator((d) => PasswordInput.parse(d))
+export const adminLogin = createServerFn({ method: "POST" })
+  .inputValidator((d) => LoginInput.parse(d))
   .handler(async ({ data }) => {
+    const { rateLimit, getClientIp } = await import("./rate-limit.server");
+    const { issueAdminToken } = await import("./admin-token.server");
+
+    const ip = getClientIp();
+    // 5 attempts per 15 min per IP
+    const rl = await rateLimit("admin:login", ip, 5, 900);
+    if (!rl.allowed) {
+      throw new Error(`محاولات كثيرة، حاول بعد ${Math.ceil(rl.retryAfter / 60)} دقيقة`);
+    }
+
     if (!checkPassword(data.password)) {
       throw new Error("كلمة المرور غير صحيحة");
     }
+
+    return { token: issueAdminToken() };
+  });
+
+export const adminListSignups = createServerFn({ method: "POST" })
+  .inputValidator((d) => TokenInput.parse(d))
+  .handler(async ({ data }) => {
+    const { verifyAdminToken } = await import("./admin-token.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    if (!verifyAdminToken(data.token)) {
+      throw new Error("Unauthorized");
+    }
+
     const { data: rows, error } = await supabaseAdmin
       .from("early_signups")
       .select("id, email, shop_url, source, created_at")

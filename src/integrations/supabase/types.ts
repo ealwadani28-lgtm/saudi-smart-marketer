@@ -19,6 +19,7 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          ip: unknown
           shop_url: string | null
           source: string
         }
@@ -26,6 +27,7 @@ export type Database = {
           created_at?: string
           email: string
           id?: string
+          ip?: unknown
           shop_url?: string | null
           source?: string
         }
@@ -33,8 +35,30 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          ip?: unknown
           shop_url?: string | null
           source?: string
+        }
+        Relationships: []
+      }
+      rate_limits: {
+        Row: {
+          count: number
+          key: string
+          updated_at: string
+          window_start: string
+        }
+        Insert: {
+          count?: number
+          key: string
+          updated_at?: string
+          window_start?: string
+        }
+        Update: {
+          count?: number
+          key?: string
+          updated_at?: string
+          window_start?: string
         }
         Relationships: []
       }
@@ -43,7 +67,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      rl_hit: {
+        Args: { _key: string; _limit: number; _window_seconds: number }
+        Returns: {
+          allowed: boolean
+          remaining: number
+          retry_after: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
