@@ -487,17 +487,40 @@ function groupBy<T, K extends string>(arr: T[], key: (x: T) => K): Record<K, T[]
   const md = buildMarkdownReport();
   const html = buildHtmlReport(md);
 
-  mkdirSync("/mnt/documents", { recursive: true });
+  mkdirSync(OUT_DIR, { recursive: true });
+
+  const dirtyTag = GIT.dirty ? "-dirty" : "";
+  const base = `${STAMP}__${GIT.short}${dirtyTag}`;
+  const mdPath = `${OUT_DIR}/${base}.md`;
+  const htmlPath = `${OUT_DIR}/${base}.html`;
+  writeFileSync(mdPath, md);
+  writeFileSync(htmlPath, html);
+
   writeFileSync("/mnt/documents/security-report.md", md);
   writeFileSync("/mnt/documents/security-report.html", html);
 
   const skipped = results.filter((r) => r.skipped).length;
   const passed = results.filter((r) => r.pass && !r.skipped).length;
   const failed = results.filter((r) => !r.pass).length;
+
+  const indexPath = `${OUT_DIR}/index.md`;
+  if (!existsSync(indexPath)) {
+    writeFileSync(
+      indexPath,
+      `# Security Audit History\n\n| Run at (UTC) | Commit | Branch | Pass | Fail | Skip | Report |\n|---|---|---|---|---|---|---|\n`,
+    );
+  }
+  appendFileSync(
+    indexPath,
+    `| ${RAN_AT.toISOString()} | \`${GIT.short}\`${GIT.dirty ? " ⚠️" : ""} | ${GIT.branch} | ${passed} | ${failed} | ${skipped} | [md](./${base}.md) · [html](./${base}.html) |\n`,
+  );
+
   console.log(`\n══════════════════════════════════════════════`);
+  console.log(`Git: ${GIT.short}${GIT.dirty ? " (dirty)" : ""} on ${GIT.branch}`);
   console.log(`Summary: ${passed} passed · ${failed} failed · ${skipped} skipped (of ${results.length})`);
-  console.log(`Reports written:`);
-  console.log(`  • /mnt/documents/security-report.md`);
-  console.log(`  • /mnt/documents/security-report.html`);
+  console.log(`Reports:`);
+  console.log(`  • ${mdPath}`);
+  console.log(`  • ${htmlPath}`);
+  console.log(`  • ${indexPath} (history)`);
   if (failed > 0) process.exit(1);
 })();
