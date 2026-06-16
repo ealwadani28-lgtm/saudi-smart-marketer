@@ -597,6 +597,13 @@ function AdminPage() {
                                 <MessageCircle className="h-3.5 w-3.5" />
                               </a>
                             )}
+                            <button
+                              onClick={() => downloadInvoice(r)}
+                              className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary transition hover:bg-primary/20"
+                              title="فاتورة PDF"
+                            >
+                              <FileText className="h-3 w-3" /> فاتورة
+                            </button>
                             {r.status !== "approved" && (
                               <button
                                 onClick={() => updateSubStatus(r.id, "approved")}
