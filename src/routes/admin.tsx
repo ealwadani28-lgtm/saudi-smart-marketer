@@ -72,6 +72,8 @@ function AdminPage() {
   const alertsFn = useServerFn(adminGetAlerts);
   const resolveFn = useServerFn(adminResolveAlert);
   const attemptsFn = useServerFn(adminGetSignupAttempts);
+  const listSubsFn = useServerFn(adminListSubscriptionRequests);
+  const updateSubFn = useServerFn(adminUpdateSubscriptionStatus);
   const [password, setPassword] = useState("");
   const [token, setToken] = useState<string | null>(null);
   const [authed, setAuthed] = useState(false);
@@ -80,15 +82,18 @@ function AdminPage() {
   const [signups, setSignups] = useState<Signup[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [attemptStats, setAttemptStats] = useState<AttemptStats | null>(null);
+  const [subRequests, setSubRequests] = useState<SubRequest[]>([]);
 
   async function loadAlertsAndStats(tk: string) {
     try {
-      const [a, s] = await Promise.all([
+      const [a, s, r] = await Promise.all([
         alertsFn({ data: { token: tk } }),
         attemptsFn({ data: { token: tk } }),
+        listSubsFn({ data: { token: tk } }),
       ]);
       setAlerts(a.alerts as Alert[]);
       setAttemptStats(s.stats);
+      setSubRequests(r.requests as SubRequest[]);
     } catch {
       // non-fatal
     }
