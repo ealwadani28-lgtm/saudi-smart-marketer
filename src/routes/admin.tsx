@@ -357,12 +357,15 @@ function AdminPage() {
   );
 }
 
-function StatCard({ label, value, icon }: { label: string; value: string; icon: React.ReactNode }) {
+function StatCard({
+  label, value, icon, hint,
+}: { label: string; value: string; icon: React.ReactNode; hint?: string }) {
   return (
     <div className="flex items-center justify-between rounded-2xl border border-border bg-card p-5">
       <div>
         <p className="text-sm text-muted-foreground">{label}</p>
         <p className="mt-1 font-display text-3xl font-bold">{value}</p>
+        {hint && <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>}
       </div>
       <div className="grid h-12 w-12 place-items-center rounded-xl bg-primary/10 text-primary">{icon}</div>
     </div>
