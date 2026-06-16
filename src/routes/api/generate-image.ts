@@ -24,28 +24,45 @@ Categories:
 - "fashion": editorial fashion photo, model or flat-lay.
 - "course/education": symbolic learning scene with subject hints.
 
-EXTRACTION:
-- Extract the brand name OR domain (e.g. "justlator.com", "Nike", "MyApp") from the product description if present. If you find one, include it explicitly in the prompt as the text that should appear on the browser/phone screen.
-- For website/app categories: REQUIRE the brand text on screen. Do NOT add "no text" instructions.
+EXTRACTION (CRITICAL — this is the most important step):
+- Identify the REAL product/brand name from the description, NOT any platform/preview/hosting URL.
+- IGNORE and NEVER use as the brand: any URL containing "lovable.app", "lovable.dev", "vercel.app", "netlify.app", "github.io", "preview--", "id-preview--", "localhost", subdomains like "*--*.lovable.app", or generic dev/staging hosts. These are NOT the product.
+- If the description contains BOTH a real brand and a preview URL, use ONLY the real brand. Example: "متجر نون noon.com على preview--xyz.lovable.app" → brand is "noon.com", NOT "lovable.app".
+- If NO real brand is found and only a preview/dev URL is present, set brand to null and DO NOT put any URL on the screen — use a generic clean dashboard mockup instead.
+- For website/app categories with a valid brand: REQUIRE that exact brand text on screen. Do NOT add "no text" instructions.
 - For other categories: keep "no text overlays, no logos" to avoid garbled words.
 
 CRITICAL:
 - Square 1:1, photorealistic, commercial-grade.
 - Match the requested tone/style.
 
-Return ONLY valid JSON: {"category": "<cat>", "brand": "<extracted brand or null>", "prompt": "<english image prompt, 3-5 sentences, very specific>"}`;
+Return ONLY valid JSON: {"category": "<cat>", "brand": "<extracted real brand or null — NEVER a preview URL>", "prompt": "<english image prompt, 3-5 sentences, very specific>"}`;
+
+
+// Strip preview/dev hosting URLs from the user's product description before
+// the classifier sees them. Belt-and-braces with the system prompt above.
+function sanitizeProduct(input: string): string {
+  const HOST_BLOCKLIST = /\b(?:[a-z0-9-]+(?:--[a-z0-9-]+)?\.)?(?:lovable\.app|lovable\.dev|vercel\.app|netlify\.app|github\.io|pages\.dev|onrender\.com|fly\.dev|railway\.app|repl\.co|localhost(?::\d+)?)\b\S*/gi;
+  const PREVIEW_PREFIX = /\b(?:id-)?preview--[a-z0-9-]+\.[a-z0-9.-]+\b/gi;
+  return input
+    .replace(PREVIEW_PREFIX, "")
+    .replace(HOST_BLOCKLIST, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
 
 async function buildSmartPrompt(apiKey: string, product: string, tone: string): Promise<string> {
   const style = TONE_STYLE[tone];
+  const cleanProduct = sanitizeProduct(product);
   try {
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: CLASSIFIER_SYSTEM },
-          { role: "user", content: `Product: ${product}\nTone: ${tone} (${style})` },
+          { role: "user", content: `Product: ${cleanProduct}\nTone: ${tone} (${style})` },
         ],
         response_format: { type: "json_object" },
       }),
@@ -60,11 +77,12 @@ async function buildSmartPrompt(apiKey: string, product: string, tone: string): 
   } catch (e) {
     console.error("smart prompt failed, falling back:", e);
   }
-  return `Professional social media ad image for: ${product}.
+  return `Professional social media ad image for: ${cleanProduct}.
 Style: ${style}.
 Square 1:1 composition, clean modern aesthetic.
 High quality commercial photography, photorealistic.`;
 }
+
 
 // Origin allowlist for browser callers. Returns false when no Origin header is
 // sent — non-browser clients must instead authenticate via the X-App-Token
@@ -146,7 +164,7 @@ export const Route = createFileRoute("/api/generate-image")({
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              model: "google/gemini-2.5-flash-image",
+              model: "google/gemini-3.1-flash-image-preview",
               messages: [{ role: "user", content: prompt }],
               modalities: ["image", "text"],
               stream: true,
