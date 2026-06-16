@@ -311,7 +311,11 @@ function RequestForm({ paymentMethod }: { paymentMethod: "paypal" | "bank" }) {
         </div>
         <h3 className="mt-4 text-lg font-semibold">تم استلام طلبك بنجاح</h3>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-          أرسل لنا إيصال الدفع عبر واتساب لتسريع التفعيل. سنرسل إيميل تأكيد
+          مبلغ الاشتراك:{" "}
+          <span className="font-semibold text-foreground">
+            {PRICE_SAR.toLocaleString("ar-SA")} ريال
+          </span>
+          . أرسل لنا إيصال الدفع عبر واتساب لتسريع التفعيل. سنرسل إيميل تأكيد
           الاشتراك خلال ساعات عمل.
         </p>
         <div className="mt-5 flex flex-wrap justify-center gap-2.5">
