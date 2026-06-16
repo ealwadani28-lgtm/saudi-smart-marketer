@@ -61,6 +61,19 @@ function AdminPage() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [attemptStats, setAttemptStats] = useState<AttemptStats | null>(null);
 
+  async function loadAlertsAndStats(tk: string) {
+    try {
+      const [a, s] = await Promise.all([
+        alertsFn({ data: { token: tk } }),
+        attemptsFn({ data: { token: tk } }),
+      ]);
+      setAlerts(a.alerts as Alert[]);
+      setAttemptStats(s.stats);
+    } catch {
+      // non-fatal
+    }
+  }
+
   async function loadWithToken(tk: string) {
     setLoading(true);
     setError("");
@@ -70,6 +83,7 @@ function AdminPage() {
       setAuthed(true);
       setToken(tk);
       sessionStorage.setItem(TOKEN_KEY, tk);
+      await loadAlertsAndStats(tk);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "خطأ غير معروف";
       setError(msg.includes("Unauthorized") ? "انتهت الجلسة، الرجاء تسجيل الدخول مجدداً" : msg);
@@ -78,6 +92,24 @@ function AdminPage() {
       sessionStorage.removeItem(TOKEN_KEY);
     } finally {
       setLoading(false);
+    }
+  }
+
+  // Auto-refresh alerts every 30s while authed
+  useEffect(() => {
+    if (!authed || !token) return;
+    const id = setInterval(() => loadAlertsAndStats(token), 30_000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authed, token]);
+
+  async function resolveAlert(id: string) {
+    if (!token) return;
+    try {
+      await resolveFn({ data: { token, alertId: id } });
+      setAlerts((prev) => prev.map((a) => (a.id === id ? { ...a, resolved_at: new Date().toISOString() } : a)));
+    } catch {
+      /* ignore */
     }
   }
 
