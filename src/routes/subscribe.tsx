@@ -34,7 +34,7 @@ export const Route = createFileRoute("/subscribe")({
 
 const PRICE_SAR = 1500;
 const PAYPAL_URL = "https://paypal.me/justlator";
-const WHATSAPP_NUMBER = "966544681368"; // dolwya
+const WHATSAPP_NUMBER = "96654681368"; // dolwya
 const CONTACT_EMAIL = "contact@justlator.tech";
 
 const BANK = {
