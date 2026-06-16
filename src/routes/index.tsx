@@ -45,12 +45,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "حملة تسويقية كاملة ٣٠ يوم بـ ٩٩٩ ريال فقط. تحليل مجاني لمتجرك على زد وسلة. شفافية كاملة، بدون عقود، بدون وعود كاذبة.",
+          "حملة تسويقية كاملة ٣٠ يوم بـ ١٬٥٠٠ ريال فقط. تحليل مجاني لمتجرك على زد وسلة. شفافية كاملة، بدون عقود، بدون وعود كاذبة.",
       },
       { property: "og:title", content: "المسوق الذكي — تسويق صادق للمتاجر السعودية" },
       {
         property: "og:description",
-        content: "حملة تسويقية كاملة ٣٠ يوم بـ ٩٩٩ ريال فقط. شفافية كاملة، بدون عقود، بدون وعود كاذبة.",
+        content: "حملة تسويقية كاملة ٣٠ يوم بـ ١٬٥٠٠ ريال فقط. شفافية كاملة، بدون عقود، بدون وعود كاذبة.",
       },
       { property: "og:type", content: "website" },
       { property: "og:image", content: ogImage.url },
@@ -59,7 +59,7 @@ export const Route = createFileRoute("/")({
       { property: "og:locale", content: "ar_SA" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "المسوق الذكي — تسويق صادق للمتاجر السعودية" },
-      { name: "twitter:description", content: "حملة تسويقية كاملة ٣٠ يوم بـ ٩٩٩ ريال فقط" },
+      { name: "twitter:description", content: "حملة تسويقية كاملة ٣٠ يوم بـ ١٬٥٠٠ ريال فقط" },
       { name: "twitter:image", content: ogImage.url },
     ],
     links: [{ rel: "canonical", href: "/" }],
@@ -252,7 +252,7 @@ function DashboardMockup() {
         className="glass-card absolute -top-6 -right-6 rounded-2xl px-4 py-3"
       >
         <div className="text-xs text-muted-foreground">سعر الحملة</div>
-        <div className="font-display text-lg font-bold text-primary">٩٩٩ ر.س</div>
+        <div className="font-display text-lg font-bold text-primary">١٬٥٠٠ ر.س</div>
       </motion.div>
 
       <motion.div
@@ -392,7 +392,7 @@ function SolutionSection() {
       n: "٤",
       icon: CreditCard,
       title: "أنت توافق وتدفع",
-      body: "٩٩٩ ريال لحملة ٣٠ يوم. تحويل بنكي أو PayPal.",
+      body: "١٬٥٠٠ ريال لحملة ٣٠ يوم. تحويل بنكي أو PayPal.",
     },
     {
       n: "٥",
@@ -477,7 +477,7 @@ function SolutionSection() {
 
 function ComparisonSection() {
   const rows = [
-    { label: "السعر", others: "٣٬٠٠٠ - ١٠٬٠٠٠ ريال/شهر", us: "٩٩٩ ريال لحملة ٣٠ يوم" },
+    { label: "السعر", others: "٣٬٠٠٠ - ١٠٬٠٠٠ ريال/شهر", us: "١٬٥٠٠ ريال لحملة ٣٠ يوم" },
     { label: "الالتزام", others: "عقود ٦-١٢ شهر", us: "٣٠ يوم فقط، بدون عقود" },
     { label: "الشفافية", others: "ما تشوف الخطة قبل الدفع", us: "توافق على الخطة قبل الدفع!" },
     { label: "الوعود", others: "«نضمن لك مبيعات!» (كذب)", us: "صادقين: نضمن التنفيذ" },
@@ -614,7 +614,7 @@ function PricingSection() {
                 الباقة التأسيسية
               </div>
               <div className="mt-6 flex items-baseline justify-center gap-2">
-                <span className="font-display text-7xl font-bold">٩٩٩</span>
+                <span className="font-display text-7xl font-bold">١٬٥٠٠</span>
                 <span className="text-2xl opacity-90">ريال فقط</span>
               </div>
               <p className="mt-2 text-sm opacity-90">لحملة تسويقية كاملة ٣٠ يوم</p>
@@ -745,7 +745,7 @@ function FAQSection() {
     },
     {
       q: "إيش الفرق بينكم وبين المسوقين العاديين؟",
-      a: "١) السعر: ٩٩٩ ريال مقابل ٣-١٠ آلاف ريال شهرياً. ٢) الشفافية: تشوف كل شي قبل الدفع. ٣) الصدق: ما نعدك بالمستحيل. ٤) التقارير: أسبوعياً مو شهرياً.",
+      a: "١) السعر: ١٬٥٠٠ ريال مقابل ٣-١٠ آلاف ريال شهرياً. ٢) الشفافية: تشوف كل شي قبل الدفع. ٣) الصدق: ما نعدك بالمستحيل. ٤) التقارير: أسبوعياً مو شهرياً.",
     },
     {
       q: "هل المحتوى راح يكون بالعربي؟",
