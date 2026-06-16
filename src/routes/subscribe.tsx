@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import {
   ArrowLeft,
@@ -10,8 +11,11 @@ import {
   Sparkles,
   Building2,
   ExternalLink,
+  Loader2,
+  CheckCircle2,
 } from "lucide-react";
 import { JustlatorFooter } from "@/components/JustlatorFooter";
+import { submitSubscriptionRequest } from "@/lib/subscription.functions";
 
 export const Route = createFileRoute("/subscribe")({
   head: () => ({
@@ -34,7 +38,7 @@ export const Route = createFileRoute("/subscribe")({
 
 const PRICE_SAR = 1500;
 const PAYPAL_URL = "https://paypal.me/justlator";
-const WHATSAPP_NUMBER = "96654681368"; // dolwya
+const WHATSAPP_NUMBER = "96654681368";
 const CONTACT_EMAIL = "contact@justlator.tech";
 
 const BANK = {
@@ -44,19 +48,25 @@ const BANK = {
   beneficiary: "Essa Alwadani",
 };
 
-function buildWhatsappLink(method: "paypal" | "bank") {
-  const label = method === "paypal" ? "PayPal" : "تحويل بنكي";
-  const msg = `السلام عليكم،%0Aأرغب بتفعيل اشتراك Justlator الشهري (1500 ريال).%0Aطريقة الدفع: ${label}%0Aمرفق إيصال الدفع 👇`;
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`;
-}
-
-function buildMailLink(method: "paypal" | "bank") {
-  const label = method === "paypal" ? "PayPal" : "تحويل بنكي";
-  const subject = encodeURIComponent(`تفعيل اشتراك Justlator — ${label}`);
-  const body = encodeURIComponent(
-    `السلام عليكم،\n\nأرغب بتفعيل اشتراك Justlator الشهري (1500 ريال).\nطريقة الدفع: ${label}\nمرفق إيصال الدفع.\n\nالاسم الكامل:\nالبريد الإلكتروني للحساب:\nرقم الجوال:\n`,
-  );
-  return `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+function buildWhatsappMessage(form: {
+  full_name: string;
+  email: string;
+  phone: string;
+  payment_method: "paypal" | "bank";
+  reference?: string;
+}) {
+  const label = form.payment_method === "paypal" ? "PayPal" : "تحويل بنكي";
+  const lines = [
+    "السلام عليكم،",
+    `أرغب بتفعيل اشتراك Justlator الشهري (${PRICE_SAR} ريال).`,
+    `الاسم: ${form.full_name}`,
+    `الإيميل: ${form.email}`,
+    form.phone ? `الجوال: ${form.phone}` : "",
+    `طريقة الدفع: ${label}`,
+    form.reference ? `رقم العملية: ${form.reference}` : "",
+    "مرفق إيصال الدفع 👇",
+  ].filter(Boolean);
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
 }
 
 function SubscribePage() {
@@ -99,8 +109,8 @@ function SubscribePage() {
             فعّل حسابك خلال ساعات
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-balance text-muted-foreground">
-            خطة واحدة بكل المميزات. اختر طريقة الدفع المناسبة، أرسل إيصال
-            التحويل، وسيصلك إيميل التأكيد بتاريخ بداية ونهاية الاشتراك.
+            ادفع بطريقتك المفضلة، ثم عبّئ النموذج وسيصلك إيميل تفعيل الاشتراك
+            بتاريخ البداية والنهاية بعد مراجعة التحويل.
           </p>
         </div>
 
@@ -138,94 +148,93 @@ function SubscribePage() {
             </ul>
 
             <div className="mt-6 rounded-lg border border-dashed border-border bg-muted/40 p-3 text-xs leading-relaxed text-muted-foreground">
-              بعد إرسال إيصال الدفع، سنفعّل حسابك ونرسل لك إيميل يحتوي تفاصيل
-              الاشتراك (تاريخ البداية والنهاية وروابط الدخول).
+              بعد إرسال طلبك، سنفعّل حسابك ونرسل لك إيميل يحتوي تفاصيل الاشتراك
+              (تاريخ البداية والنهاية وروابط الدخول) على{" "}
+              <span className="font-medium text-foreground">{CONTACT_EMAIL}</span>.
             </div>
           </aside>
 
-          {/* Payment methods */}
-          <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-            <h2 className="text-lg font-semibold">اختر طريقة الدفع</h2>
-
-            <div className="mt-4 inline-flex rounded-lg border border-border bg-muted/40 p-1">
-              <TabButton active={tab === "bank"} onClick={() => setTab("bank")}>
-                <Building2 className="h-4 w-4" />
-                تحويل بنكي
-              </TabButton>
-              <TabButton active={tab === "paypal"} onClick={() => setTab("paypal")}>
-                <CreditCard className="h-4 w-4" />
-                PayPal
-              </TabButton>
-            </div>
-
-            {tab === "bank" ? (
-              <div className="mt-6 space-y-3">
-                <CopyRow
-                  label="اسم البنك"
-                  value={BANK.name}
-                  onCopy={() => copy(BANK.name, "name")}
-                  copied={copied === "name"}
-                />
-                <CopyRow
-                  label="اسم المستفيد"
-                  value={BANK.beneficiary}
-                  onCopy={() => copy(BANK.beneficiary, "ben")}
-                  copied={copied === "ben"}
-                />
-                <CopyRow
-                  label="رقم الآيبان (IBAN)"
-                  value={BANK.iban}
-                  mono
-                  onCopy={() => copy(BANK.iban, "iban")}
-                  copied={copied === "iban"}
-                />
-                <CopyRow
-                  label="رمز السويفت (SWIFT)"
-                  value={BANK.swift}
-                  mono
-                  onCopy={() => copy(BANK.swift, "swift")}
-                  copied={copied === "swift"}
-                />
-                <CopyRow
-                  label="المبلغ"
-                  value={`${PRICE_SAR} ريال`}
-                  onCopy={() => copy(String(PRICE_SAR), "amt")}
-                  copied={copied === "amt"}
-                />
-
-                <PaymentCTA method="bank" />
+          {/* Payment + Form */}
+          <section className="space-y-6">
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="text-lg font-semibold">١. اختر طريقة الدفع</h2>
+                <span className="text-xs font-medium text-muted-foreground">
+                  المبلغ: <span className="text-foreground">{PRICE_SAR} ريال</span>
+                </span>
               </div>
-            ) : (
-              <div className="mt-6 space-y-4">
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  ادفع <span className="font-semibold text-foreground">{PRICE_SAR} ريال</span>{" "}
-                  (ما يعادلها بالدولار) عبر رابط PayPal الرسمي الخاص بنا، ثم
-                  أرسل لنا لقطة من تأكيد العملية.
-                </p>
 
-                <a
-                  href={PAYPAL_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center justify-between rounded-xl border border-border bg-background px-4 py-3.5 transition-colors hover:border-primary/50 hover:bg-primary/5"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="grid h-10 w-10 place-items-center rounded-lg bg-[#003087] text-white text-xs font-bold">
-                      Pay<span className="text-[#009cde]">Pal</span>
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold">paypal.me/justlator</div>
-                      <div className="text-xs text-muted-foreground">
-                        المستفيد: Essa Alwadani
+              <div className="mt-4 inline-flex rounded-lg border border-border bg-muted/40 p-1">
+                <TabButton active={tab === "bank"} onClick={() => setTab("bank")}>
+                  <Building2 className="h-4 w-4" />
+                  تحويل بنكي
+                </TabButton>
+                <TabButton active={tab === "paypal"} onClick={() => setTab("paypal")}>
+                  <CreditCard className="h-4 w-4" />
+                  PayPal
+                </TabButton>
+              </div>
+
+              {tab === "bank" ? (
+                <div className="mt-6 space-y-3">
+                  <CopyRow
+                    label="اسم البنك"
+                    value={BANK.name}
+                    onCopy={() => copy(BANK.name, "name")}
+                    copied={copied === "name"}
+                  />
+                  <CopyRow
+                    label="اسم المستفيد"
+                    value={BANK.beneficiary}
+                    onCopy={() => copy(BANK.beneficiary, "ben")}
+                    copied={copied === "ben"}
+                  />
+                  <CopyRow
+                    label="رقم الآيبان (IBAN)"
+                    value={BANK.iban}
+                    mono
+                    onCopy={() => copy(BANK.iban, "iban")}
+                    copied={copied === "iban"}
+                  />
+                  <CopyRow
+                    label="رمز السويفت (SWIFT)"
+                    value={BANK.swift}
+                    mono
+                    onCopy={() => copy(BANK.swift, "swift")}
+                    copied={copied === "swift"}
+                  />
+                </div>
+              ) : (
+                <div className="mt-6 space-y-4">
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    ادفع <span className="font-semibold text-foreground">{PRICE_SAR} ريال</span>{" "}
+                    (ما يعادلها بالدولار) عبر رابط PayPal الرسمي الخاص بنا.
+                  </p>
+
+                  <a
+                    href={PAYPAL_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center justify-between rounded-xl border border-border bg-background px-4 py-3.5 transition-colors hover:border-primary/50 hover:bg-primary/5"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="grid h-10 w-10 place-items-center rounded-lg bg-[#003087] text-white text-xs font-bold">
+                        Pay<span className="text-[#009cde]">Pal</span>
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold">paypal.me/justlator</div>
+                        <div className="text-xs text-muted-foreground">
+                          المستفيد: Essa Alwadani
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <ExternalLink className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary" />
-                </a>
+                    <ExternalLink className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary" />
+                  </a>
+                </div>
+              )}
+            </div>
 
-                <PaymentCTA method="paypal" />
-              </div>
-            )}
+            <RequestForm paymentMethod={tab} />
           </section>
         </div>
 
@@ -233,12 +242,235 @@ function SubscribePage() {
           أي استفسار؟ راسلنا على{" "}
           <a className="underline-offset-2 hover:underline" href={`mailto:${CONTACT_EMAIL}`}>
             {CONTACT_EMAIL}
+          </a>{" "}
+          أو واتساب{" "}
+          <a
+            className="underline-offset-2 hover:underline"
+            href={`https://wa.me/${WHATSAPP_NUMBER}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            مباشر
           </a>
         </p>
       </main>
 
       <JustlatorFooter />
     </div>
+  );
+}
+
+function RequestForm({ paymentMethod }: { paymentMethod: "paypal" | "bank" }) {
+  const submitFn = useServerFn(submitSubscriptionRequest);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [reference, setReference] = useState("");
+  const [notes, setNotes] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState<{ waLink: string } | null>(null);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      await submitFn({
+        data: {
+          full_name: fullName.trim(),
+          email: email.trim(),
+          phone: phone.trim() || null,
+          payment_method: paymentMethod,
+          reference: reference.trim() || null,
+          notes: notes.trim() || null,
+        },
+      });
+      const waLink = buildWhatsappMessage({
+        full_name: fullName.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        payment_method: paymentMethod,
+        reference: reference.trim(),
+      });
+      setSuccess({ waLink });
+      // Auto-open WhatsApp
+      window.open(waLink, "_blank", "noopener,noreferrer");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "حدث خطأ، حاول مرة أخرى");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (success) {
+    return (
+      <div className="rounded-2xl border border-primary/30 bg-primary/5 p-6 text-center">
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-primary/15">
+          <CheckCircle2 className="h-8 w-8 text-primary" />
+        </div>
+        <h3 className="mt-4 text-lg font-semibold">تم استلام طلبك بنجاح</h3>
+        <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+          أرسل لنا إيصال الدفع عبر واتساب لتسريع التفعيل. سنرسل إيميل تأكيد
+          الاشتراك خلال ساعات عمل.
+        </p>
+        <div className="mt-5 flex flex-wrap justify-center gap-2.5">
+          <a
+            href={success.waLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg bg-[#25D366] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          >
+            <MessageCircle className="h-4 w-4" />
+            فتح واتساب لإرسال الإيصال
+          </a>
+          <a
+            href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("إيصال دفع اشتراك Justlator")}`}
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-muted"
+          >
+            <Mail className="h-4 w-4" />
+            إرسال الإيصال بالإيميل
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <form
+      onSubmit={onSubmit}
+      className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+    >
+      <h2 className="text-lg font-semibold">٢. أرسل طلب الاشتراك</h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        بعد إرسال النموذج سيفتح واتساب تلقائياً بكل التفاصيل لإرفاق الإيصال.
+      </p>
+
+      <div className="mt-5 grid gap-4 sm:grid-cols-2">
+        <Field label="الاسم الكامل" required>
+          <input
+            type="text"
+            required
+            minLength={2}
+            maxLength={120}
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
+            placeholder="الاسم كما تريد أن يظهر بالفاتورة"
+          />
+        </Field>
+
+        <Field label="البريد الإلكتروني" required>
+          <input
+            type="email"
+            required
+            maxLength={255}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
+            placeholder="you@example.com"
+            dir="ltr"
+          />
+        </Field>
+
+        <Field label="رقم الجوال (واتساب)">
+          <input
+            type="tel"
+            maxLength={40}
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
+            placeholder="05XXXXXXXX"
+            dir="ltr"
+          />
+        </Field>
+
+        <Field
+          label={
+            paymentMethod === "paypal" ? "رقم عملية PayPal (اختياري)" : "رقم مرجع التحويل (اختياري)"
+          }
+        >
+          <input
+            type="text"
+            maxLength={200}
+            value={reference}
+            onChange={(e) => setReference(e.target.value)}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
+            placeholder={paymentMethod === "paypal" ? "Transaction ID" : "مرجع التحويل البنكي"}
+            dir="ltr"
+          />
+        </Field>
+      </div>
+
+      <Field label="ملاحظات (اختياري)" className="mt-4">
+        <textarea
+          maxLength={1000}
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          rows={3}
+          className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
+          placeholder="اسم المتجر، أي طلب خاص، إلخ"
+        />
+      </Field>
+
+      {error && (
+        <div className="mt-4 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {error}
+        </div>
+      )}
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:opacity-90 disabled:opacity-60"
+      >
+        {loading ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            جارٍ الإرسال…
+          </>
+        ) : (
+          <>
+            <MessageCircle className="h-4 w-4" />
+            إرسال الطلب وفتح واتساب
+          </>
+        )}
+      </button>
+
+      <p className="mt-3 text-center text-[11px] leading-relaxed text-muted-foreground">
+        بالضغط أعلاه أوافق على{" "}
+        <Link to="/terms" className="underline-offset-2 hover:underline">
+          الشروط
+        </Link>{" "}
+        و
+        <Link to="/privacy" className="underline-offset-2 hover:underline">
+          سياسة الخصوصية
+        </Link>
+        .
+      </p>
+    </form>
+  );
+}
+
+function Field({
+  label,
+  required,
+  className,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className={`block ${className ?? ""}`}>
+      <span className="mb-1.5 block text-xs font-medium text-foreground/80">
+        {label}
+        {required && <span className="text-destructive"> *</span>}
+      </span>
+      {children}
+    </label>
   );
 }
 
@@ -309,35 +541,6 @@ function CopyRow({
           </>
         )}
       </button>
-    </div>
-  );
-}
-
-function PaymentCTA({ method }: { method: "paypal" | "bank" }) {
-  return (
-    <div className="mt-5 rounded-xl border border-primary/30 bg-primary/5 p-4">
-      <div className="text-sm font-semibold">بعد الدفع، أرسل لنا الإيصال:</div>
-      <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
-        <a
-          href={buildWhatsappLink(method)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#25D366] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-        >
-          <MessageCircle className="h-4 w-4" />
-          إرسال عبر واتساب
-        </a>
-        <a
-          href={buildMailLink(method)}
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-muted"
-        >
-          <Mail className="h-4 w-4" />
-          إرسال عبر الإيميل
-        </a>
-      </div>
-      <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-        نراجع التحويل ونرسل لك إيميل تفعيل الاشتراك خلال ساعات عمل.
-      </p>
     </div>
   );
 }
