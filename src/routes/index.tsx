@@ -34,6 +34,7 @@ import {
 import ogImage from "@/assets/og-image.jpg.asset.json";
 import { ExitIntentPopup } from "@/components/ExitIntentPopup";
 import { JustlatorFooter } from "@/components/JustlatorFooter";
+import { LiveVisitorCounter } from "@/components/LiveVisitorCounter";
 import { MagicLampToggle } from "@/components/portable/MagicLampToggle";
 import { useTheme } from "@/hooks/use-theme";
 
