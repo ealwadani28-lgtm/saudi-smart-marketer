@@ -10,7 +10,7 @@
  *   • /mnt/documents/security-report.html
  */
 import { createClient } from "@supabase/supabase-js";
-import { mkdirSync, writeFileSync, appendFileSync, existsSync, readFileSync } from "fs";
+import { mkdirSync, writeFileSync, appendFileSync, existsSync } from "fs";
 import { execSync } from "child_process";
 
 function gitInfo() {
