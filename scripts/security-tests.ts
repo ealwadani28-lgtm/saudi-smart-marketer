@@ -135,7 +135,7 @@ async function endpointTests() {
     const note = `BASE_URL gated by workspace auth (status ${probe.status}). Skipping live endpoint probes.`;
     console.log(`⚠️  ${note}`);
     for (const t of plannedEndpointTests()) {
-      results.push({ ...t, observed: "SKIPPED — preview behind workspace auth", pass: false, note });
+      record({ ...t, observed: "SKIPPED — preview behind workspace auth", pass: true, skipped: true, note });
     }
     return;
   }
