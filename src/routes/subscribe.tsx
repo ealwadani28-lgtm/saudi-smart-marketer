@@ -67,7 +67,12 @@ function buildWhatsappMessage(form: {
   payment_method: PaymentMethod;
   reference?: string;
 }) {
-  const label = form.payment_method === "stc_pay" ? "STC Pay" : "تحويل بنكي";
+  const label =
+    form.payment_method === "stc_pay"
+      ? "STC Pay"
+      : form.payment_method === "paypal"
+        ? "PayPal"
+        : "تحويل بنكي";
   const lines = [
     "السلام عليكم،",
     `أرغب بتفعيل اشتراك Justlator الشهري (${PRICE_SAR} ريال).`,
