@@ -365,7 +365,7 @@ function AdminPage() {
           {error && <p className="mt-3 text-sm text-destructive">{error}</p>}
           <button
             type="submit"
-            disabled={loading || !password}
+            disabled={loading}
             className="mt-6 w-full rounded-xl bg-primary px-4 py-3 font-medium text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
           >
             {loading ? "جاري التحقق..." : "دخول"}
