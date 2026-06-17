@@ -566,10 +566,12 @@ function AdminPage() {
                             className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium ${
                               r.payment_method === "paypal"
                                 ? "bg-blue-500/10 text-blue-700 dark:text-blue-400"
+                                : r.payment_method === "stc_pay"
+                                  ? "bg-violet-500/10 text-violet-700 dark:text-violet-400"
                                 : "bg-primary/10 text-primary"
                             }`}
                           >
-                            {r.payment_method === "paypal" ? "PayPal" : "بنكي"}
+                            {getPaymentLabel(r.payment_method)}
                           </span>
                           <div className="mt-1 text-xs text-muted-foreground">
                             {r.amount_sar} ر.س
