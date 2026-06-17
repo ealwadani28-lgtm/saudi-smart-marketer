@@ -170,7 +170,7 @@ function AdminCustomerView() {
       {/* Admin banner */}
       <div className="border-b border-amber-500/30 bg-amber-500/10 px-4 py-2 text-center text-xs font-medium text-amber-900 dark:text-amber-300">
         <ShieldCheck className="inline h-3.5 w-3.5 ml-1" />
-        وضع الأدمن — عرض للقراءة فقط، العميل لا يعلم بهذه الزيارة
+        وضع الأدمن — إدارة مساحة العميل مباشرة بدون تسجيل كعميل أو رمز مؤقت
       </div>
 
       <header className="border-b border-border bg-card/50 px-4 py-4">
