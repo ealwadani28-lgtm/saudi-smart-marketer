@@ -342,6 +342,10 @@ function AdminPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
+            if (!password.trim()) {
+              setError("الرجاء إدخال كلمة المرور");
+              return;
+            }
             login(password);
           }}
           className="w-full max-w-md rounded-3xl border border-border bg-card p-8 shadow-xl"
