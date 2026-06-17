@@ -133,7 +133,8 @@ function AdminCustomerView() {
         next_refresh_at: null,
       };
       setAnalyses((prev) => [newRow, ...prev]);
-      setCustomer((prev) => prev ? { ...prev, shop_url: shopUrlInput.trim(), shop_name: String(newRow.snapshot.title ?? prev.shop_name ?? "") || prev.shop_name } : prev);
+      const analyzedTitle = typeof newRow.snapshot?.title === "string" ? newRow.snapshot.title : null;
+      setCustomer((prev) => prev ? { ...prev, shop_url: shopUrlInput.trim(), shop_name: analyzedTitle || prev.shop_name } : prev);
       setTab("analyses");
     } catch (e) {
       setAnalyzeError(e instanceof Error ? e.message : "تعذّر التحليل");
