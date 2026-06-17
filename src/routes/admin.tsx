@@ -100,14 +100,16 @@ function AdminPage() {
 
   async function loadAlertsAndStats(tk: string) {
     try {
-      const [a, s, r] = await Promise.all([
+      const [a, s, r, c] = await Promise.all([
         alertsFn({ data: { token: tk } }),
         attemptsFn({ data: { token: tk } }),
         listSubsFn({ data: { token: tk } }),
+        listCustomersFn({ data: { token: tk } }),
       ]);
       setAlerts(a.alerts as Alert[]);
       setAttemptStats(s.stats);
       setSubRequests(r.requests as SubRequest[]);
+      setCustomers(c.customers as typeof customers);
     } catch {
       // non-fatal
     }
