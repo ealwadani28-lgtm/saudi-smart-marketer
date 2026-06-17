@@ -89,6 +89,11 @@ function WorkspacePage() {
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) {
+        const adminToken = sessionStorage.getItem("admin_token_v2") || localStorage.getItem("admin_token_v2");
+        if (adminToken) {
+          navigate({ to: "/admin" });
+          return;
+        }
         navigate({ to: "/login" });
         return;
       }

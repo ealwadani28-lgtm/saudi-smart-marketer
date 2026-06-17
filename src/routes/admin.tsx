@@ -116,6 +116,7 @@ function AdminPage() {
       setAuthed(true);
       setToken(tk);
       sessionStorage.setItem(TOKEN_KEY, tk);
+      localStorage.setItem(TOKEN_KEY, tk);
       await loadAlertsAndStats(tk);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "خطأ غير معروف";
@@ -123,6 +124,7 @@ function AdminPage() {
       setAuthed(false);
       setToken(null);
       sessionStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(TOKEN_KEY);
     } finally {
       setLoading(false);
     }
@@ -164,7 +166,7 @@ function AdminPage() {
   useEffect(() => {
     // Migrate away from the old password-in-sessionStorage scheme.
     sessionStorage.removeItem(LEGACY_PW_KEY);
-    const saved = sessionStorage.getItem(TOKEN_KEY);
+    const saved = sessionStorage.getItem(TOKEN_KEY) || localStorage.getItem(TOKEN_KEY);
     if (saved) {
       loadWithToken(saved);
     }
@@ -173,6 +175,7 @@ function AdminPage() {
 
   function logout() {
     sessionStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(TOKEN_KEY);
     setAuthed(false);
     setToken(null);
     setPassword("");

@@ -92,7 +92,7 @@ function AdminCustomerView() {
   const [tab, setTab] = useState<"updates" | "analyses" | "competitors">("updates");
 
   useEffect(() => {
-    const token = localStorage.getItem(TOKEN_KEY) || "";
+    const token = sessionStorage.getItem(TOKEN_KEY) || localStorage.getItem(TOKEN_KEY) || "";
     if (!token) {
       setError("الرجاء تسجيل الدخول كأدمن أولاً من /admin");
       setLoading(false);
