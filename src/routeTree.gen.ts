@@ -20,6 +20,7 @@ import { Route as AnalyzeRouteImport } from './routes/analyze'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiGenerateImageRouteImport } from './routes/api/generate-image'
+import { Route as ApiPublicRefreshAnalysesRouteImport } from './routes/api/public/refresh-analyses'
 
 const WorkspaceRoute = WorkspaceRouteImport.update({
   id: '/workspace',
@@ -76,6 +77,12 @@ const ApiGenerateImageRoute = ApiGenerateImageRouteImport.update({
   path: '/api/generate-image',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicRefreshAnalysesRoute =
+  ApiPublicRefreshAnalysesRouteImport.update({
+    id: '/api/public/refresh-analyses',
+    path: '/api/public/refresh-analyses',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByFullPath {
   '/try': typeof TryRoute
   '/workspace': typeof WorkspaceRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
+  '/api/public/refresh-analyses': typeof ApiPublicRefreshAnalysesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -102,6 +110,7 @@ export interface FileRoutesByTo {
   '/try': typeof TryRoute
   '/workspace': typeof WorkspaceRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
+  '/api/public/refresh-analyses': typeof ApiPublicRefreshAnalysesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,6 +125,7 @@ export interface FileRoutesById {
   '/try': typeof TryRoute
   '/workspace': typeof WorkspaceRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
+  '/api/public/refresh-analyses': typeof ApiPublicRefreshAnalysesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +141,7 @@ export interface FileRouteTypes {
     | '/try'
     | '/workspace'
     | '/api/generate-image'
+    | '/api/public/refresh-analyses'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +155,7 @@ export interface FileRouteTypes {
     | '/try'
     | '/workspace'
     | '/api/generate-image'
+    | '/api/public/refresh-analyses'
   id:
     | '__root__'
     | '/'
@@ -157,6 +169,7 @@ export interface FileRouteTypes {
     | '/try'
     | '/workspace'
     | '/api/generate-image'
+    | '/api/public/refresh-analyses'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -171,6 +184,7 @@ export interface RootRouteChildren {
   TryRoute: typeof TryRoute
   WorkspaceRoute: typeof WorkspaceRoute
   ApiGenerateImageRoute: typeof ApiGenerateImageRoute
+  ApiPublicRefreshAnalysesRoute: typeof ApiPublicRefreshAnalysesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -252,6 +266,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiGenerateImageRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/refresh-analyses': {
+      id: '/api/public/refresh-analyses'
+      path: '/api/public/refresh-analyses'
+      fullPath: '/api/public/refresh-analyses'
+      preLoaderRoute: typeof ApiPublicRefreshAnalysesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -267,6 +288,7 @@ const rootRouteChildren: RootRouteChildren = {
   TryRoute: TryRoute,
   WorkspaceRoute: WorkspaceRoute,
   ApiGenerateImageRoute: ApiGenerateImageRoute,
+  ApiPublicRefreshAnalysesRoute: ApiPublicRefreshAnalysesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

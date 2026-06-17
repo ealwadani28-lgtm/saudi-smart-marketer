@@ -158,7 +158,7 @@ function Hero() {
             ما نعدك بالنتائج، لكن نعدك بالتنفيذ المحكم والتقارير الواضحة.
           </p>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-wrap">
             <Link
               to="/try"
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground shadow-lg transition hover:opacity-90"
@@ -166,10 +166,17 @@ function Hero() {
               <Sparkles className="h-5 w-5" />
               جرّب المسوّق الذكي الآن — مجاناً
             </Link>
+            <Link
+              to="/analyze"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-primary bg-background px-6 py-4 text-base font-bold text-primary transition hover:bg-primary/5"
+            >
+              🔍 حلّل متجرك مجاناً
+            </Link>
             <a href="#waitlist" className="inline-flex items-center justify-center rounded-xl border-2 border-border bg-background px-6 py-4 text-base font-medium transition hover:border-primary hover:text-primary">
               سجّل في قائمة الأوائل
             </a>
           </div>
+
 
           <div className="mt-6 inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-primary">
             <ShieldCheck className="h-4 w-4" />
