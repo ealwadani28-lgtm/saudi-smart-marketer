@@ -12,6 +12,7 @@ import {
   Loader2,
   CheckCircle2,
   Smartphone,
+  Wallet,
 } from "lucide-react";
 import { JustlatorFooter } from "@/components/JustlatorFooter";
 import { submitSubscriptionRequest } from "@/lib/subscription.functions";
@@ -23,12 +24,12 @@ export const Route = createFileRoute("/subscribe")({
       {
         name: "description",
         content:
-          "اشترك في Justlator بـ 1500 ريال شهرياً. ادفع عبر تحويل بنكي أو STC Pay، وسنفعّل حسابك خلال ساعات.",
+          "اشترك في Justlator بـ 1500 ريال شهرياً. ادفع عبر تحويل بنكي، STC Pay، أو PayPal، وسنفعّل حسابك خلال ساعات.",
       },
       { property: "og:title", content: "الاشتراك الشهري — Justlator" },
       {
         property: "og:description",
-        content: "1500 ريال / شهر. تحويل بنكي مباشر أو STC Pay.",
+        content: "1500 ريال / شهر. تحويل بنكي، STC Pay، أو PayPal.",
       },
     ],
   }),
@@ -38,7 +39,7 @@ export const Route = createFileRoute("/subscribe")({
 const PRICE_SAR = 1500;
 const WHATSAPP_NUMBER = "96654681368";
 const CONTACT_EMAIL = "contact@justlator.tech";
-type PaymentMethod = "bank" | "stc_pay";
+type PaymentMethod = "bank" | "stc_pay" | "paypal";
 
 const BANK = {
   name: "البنك الأهلي السعودي (SNB)",
@@ -52,6 +53,13 @@ const STC_PAY = {
   beneficiary: "Essa Alwadani",
 };
 
+const PAYPAL = {
+  email: "ealwadani28@gmail.com",
+  beneficiary: "Essa Alwadani",
+  link: "https://www.paypal.com/paypalme/ealwadani28",
+};
+
+
 function buildWhatsappMessage(form: {
   full_name: string;
   email: string;
@@ -59,7 +67,12 @@ function buildWhatsappMessage(form: {
   payment_method: PaymentMethod;
   reference?: string;
 }) {
-  const label = form.payment_method === "stc_pay" ? "STC Pay" : "تحويل بنكي";
+  const label =
+    form.payment_method === "stc_pay"
+      ? "STC Pay"
+      : form.payment_method === "paypal"
+        ? "PayPal"
+        : "تحويل بنكي";
   const lines = [
     "السلام عليكم،",
     `أرغب بتفعيل اشتراك Justlator الشهري (${PRICE_SAR} ريال).`,
@@ -168,7 +181,7 @@ function SubscribePage() {
                 </span>
               </div>
 
-              <div className="mt-4 inline-flex rounded-lg border border-border bg-muted/40 p-1">
+              <div className="mt-4 inline-flex flex-wrap rounded-lg border border-border bg-muted/40 p-1">
                 <TabButton active={tab === "bank"} onClick={() => setTab("bank")}>
                   <Building2 className="h-4 w-4" />
                   تحويل بنكي
@@ -176,6 +189,10 @@ function SubscribePage() {
                 <TabButton active={tab === "stc_pay"} onClick={() => setTab("stc_pay")}>
                   <Smartphone className="h-4 w-4" />
                   STC Pay
+                </TabButton>
+                <TabButton active={tab === "paypal"} onClick={() => setTab("paypal")}>
+                  <Wallet className="h-4 w-4" />
+                  PayPal
                 </TabButton>
               </div>
 
@@ -208,7 +225,7 @@ function SubscribePage() {
                     copied={copied === "swift"}
                   />
                 </div>
-              ) : (
+              ) : tab === "stc_pay" ? (
                 <div className="mt-6 space-y-3">
                   <CopyRow
                     label="رقم STC Pay"
@@ -224,7 +241,36 @@ function SubscribePage() {
                     copied={copied === "stc-ben"}
                   />
                 </div>
+              ) : (
+                <div className="mt-6 space-y-3">
+                  <CopyRow
+                    label="إيميل PayPal"
+                    value={PAYPAL.email}
+                    mono
+                    onCopy={() => copy(PAYPAL.email, "pp-email")}
+                    copied={copied === "pp-email"}
+                  />
+                  <CopyRow
+                    label="اسم المستفيد"
+                    value={PAYPAL.beneficiary}
+                    onCopy={() => copy(PAYPAL.beneficiary, "pp-ben")}
+                    copied={copied === "pp-ben"}
+                  />
+                  <a
+                    href={PAYPAL.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#0070BA] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  >
+                    <Wallet className="h-4 w-4" />
+                    فتح PayPal.me للدفع المباشر
+                  </a>
+                  <p className="rounded-lg border border-dashed border-border bg-muted/40 p-3 text-xs leading-relaxed text-muted-foreground">
+                    أرسل المبلغ كـ <span className="font-medium text-foreground">"Friends &amp; Family"</span> لتفادي رسوم PayPal. المبلغ بالدولار حسب سعر الصرف الحالي (~{Math.ceil(PRICE_SAR / 3.75)}$).
+                  </p>
+                </div>
               )}
+
             </div>
 
             <RequestForm paymentMethod={tab} />
