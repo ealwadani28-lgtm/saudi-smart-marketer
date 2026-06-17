@@ -6,7 +6,7 @@ import {
   AlertTriangle, ShieldCheck, Activity, CreditCard, Check, X, MessageCircle,
   FileDown, FileText,
 } from "lucide-react";
-import { adminListSignups, adminLogin, adminImpersonateCustomer } from "@/lib/admin.functions";
+import { adminListSignups, adminLogin } from "@/lib/admin.functions";
 import { adminGetAlerts, adminResolveAlert, adminGetSignupAttempts } from "@/lib/telemetry.functions";
 import {
   adminListSubscriptionRequests,
