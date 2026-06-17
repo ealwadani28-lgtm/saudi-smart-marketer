@@ -85,14 +85,54 @@ export const adminUpdateSubscriptionStatus = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (!verifyAdminToken(data.token)) throw new Error("Unauthorized");
 
-    const { error } = await supabaseAdmin
+    const now = new Date();
+    const reviewedAt = data.status === "pending" ? null : now.toISOString();
+
+    const { data: request, error } = await supabaseAdmin
       .from("subscription_requests")
       .update({
         status: data.status,
-        reviewed_at: data.status === "pending" ? null : new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        reviewed_at: reviewedAt,
+        updated_at: now.toISOString(),
       })
       .eq("id", data.id);
+      .select("id, full_name, email, phone, notes, status")
+      .single();
     if (error) throw new Error(error.message);
+
+    if (data.status === "approved" && request) {
+      const subscriptionStart = now;
+      const subscriptionEnd = new Date(subscriptionStart);
+      subscriptionEnd.setMonth(subscriptionEnd.getMonth() + 1);
+
+      const { data: customer, error: customerError } = await supabaseAdmin
+        .from("customers")
+        .upsert(
+          {
+            full_name: request.full_name,
+            email: request.email,
+            subscription_start: subscriptionStart.toISOString(),
+            subscription_end: subscriptionEnd.toISOString(),
+            status: "active",
+            updated_at: now.toISOString(),
+          },
+          { onConflict: "email" },
+        )
+        .select("id")
+        .single();
+      if (customerError) throw new Error(customerError.message);
+
+      const { error: updateError } = await supabaseAdmin
+        .from("customer_updates")
+        .insert({
+          customer_id: customer.id,
+          type: "subscription_approved",
+          title: "تم تفعيل الاشتراك",
+          body: `تم تفعيل اشتراك شهر واحد بناءً على طلب #${request.id.slice(0, 8)}.`,
+          done: true,
+        });
+      if (updateError) throw new Error(updateError.message);
+    }
+
     return { ok: true as const };
   });
