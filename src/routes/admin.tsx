@@ -92,6 +92,11 @@ function AdminPage() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [attemptStats, setAttemptStats] = useState<AttemptStats | null>(null);
   const [subRequests, setSubRequests] = useState<SubRequest[]>([]);
+  const [customers, setCustomers] = useState<Array<{
+    id: string; full_name: string; email: string; shop_url: string | null;
+    shop_name: string | null; status: string;
+    subscription_start: string | null; subscription_end: string | null; created_at: string;
+  }>>([]);
 
   async function loadAlertsAndStats(tk: string) {
     try {
