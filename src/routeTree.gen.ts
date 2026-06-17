@@ -22,6 +22,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiGenerateImageRouteImport } from './routes/api/generate-image'
 import { Route as ApiPublicRefreshCompetitorsRouteImport } from './routes/api/public/refresh-competitors'
 import { Route as ApiPublicRefreshAnalysesRouteImport } from './routes/api/public/refresh-analyses'
+import { Route as AdminCustomerEmailRouteImport } from './routes/admin.customer.$email'
 
 const WorkspaceRoute = WorkspaceRouteImport.update({
   id: '/workspace',
@@ -90,10 +91,15 @@ const ApiPublicRefreshAnalysesRoute =
     path: '/api/public/refresh-analyses',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminCustomerEmailRoute = AdminCustomerEmailRouteImport.update({
+  id: '/customer/$email',
+  path: '/customer/$email',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/analyze': typeof AnalyzeRoute
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
@@ -103,12 +109,13 @@ export interface FileRoutesByFullPath {
   '/try': typeof TryRoute
   '/workspace': typeof WorkspaceRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
+  '/admin/customer/$email': typeof AdminCustomerEmailRoute
   '/api/public/refresh-analyses': typeof ApiPublicRefreshAnalysesRoute
   '/api/public/refresh-competitors': typeof ApiPublicRefreshCompetitorsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/analyze': typeof AnalyzeRoute
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
@@ -118,13 +125,14 @@ export interface FileRoutesByTo {
   '/try': typeof TryRoute
   '/workspace': typeof WorkspaceRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
+  '/admin/customer/$email': typeof AdminCustomerEmailRoute
   '/api/public/refresh-analyses': typeof ApiPublicRefreshAnalysesRoute
   '/api/public/refresh-competitors': typeof ApiPublicRefreshCompetitorsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/analyze': typeof AnalyzeRoute
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   '/try': typeof TryRoute
   '/workspace': typeof WorkspaceRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
+  '/admin/customer/$email': typeof AdminCustomerEmailRoute
   '/api/public/refresh-analyses': typeof ApiPublicRefreshAnalysesRoute
   '/api/public/refresh-competitors': typeof ApiPublicRefreshCompetitorsRoute
 }
@@ -151,6 +160,7 @@ export interface FileRouteTypes {
     | '/try'
     | '/workspace'
     | '/api/generate-image'
+    | '/admin/customer/$email'
     | '/api/public/refresh-analyses'
     | '/api/public/refresh-competitors'
   fileRoutesByTo: FileRoutesByTo
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
     | '/try'
     | '/workspace'
     | '/api/generate-image'
+    | '/admin/customer/$email'
     | '/api/public/refresh-analyses'
     | '/api/public/refresh-competitors'
   id:
@@ -181,13 +192,14 @@ export interface FileRouteTypes {
     | '/try'
     | '/workspace'
     | '/api/generate-image'
+    | '/admin/customer/$email'
     | '/api/public/refresh-analyses'
     | '/api/public/refresh-competitors'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AnalyzeRoute: typeof AnalyzeRoute
   LoginRoute: typeof LoginRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -294,12 +306,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicRefreshAnalysesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/customer/$email': {
+      id: '/admin/customer/$email'
+      path: '/customer/$email'
+      fullPath: '/admin/customer/$email'
+      preLoaderRoute: typeof AdminCustomerEmailRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminCustomerEmailRoute: typeof AdminCustomerEmailRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminCustomerEmailRoute: AdminCustomerEmailRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   AnalyzeRoute: AnalyzeRoute,
   LoginRoute: LoginRoute,
   PrivacyRoute: PrivacyRoute,
