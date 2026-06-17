@@ -34,6 +34,7 @@ type Signup = {
 
 const TOKEN_KEY = "admin_token_v2";
 const LEGACY_PW_KEY = "admin_pw";
+const RETURN_TO_KEY = "admin_return_to";
 
 type Alert = {
   id: string;
@@ -126,6 +127,11 @@ function AdminPage() {
       sessionStorage.setItem(TOKEN_KEY, tk);
       localStorage.setItem(TOKEN_KEY, tk);
       await loadAlertsAndStats(tk);
+      const returnTo = sessionStorage.getItem(RETURN_TO_KEY);
+      if (returnTo?.startsWith("/admin/customer/")) {
+        sessionStorage.removeItem(RETURN_TO_KEY);
+        window.location.assign(returnTo);
+      }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "خطأ غير معروف";
       setError(msg.includes("Unauthorized") ? "انتهت الجلسة، الرجاء تسجيل الدخول مجدداً" : msg);
