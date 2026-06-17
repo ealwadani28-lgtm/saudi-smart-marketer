@@ -100,7 +100,8 @@ function AdminCustomerView() {
   useEffect(() => {
     const token = sessionStorage.getItem(TOKEN_KEY) || localStorage.getItem(TOKEN_KEY) || "";
     if (!token) {
-      setError("الرجاء تسجيل الدخول كأدمن أولاً من /admin");
+      sessionStorage.setItem("admin_return_to", `/admin/customer/${encodeURIComponent(email)}`);
+      window.location.replace("/admin");
       setLoading(false);
       return;
     }
