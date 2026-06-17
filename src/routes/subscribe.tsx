@@ -181,7 +181,7 @@ function SubscribePage() {
                 </span>
               </div>
 
-              <div className="mt-4 inline-flex rounded-lg border border-border bg-muted/40 p-1">
+              <div className="mt-4 inline-flex flex-wrap rounded-lg border border-border bg-muted/40 p-1">
                 <TabButton active={tab === "bank"} onClick={() => setTab("bank")}>
                   <Building2 className="h-4 w-4" />
                   تحويل بنكي
@@ -189,6 +189,10 @@ function SubscribePage() {
                 <TabButton active={tab === "stc_pay"} onClick={() => setTab("stc_pay")}>
                   <Smartphone className="h-4 w-4" />
                   STC Pay
+                </TabButton>
+                <TabButton active={tab === "paypal"} onClick={() => setTab("paypal")}>
+                  <Wallet className="h-4 w-4" />
+                  PayPal
                 </TabButton>
               </div>
 
@@ -221,7 +225,7 @@ function SubscribePage() {
                     copied={copied === "swift"}
                   />
                 </div>
-              ) : (
+              ) : tab === "stc_pay" ? (
                 <div className="mt-6 space-y-3">
                   <CopyRow
                     label="رقم STC Pay"
@@ -237,7 +241,36 @@ function SubscribePage() {
                     copied={copied === "stc-ben"}
                   />
                 </div>
+              ) : (
+                <div className="mt-6 space-y-3">
+                  <CopyRow
+                    label="إيميل PayPal"
+                    value={PAYPAL.email}
+                    mono
+                    onCopy={() => copy(PAYPAL.email, "pp-email")}
+                    copied={copied === "pp-email"}
+                  />
+                  <CopyRow
+                    label="اسم المستفيد"
+                    value={PAYPAL.beneficiary}
+                    onCopy={() => copy(PAYPAL.beneficiary, "pp-ben")}
+                    copied={copied === "pp-ben"}
+                  />
+                  <a
+                    href={PAYPAL.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#0070BA] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                  >
+                    <Wallet className="h-4 w-4" />
+                    فتح PayPal.me للدفع المباشر
+                  </a>
+                  <p className="rounded-lg border border-dashed border-border bg-muted/40 p-3 text-xs leading-relaxed text-muted-foreground">
+                    أرسل المبلغ كـ <span className="font-medium text-foreground">"Friends &amp; Family"</span> لتفادي رسوم PayPal. المبلغ بالدولار حسب سعر الصرف الحالي (~{Math.ceil(PRICE_SAR / 3.75)}$).
+                  </p>
+                </div>
               )}
+
             </div>
 
             <RequestForm paymentMethod={tab} />
