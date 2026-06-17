@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getWorkspace } from "@/lib/customer.functions";
 import { analyzeStorePaid, listStoreAnalyses, type StoreSnapshot, type StoreReport } from "@/lib/analyzer.functions";
 import { printStoreReport } from "@/lib/storeReportPdf";
+import { ContentPlanView } from "@/components/ContentPlanView";
 
 export const Route = createFileRoute("/workspace")({
   head: () => ({
@@ -408,12 +409,15 @@ function AnalysisCard({ analysis, tier, compact }: { analysis: Analysis; tier: "
             </div>
           )}
           {report.contentPlan && report.contentPlan.length > 0 && (
-            <div className="mt-4">
-              <h4 className="mb-2 flex items-center gap-2 text-sm font-bold text-cyan-700">
+            <div className="mt-6">
+              <h4 className="mb-4 flex items-center gap-2 text-sm font-bold text-cyan-700 dark:text-cyan-400">
                 <FileText className="h-4 w-4" />
-                خطة محتوى {report.contentPlan.length} يوم
+                خطة محتوى {report.contentPlan.length} يوم — تفاعلية
               </h4>
-              <p className="text-xs text-muted-foreground">حمّل PDF لرؤية الخطة الكاملة.</p>
+              <ContentPlanView
+                contentPlan={report.contentPlan}
+                shopType={snapshot.title || "المتجر"}
+              />
             </div>
           )}
         </>
