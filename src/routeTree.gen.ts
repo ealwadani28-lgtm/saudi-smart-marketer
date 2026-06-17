@@ -20,6 +20,7 @@ import { Route as AnalyzeRouteImport } from './routes/analyze'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiGenerateImageRouteImport } from './routes/api/generate-image'
+import { Route as ApiPublicRefreshCompetitorsRouteImport } from './routes/api/public/refresh-competitors'
 import { Route as ApiPublicRefreshAnalysesRouteImport } from './routes/api/public/refresh-analyses'
 
 const WorkspaceRoute = WorkspaceRouteImport.update({
@@ -77,6 +78,12 @@ const ApiGenerateImageRoute = ApiGenerateImageRouteImport.update({
   path: '/api/generate-image',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicRefreshCompetitorsRoute =
+  ApiPublicRefreshCompetitorsRouteImport.update({
+    id: '/api/public/refresh-competitors',
+    path: '/api/public/refresh-competitors',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicRefreshAnalysesRoute =
   ApiPublicRefreshAnalysesRouteImport.update({
     id: '/api/public/refresh-analyses',
@@ -97,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/workspace': typeof WorkspaceRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/api/public/refresh-analyses': typeof ApiPublicRefreshAnalysesRoute
+  '/api/public/refresh-competitors': typeof ApiPublicRefreshCompetitorsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -111,6 +119,7 @@ export interface FileRoutesByTo {
   '/workspace': typeof WorkspaceRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/api/public/refresh-analyses': typeof ApiPublicRefreshAnalysesRoute
+  '/api/public/refresh-competitors': typeof ApiPublicRefreshCompetitorsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -126,6 +135,7 @@ export interface FileRoutesById {
   '/workspace': typeof WorkspaceRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/api/public/refresh-analyses': typeof ApiPublicRefreshAnalysesRoute
+  '/api/public/refresh-competitors': typeof ApiPublicRefreshCompetitorsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/workspace'
     | '/api/generate-image'
     | '/api/public/refresh-analyses'
+    | '/api/public/refresh-competitors'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -156,6 +167,7 @@ export interface FileRouteTypes {
     | '/workspace'
     | '/api/generate-image'
     | '/api/public/refresh-analyses'
+    | '/api/public/refresh-competitors'
   id:
     | '__root__'
     | '/'
@@ -170,6 +182,7 @@ export interface FileRouteTypes {
     | '/workspace'
     | '/api/generate-image'
     | '/api/public/refresh-analyses'
+    | '/api/public/refresh-competitors'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -185,6 +198,7 @@ export interface RootRouteChildren {
   WorkspaceRoute: typeof WorkspaceRoute
   ApiGenerateImageRoute: typeof ApiGenerateImageRoute
   ApiPublicRefreshAnalysesRoute: typeof ApiPublicRefreshAnalysesRoute
+  ApiPublicRefreshCompetitorsRoute: typeof ApiPublicRefreshCompetitorsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -266,6 +280,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiGenerateImageRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/refresh-competitors': {
+      id: '/api/public/refresh-competitors'
+      path: '/api/public/refresh-competitors'
+      fullPath: '/api/public/refresh-competitors'
+      preLoaderRoute: typeof ApiPublicRefreshCompetitorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/refresh-analyses': {
       id: '/api/public/refresh-analyses'
       path: '/api/public/refresh-analyses'
@@ -289,6 +310,7 @@ const rootRouteChildren: RootRouteChildren = {
   WorkspaceRoute: WorkspaceRoute,
   ApiGenerateImageRoute: ApiGenerateImageRoute,
   ApiPublicRefreshAnalysesRoute: ApiPublicRefreshAnalysesRoute,
+  ApiPublicRefreshCompetitorsRoute: ApiPublicRefreshCompetitorsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
