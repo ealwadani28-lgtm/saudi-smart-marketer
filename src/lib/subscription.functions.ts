@@ -121,6 +121,7 @@ export const adminUpdateSubscriptionStatus = createServerFn({ method: "POST" })
         .select("id")
         .single();
       if (customerError) throw new Error(customerError.message);
+      if (!customer) throw new Error("تعذر إنشاء سجل العميل");
 
       const { error: updateError } = await supabaseAdmin
         .from("customer_updates")
