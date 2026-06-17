@@ -6,7 +6,7 @@ import {
   AlertTriangle, ShieldCheck, Activity, CreditCard, Check, X, MessageCircle,
   FileDown, FileText,
 } from "lucide-react";
-import { adminListSignups, adminLogin, adminImpersonateCustomer } from "@/lib/admin.functions";
+import { adminListSignups, adminLogin } from "@/lib/admin.functions";
 import { adminGetAlerts, adminResolveAlert, adminGetSignupAttempts } from "@/lib/telemetry.functions";
 import {
   adminListSubscriptionRequests,
@@ -76,17 +76,11 @@ function AdminPage() {
   const listSubsFn = useServerFn(adminListSubscriptionRequests);
   const updateSubFn = useServerFn(adminUpdateSubscriptionStatus);
   const activateFn = useServerFn(activateCustomer);
-  const impersonateFn = useServerFn(adminImpersonateCustomer);
 
-  async function impersonate(email: string) {
-    try {
-      const token = localStorage.getItem(TOKEN_KEY) || "";
-      const res = await impersonateFn({ data: { token, email } });
-      window.open(res.url, "_blank", "noopener,noreferrer");
-    } catch (e) {
-      alert(e instanceof Error ? e.message : "فشل إنشاء الرابط");
-    }
+  function openCustomerView(email: string) {
+    window.open(`/admin/customer/${encodeURIComponent(email)}`, "_blank", "noopener,noreferrer");
   }
+
   const [activating, setActivating] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [token, setToken] = useState<string | null>(null);
@@ -651,11 +645,11 @@ function AdminPage() {
                             )}
                             {r.status === "approved" && (
                               <button
-                                onClick={() => impersonate(r.email)}
+                                onClick={() => openCustomerView(r.email)}
                                 className="inline-flex items-center gap-1 rounded-md bg-primary/15 px-2 py-1 text-xs font-medium text-primary transition hover:bg-primary/25"
-                                title="افتح workspace كهذا العميل (رابط مؤقت)"
+                                title="عرض بيانات العميل (للأدمن فقط، بدون انتحال هوية)"
                               >
-                                <ExternalLink className="h-3 w-3" /> ادخل كعميل
+                                <ExternalLink className="h-3 w-3" /> اعرض البيانات
                               </button>
                             )}
                             {r.status !== "rejected" && (
