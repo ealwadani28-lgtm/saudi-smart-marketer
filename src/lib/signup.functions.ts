@@ -8,7 +8,7 @@ const Input = z.object({
 });
 
 export const submitEarlySignup = createServerFn({ method: "POST" })
-  .inputValidator((d) => Input.parse(d))
+  .validator((d) => Input.parse(d))
   .handler(async ({ data }) => {
     // Lazy server-only imports — keep client bundle clean.
     const { rateLimit, getClientIp } = await import("./rate-limit.server");

@@ -15,7 +15,7 @@ const LoginInput = z.object({ password: z.string().min(1).max(256) });
 const TokenInput = z.object({ token: z.string().min(8).max(512) });
 
 export const adminLogin = createServerFn({ method: "POST" })
-  .inputValidator((d) => LoginInput.parse(d))
+  .validator((d) => LoginInput.parse(d))
   .handler(async ({ data }) => {
     const { rateLimit, getClientIp } = await import("./rate-limit.server");
     const { issueAdminToken } = await import("./admin-token.server");
@@ -35,7 +35,7 @@ export const adminLogin = createServerFn({ method: "POST" })
   });
 
 export const adminListSignups = createServerFn({ method: "POST" })
-  .inputValidator((d) => TokenInput.parse(d))
+  .validator((d) => TokenInput.parse(d))
   .handler(async ({ data }) => {
     const { verifyAdminToken } = await import("./admin-token.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

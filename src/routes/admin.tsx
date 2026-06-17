@@ -12,6 +12,7 @@ import {
   adminListSubscriptionRequests,
   adminUpdateSubscriptionStatus,
 } from "@/lib/subscription.functions";
+import { activateCustomer } from "@/lib/customer.functions";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -56,7 +57,7 @@ type SubRequest = {
   full_name: string;
   email: string;
   phone: string | null;
-  payment_method: "bank" | "stc_pay" | "paypal";
+  payment_method: "bank" | "paypal";
   reference: string | null;
   notes: string | null;
   amount_sar: number;
@@ -74,6 +75,8 @@ function AdminPage() {
   const attemptsFn = useServerFn(adminGetSignupAttempts);
   const listSubsFn = useServerFn(adminListSubscriptionRequests);
   const updateSubFn = useServerFn(adminUpdateSubscriptionStatus);
+  const activateFn = useServerFn(activateCustomer);
+  const [activating, setActivating] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [token, setToken] = useState<string | null>(null);
   const [authed, setAuthed] = useState(false);
@@ -174,6 +177,26 @@ function AdminPage() {
     setSubRequests([]);
   }
 
+  async function activateAndSend(requestId: string) {
+    if (!token) return;
+    setActivating(requestId);
+    try {
+      const res = await activateFn({ data: { token, subscriptionRequestId: requestId } });
+      setSubRequests((prev) =>
+        prev.map((r) =>
+          r.id === requestId
+            ? { ...r, status: "approved", reviewed_at: new Date().toISOString() }
+            : r,
+        ),
+      );
+      alert(`تم تفعيل الحساب وإرسال رابط الدخول إلى ${res.email}`);
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "حدث خطأ أثناء التفعيل");
+    } finally {
+      setActivating(null);
+    }
+  }
+
   async function updateSubStatus(id: string, status: "approved" | "rejected" | "pending") {
     if (!token) return;
     try {
@@ -234,7 +257,7 @@ function AdminPage() {
   function downloadInvoice(r: SubRequest) {
     const date = new Date(r.created_at).toLocaleDateString("ar-SA");
     const invoiceNo = r.id.slice(0, 8).toUpperCase();
-    const payment = getPaymentLabel(r.payment_method);
+    const payment = r.payment_method === "paypal" ? "PayPal" : "تحويل بنكي";
     const amount = r.amount_sar.toLocaleString("ar-SA");
     const html = `<!doctype html>
 <html lang="ar" dir="rtl"><head><meta charset="utf-8" />
@@ -566,12 +589,10 @@ function AdminPage() {
                             className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium ${
                               r.payment_method === "paypal"
                                 ? "bg-blue-500/10 text-blue-700 dark:text-blue-400"
-                                : r.payment_method === "stc_pay"
-                                  ? "bg-violet-500/10 text-violet-700 dark:text-violet-400"
                                 : "bg-primary/10 text-primary"
                             }`}
                           >
-                            {getPaymentLabel(r.payment_method)}
+                            {r.payment_method === "paypal" ? "PayPal" : "بنكي"}
                           </span>
                           <div className="mt-1 text-xs text-muted-foreground">
                             {r.amount_sar} ر.س
@@ -608,11 +629,13 @@ function AdminPage() {
                             </button>
                             {r.status !== "approved" && (
                               <button
-                                onClick={() => updateSubStatus(r.id, "approved")}
-                                className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-1 text-xs font-medium text-emerald-700 transition hover:bg-emerald-500/25 dark:text-emerald-400"
-                                title="موافقة"
+                                onClick={() => activateAndSend(r.id)}
+                                disabled={activating === r.id}
+                                className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-1 text-xs font-medium text-emerald-700 transition hover:bg-emerald-500/25 dark:text-emerald-400 disabled:opacity-50"
+                                title="تفعيل وإرسال رابط الدخول"
                               >
-                                <Check className="h-3 w-3" /> فعّل
+                                <Check className="h-3 w-3" />
+                                {activating === r.id ? "جاري..." : "فعّل + أرسل"}
                               </button>
                             )}
                             {r.status !== "rejected" && (
@@ -667,12 +690,6 @@ function isSameDay(a: Date, b: Date) {
 }
 function truncate(s: string, n: number) {
   return s.length > n ? s.slice(0, n) + "…" : s;
-}
-
-function getPaymentLabel(method: SubRequest["payment_method"]) {
-  if (method === "paypal") return "PayPal";
-  if (method === "stc_pay") return "STC Pay";
-  return "تحويل بنكي";
 }
 
 function escapeHtml(s: string) {

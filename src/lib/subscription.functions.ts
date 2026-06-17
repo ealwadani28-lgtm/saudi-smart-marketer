@@ -5,7 +5,7 @@ const SubmitInput = z.object({
   full_name: z.string().trim().min(2).max(120),
   email: z.string().trim().toLowerCase().email().max(255),
   phone: z.string().trim().min(5).max(40).optional().nullable(),
-  payment_method: z.enum(["bank", "stc_pay", "paypal"]),
+  payment_method: z.enum(["bank", "paypal"]),
   reference: z.string().trim().max(200).optional().nullable(),
   notes: z.string().trim().max(1000).optional().nullable(),
 });
@@ -18,7 +18,7 @@ const UpdateInput = z.object({
 });
 
 export const submitSubscriptionRequest = createServerFn({ method: "POST" })
-  .inputValidator((d) => SubmitInput.parse(d))
+  .validator((d) => SubmitInput.parse(d))
   .handler(async ({ data }) => {
     const { rateLimit, getClientIp } = await import("./rate-limit.server");
     const { hashWithSalt } = await import("./hash.server");
@@ -61,7 +61,7 @@ export const submitSubscriptionRequest = createServerFn({ method: "POST" })
   });
 
 export const adminListSubscriptionRequests = createServerFn({ method: "POST" })
-  .inputValidator((d) => TokenInput.parse(d))
+  .validator((d) => TokenInput.parse(d))
   .handler(async ({ data }) => {
     const { verifyAdminToken } = await import("./admin-token.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -79,61 +79,20 @@ export const adminListSubscriptionRequests = createServerFn({ method: "POST" })
   });
 
 export const adminUpdateSubscriptionStatus = createServerFn({ method: "POST" })
-  .inputValidator((d) => UpdateInput.parse(d))
+  .validator((d) => UpdateInput.parse(d))
   .handler(async ({ data }) => {
     const { verifyAdminToken } = await import("./admin-token.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     if (!verifyAdminToken(data.token)) throw new Error("Unauthorized");
 
-    const now = new Date();
-    const reviewedAt = data.status === "pending" ? null : now.toISOString();
-
-    const { data: request, error } = await supabaseAdmin
+    const { error } = await supabaseAdmin
       .from("subscription_requests")
       .update({
         status: data.status,
-        reviewed_at: reviewedAt,
-        updated_at: now.toISOString(),
+        reviewed_at: data.status === "pending" ? null : new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       })
-      .eq("id", data.id)
-      .select("id, full_name, email, phone, notes, status")
-      .single();
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
-
-    if (data.status === "approved" && request) {
-      const subscriptionStart = now;
-      const subscriptionEnd = new Date(subscriptionStart);
-      subscriptionEnd.setMonth(subscriptionEnd.getMonth() + 1);
-
-      const { data: customer, error: customerError } = await supabaseAdmin
-        .from("customers")
-        .upsert(
-          {
-            full_name: request.full_name,
-            email: request.email,
-            subscription_start: subscriptionStart.toISOString(),
-            subscription_end: subscriptionEnd.toISOString(),
-            status: "active",
-            updated_at: now.toISOString(),
-          },
-          { onConflict: "email" },
-        )
-        .select("id")
-        .single();
-      if (customerError) throw new Error(customerError.message);
-      if (!customer) throw new Error("تعذر إنشاء سجل العميل");
-
-      const { error: updateError } = await supabaseAdmin
-        .from("customer_updates")
-        .insert({
-          customer_id: customer.id,
-          type: "subscription_approved",
-          title: "تم تفعيل الاشتراك",
-          body: `تم تفعيل اشتراك شهر واحد بناءً على طلب #${request.id.slice(0, 8)}.`,
-          done: true,
-        });
-      if (updateError) throw new Error(updateError.message);
-    }
-
     return { ok: true as const };
   });

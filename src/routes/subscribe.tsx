@@ -5,14 +5,14 @@ import {
   ArrowLeft,
   Check,
   Copy,
+  CreditCard,
   Mail,
   MessageCircle,
   Sparkles,
   Building2,
+  ExternalLink,
   Loader2,
   CheckCircle2,
-  Smartphone,
-  Wallet,
 } from "lucide-react";
 import { JustlatorFooter } from "@/components/JustlatorFooter";
 import { submitSubscriptionRequest } from "@/lib/subscription.functions";
@@ -24,12 +24,12 @@ export const Route = createFileRoute("/subscribe")({
       {
         name: "description",
         content:
-          "اشترك في Justlator بـ 1500 ريال شهرياً. ادفع عبر تحويل بنكي، STC Pay، أو PayPal، وسنفعّل حسابك خلال ساعات.",
+          "اشترك في Justlator بـ 1500 ريال شهرياً. ادفع عبر PayPal أو تحويل بنكي مباشر، وسنفعّل حسابك خلال ساعات.",
       },
       { property: "og:title", content: "الاشتراك الشهري — Justlator" },
       {
         property: "og:description",
-        content: "1500 ريال / شهر. تحويل بنكي، STC Pay، أو PayPal.",
+        content: "1500 ريال / شهر. PayPal أو تحويل بنكي مباشر للبنك الأهلي السعودي.",
       },
     ],
   }),
@@ -37,9 +37,9 @@ export const Route = createFileRoute("/subscribe")({
 });
 
 const PRICE_SAR = 1500;
+const PAYPAL_URL = "https://paypal.me/justlator";
 const WHATSAPP_NUMBER = "96654681368";
 const CONTACT_EMAIL = "contact@justlator.tech";
-type PaymentMethod = "bank" | "stc_pay" | "paypal";
 
 const BANK = {
   name: "البنك الأهلي السعودي (SNB)",
@@ -48,31 +48,14 @@ const BANK = {
   beneficiary: "Essa Alwadani",
 };
 
-const STC_PAY = {
-  phone: "+96654681368",
-  beneficiary: "Essa Alwadani",
-};
-
-const PAYPAL = {
-  email: "ealwadani28@gmail.com",
-  beneficiary: "Essa Alwadani",
-  link: "https://www.paypal.com/paypalme/ealwadani28",
-};
-
-
 function buildWhatsappMessage(form: {
   full_name: string;
   email: string;
   phone: string;
-  payment_method: PaymentMethod;
+  payment_method: "paypal" | "bank";
   reference?: string;
 }) {
-  const label =
-    form.payment_method === "stc_pay"
-      ? "STC Pay"
-      : form.payment_method === "paypal"
-        ? "PayPal"
-        : "تحويل بنكي";
+  const label = form.payment_method === "paypal" ? "PayPal" : "تحويل بنكي";
   const lines = [
     "السلام عليكم،",
     `أرغب بتفعيل اشتراك Justlator الشهري (${PRICE_SAR} ريال).`,
@@ -87,7 +70,7 @@ function buildWhatsappMessage(form: {
 }
 
 function SubscribePage() {
-  const [tab, setTab] = useState<PaymentMethod>("bank");
+  const [tab, setTab] = useState<"paypal" | "bank">("bank");
   const [copied, setCopied] = useState<string | null>(null);
 
   const copy = async (value: string, key: string) => {
@@ -181,17 +164,13 @@ function SubscribePage() {
                 </span>
               </div>
 
-              <div className="mt-4 inline-flex flex-wrap rounded-lg border border-border bg-muted/40 p-1">
+              <div className="mt-4 inline-flex rounded-lg border border-border bg-muted/40 p-1">
                 <TabButton active={tab === "bank"} onClick={() => setTab("bank")}>
                   <Building2 className="h-4 w-4" />
                   تحويل بنكي
                 </TabButton>
-                <TabButton active={tab === "stc_pay"} onClick={() => setTab("stc_pay")}>
-                  <Smartphone className="h-4 w-4" />
-                  STC Pay
-                </TabButton>
                 <TabButton active={tab === "paypal"} onClick={() => setTab("paypal")}>
-                  <Wallet className="h-4 w-4" />
+                  <CreditCard className="h-4 w-4" />
                   PayPal
                 </TabButton>
               </div>
@@ -225,52 +204,34 @@ function SubscribePage() {
                     copied={copied === "swift"}
                   />
                 </div>
-              ) : tab === "stc_pay" ? (
-                <div className="mt-6 space-y-3">
-                  <CopyRow
-                    label="رقم STC Pay"
-                    value={STC_PAY.phone}
-                    mono
-                    onCopy={() => copy(STC_PAY.phone, "stc-phone")}
-                    copied={copied === "stc-phone"}
-                  />
-                  <CopyRow
-                    label="اسم المستفيد"
-                    value={STC_PAY.beneficiary}
-                    onCopy={() => copy(STC_PAY.beneficiary, "stc-ben")}
-                    copied={copied === "stc-ben"}
-                  />
-                </div>
               ) : (
-                <div className="mt-6 space-y-3">
-                  <CopyRow
-                    label="إيميل PayPal"
-                    value={PAYPAL.email}
-                    mono
-                    onCopy={() => copy(PAYPAL.email, "pp-email")}
-                    copied={copied === "pp-email"}
-                  />
-                  <CopyRow
-                    label="اسم المستفيد"
-                    value={PAYPAL.beneficiary}
-                    onCopy={() => copy(PAYPAL.beneficiary, "pp-ben")}
-                    copied={copied === "pp-ben"}
-                  />
+                <div className="mt-6 space-y-4">
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    ادفع <span className="font-semibold text-foreground">{PRICE_SAR} ريال</span>{" "}
+                    (ما يعادلها بالدولار) عبر رابط PayPal الرسمي الخاص بنا.
+                  </p>
+
                   <a
-                    href={PAYPAL.link}
+                    href={PAYPAL_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#0070BA] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                    className="group flex items-center justify-between rounded-xl border border-border bg-background px-4 py-3.5 transition-colors hover:border-primary/50 hover:bg-primary/5"
                   >
-                    <Wallet className="h-4 w-4" />
-                    فتح PayPal.me للدفع المباشر
+                    <div className="flex items-center gap-3">
+                      <div className="grid h-10 w-10 place-items-center rounded-lg bg-[#003087] text-white text-xs font-bold">
+                        Pay<span className="text-[#009cde]">Pal</span>
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold">paypal.me/justlator</div>
+                        <div className="text-xs text-muted-foreground">
+                          المستفيد: Essa Alwadani
+                        </div>
+                      </div>
+                    </div>
+                    <ExternalLink className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary" />
                   </a>
-                  <p className="rounded-lg border border-dashed border-border bg-muted/40 p-3 text-xs leading-relaxed text-muted-foreground">
-                    أرسل المبلغ كـ <span className="font-medium text-foreground">"Friends &amp; Family"</span> لتفادي رسوم PayPal. المبلغ بالدولار حسب سعر الصرف الحالي (~{Math.ceil(PRICE_SAR / 3.75)}$).
-                  </p>
                 </div>
               )}
-
             </div>
 
             <RequestForm paymentMethod={tab} />
@@ -299,7 +260,7 @@ function SubscribePage() {
   );
 }
 
-function RequestForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
+function RequestForm({ paymentMethod }: { paymentMethod: "paypal" | "bank" }) {
   const submitFn = useServerFn(submitSubscriptionRequest);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -430,7 +391,7 @@ function RequestForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
 
         <Field
           label={
-            paymentMethod === "stc_pay" ? "رقم عملية STC Pay (اختياري)" : "رقم مرجع التحويل (اختياري)"
+            paymentMethod === "paypal" ? "رقم عملية PayPal (اختياري)" : "رقم مرجع التحويل (اختياري)"
           }
         >
           <input
@@ -439,7 +400,7 @@ function RequestForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
             value={reference}
             onChange={(e) => setReference(e.target.value)}
             className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
-            placeholder={paymentMethod === "stc_pay" ? "رقم العملية" : "مرجع التحويل البنكي"}
+            placeholder={paymentMethod === "paypal" ? "Transaction ID" : "مرجع التحويل البنكي"}
             dir="ltr"
           />
         </Field>
