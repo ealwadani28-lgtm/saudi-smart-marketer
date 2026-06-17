@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import {
   ArrowRight, Loader2, Lock, Store, CalendarDays, AlertCircle,
   CheckCircle2, Sparkles, ChevronRight, ShieldCheck, ExternalLink,
+  RefreshCw,
 } from "lucide-react";
-import { adminGetCustomerView } from "@/lib/admin.functions";
+import { adminAnalyzeCustomerStore, adminGetCustomerView } from "@/lib/admin.functions";
 
 const TOKEN_KEY = "admin_token_v2";
 
@@ -82,14 +83,19 @@ function AdminCustomerView() {
   const { email: rawEmail } = Route.useParams();
   const email = decodeURIComponent(rawEmail);
   const getView = useServerFn(adminGetCustomerView);
+  const runAdminAnalysis = useServerFn(adminAnalyzeCustomerStore);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [token, setToken] = useState("");
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [updates, setUpdates] = useState<Update[]>([]);
   const [analyses, setAnalyses] = useState<Analysis[]>([]);
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
   const [tab, setTab] = useState<"updates" | "analyses" | "competitors">("updates");
+  const [shopUrlInput, setShopUrlInput] = useState("");
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analyzeError, setAnalyzeError] = useState("");
 
   useEffect(() => {
     const token = sessionStorage.getItem(TOKEN_KEY) || localStorage.getItem(TOKEN_KEY) || "";
@@ -98,16 +104,44 @@ function AdminCustomerView() {
       setLoading(false);
       return;
     }
+    setToken(token);
     getView({ data: { token, email } })
       .then((res) => {
-        setCustomer(res.customer as Customer);
+        const customer = res.customer as Customer;
+        setCustomer(customer);
         setUpdates(res.updates as Update[]);
         setAnalyses(res.analyses as Analysis[]);
         setCompetitors(res.competitors as Competitor[]);
+        setShopUrlInput(customer.shop_url ?? "");
       })
       .catch((e) => setError(e instanceof Error ? e.message : "فشل تحميل البيانات"))
       .finally(() => setLoading(false));
   }, [email, getView]);
+
+  async function handleAdminAnalyze() {
+    if (!token || !shopUrlInput.trim()) return;
+    setAnalyzeError("");
+    setAnalyzing(true);
+    try {
+      const res = await runAdminAnalysis({ data: { token, email, storeUrl: shopUrlInput.trim() } });
+      const newRow: Analysis = {
+        id: res.id!,
+        store_url: shopUrlInput.trim(),
+        snapshot: res.snapshot as Record<string, unknown>,
+        report: res.report as Record<string, unknown>,
+        created_at: res.createdAt ?? new Date().toISOString(),
+        next_refresh_at: null,
+      };
+      setAnalyses((prev) => [newRow, ...prev]);
+      const analyzedTitle = typeof newRow.snapshot?.title === "string" ? newRow.snapshot.title : null;
+      setCustomer((prev) => prev ? { ...prev, shop_url: shopUrlInput.trim(), shop_name: analyzedTitle || prev.shop_name } : prev);
+      setTab("analyses");
+    } catch (e) {
+      setAnalyzeError(e instanceof Error ? e.message : "تعذّر التحليل");
+    } finally {
+      setAnalyzing(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -136,7 +170,7 @@ function AdminCustomerView() {
       {/* Admin banner */}
       <div className="border-b border-amber-500/30 bg-amber-500/10 px-4 py-2 text-center text-xs font-medium text-amber-900 dark:text-amber-300">
         <ShieldCheck className="inline h-3.5 w-3.5 ml-1" />
-        وضع الأدمن — عرض للقراءة فقط، العميل لا يعلم بهذه الزيارة
+        وضع الأدمن — إدارة مساحة العميل مباشرة بدون تسجيل كعميل أو رمز مؤقت
       </div>
 
       <header className="border-b border-border bg-card/50 px-4 py-4">
@@ -211,6 +245,26 @@ function AdminCustomerView() {
 
         {tab === "analyses" && (
           <section className="space-y-3">
+            <div className="rounded-lg border border-border bg-card p-4">
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <input
+                  dir="ltr"
+                  value={shopUrlInput}
+                  onChange={(e) => setShopUrlInput(e.target.value)}
+                  placeholder="https://yourstore.com"
+                  className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+                />
+                <button
+                  onClick={handleAdminAnalyze}
+                  disabled={analyzing || !shopUrlInput.trim()}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-bold text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
+                >
+                  {analyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                  {analyzing ? "جاري التحليل..." : "حلّل كأدمن"}
+                </button>
+              </div>
+              {analyzeError && <p className="mt-2 text-xs text-destructive">{analyzeError}</p>}
+            </div>
             {analyses.length === 0 ? <Empty text="لا توجد تحليلات بعد" /> : analyses.map((a) => (
               <div key={a.id} className="rounded-lg border border-border bg-card p-4">
                 <div className="flex items-center justify-between gap-2">

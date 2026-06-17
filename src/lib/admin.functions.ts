@@ -57,6 +57,25 @@ const CustomerViewInput = z.object({
   email: z.string().email().max(256),
 });
 
+const AdminAnalyzeInput = z.object({
+  token: z.string().min(8).max(512),
+  email: z.string().email().max(256),
+  storeUrl: z
+    .string()
+    .trim()
+    .min(4)
+    .max(500)
+    .transform((s) => (s.startsWith("http") ? s : `https://${s}`))
+    .refine((s) => {
+      try {
+        const u = new URL(s);
+        return u.protocol === "http:" || u.protocol === "https:";
+      } catch {
+        return false;
+      }
+    }, "رابط غير صالح"),
+});
+
 /**
  * Admin read-only view of a customer's workspace data.
  * Does NOT impersonate the customer — admin sees the data within the admin panel.
@@ -106,6 +125,61 @@ export const adminGetCustomerView = createServerFn({ method: "POST" })
       analyses: analysesRes.data ?? [],
       competitors: competitorsRes.data ?? [],
     };
+  });
+
+export const adminAnalyzeCustomerStore = createServerFn({ method: "POST" })
+  .inputValidator((d) => AdminAnalyzeInput.parse(d))
+  .handler(async ({ data }) => {
+    const { verifyAdminToken } = await import("./admin-token.server");
+    const { fetchStoreHtml, buildSnapshot, callGemini } = await import("./analyzer.functions");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    if (!verifyAdminToken(data.token)) {
+      throw new Error("Unauthorized");
+    }
+
+    const { data: customer, error: cErr } = await supabaseAdmin
+      .from("customers")
+      .select("id, status")
+      .eq("email", data.email)
+      .single();
+    if (cErr || !customer) throw new Error("لم نجد مساحة عمل لهذا العميل");
+    if (customer.status !== "active") throw new Error("اشتراك العميل غير مفعّل");
+
+    const html = await fetchStoreHtml(data.storeUrl);
+    const snapshot = buildSnapshot(html, data.storeUrl);
+    const report = await callGemini(snapshot, "paid");
+    const refreshAt = new Date();
+    refreshAt.setDate(refreshAt.getDate() + 14);
+
+    const { data: row, error } = await supabaseAdmin
+      .from("store_analyses")
+      .insert({
+        customer_id: customer.id,
+        store_url: data.storeUrl,
+        tier: "paid",
+        snapshot,
+        report,
+        next_refresh_at: refreshAt.toISOString(),
+      })
+      .select("id, created_at")
+      .single();
+    if (error) throw new Error(`فشل حفظ التحليل: ${error.message}`);
+
+    await supabaseAdmin
+      .from("customers")
+      .update({ shop_url: data.storeUrl, shop_name: snapshot.title || null })
+      .eq("id", customer.id);
+
+    await supabaseAdmin.from("customer_updates").insert({
+      customer_id: customer.id,
+      type: "analysis",
+      title: `تحليل المتجر جاهز — ${snapshot.title || data.storeUrl}`,
+      body: report.summary,
+      done: true,
+    });
+
+    return { id: row?.id, snapshot, report, createdAt: row?.created_at };
   });
 
 
