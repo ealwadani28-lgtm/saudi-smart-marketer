@@ -17,7 +17,7 @@ const ResolveInput = z.object({
  * Throttled server-side (per-IP 60s) inside the DB function.
  */
 export const pingVisitor = createServerFn({ method: "POST" })
-  .validator((d) => PingInput.parse(d))
+  .inputValidator((d) => PingInput.parse(d))
   .handler(async ({ data }) => {
     const { getClientIp } = await import("./rate-limit.server");
     const { hashWithSalt } = await import("./hash.server");
@@ -42,7 +42,7 @@ export const pingVisitor = createServerFn({ method: "POST" })
   });
 
 export const adminGetAlerts = createServerFn({ method: "POST" })
-  .validator((d) => TokenInput.parse(d))
+  .inputValidator((d) => TokenInput.parse(d))
   .handler(async ({ data }) => {
     const { verifyAdminToken } = await import("./admin-token.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -58,7 +58,7 @@ export const adminGetAlerts = createServerFn({ method: "POST" })
   });
 
 export const adminResolveAlert = createServerFn({ method: "POST" })
-  .validator((d) => ResolveInput.parse(d))
+  .inputValidator((d) => ResolveInput.parse(d))
   .handler(async ({ data }) => {
     const { verifyAdminToken } = await import("./admin-token.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -73,7 +73,7 @@ export const adminResolveAlert = createServerFn({ method: "POST" })
   });
 
 export const adminGetSignupAttempts = createServerFn({ method: "POST" })
-  .validator((d) => TokenInput.parse(d))
+  .inputValidator((d) => TokenInput.parse(d))
   .handler(async ({ data }) => {
     const { verifyAdminToken } = await import("./admin-token.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
