@@ -52,13 +52,17 @@ export const adminListSignups = createServerFn({ method: "POST" })
     return { signups: rows ?? [], total: rows?.length ?? 0 };
   });
 
-const ImpersonateInput = z.object({
+const CustomerViewInput = z.object({
   token: z.string().min(8).max(512),
   email: z.string().email().max(256),
 });
 
-export const adminImpersonateCustomer = createServerFn({ method: "POST" })
-  .inputValidator((d) => ImpersonateInput.parse(d))
+/**
+ * Admin read-only view of a customer's workspace data.
+ * Does NOT impersonate the customer — admin sees the data within the admin panel.
+ */
+export const adminGetCustomerView = createServerFn({ method: "POST" })
+  .inputValidator((d) => CustomerViewInput.parse(d))
   .handler(async ({ data }) => {
     const { verifyAdminToken } = await import("./admin-token.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -67,17 +71,41 @@ export const adminImpersonateCustomer = createServerFn({ method: "POST" })
       throw new Error("Unauthorized");
     }
 
-    const siteUrl = process.env.SITE_URL || process.env.VITE_SITE_URL || "";
-    const { data: linkData, error } = await supabaseAdmin.auth.admin.generateLink({
-      type: "magiclink",
-      email: data.email,
-      options: {
-        redirectTo: siteUrl ? `${siteUrl}/workspace` : undefined,
-      },
-    });
-    if (error) throw new Error(error.message);
-    const actionLink = linkData?.properties?.action_link;
-    if (!actionLink) throw new Error("تعذّر إنشاء رابط الدخول");
-    return { url: actionLink, email: data.email };
+    const { data: customer, error: cErr } = await supabaseAdmin
+      .from("customers")
+      .select("id, full_name, email, shop_url, shop_name, subscription_start, subscription_end, status, created_at")
+      .eq("email", data.email)
+      .maybeSingle();
+
+    if (cErr) throw new Error(cErr.message);
+    if (!customer) throw new Error("لم يتم العثور على عميل بهذا البريد");
+
+    const [updatesRes, analysesRes, competitorsRes] = await Promise.all([
+      supabaseAdmin
+        .from("customer_updates")
+        .select("id, type, title, body, done, created_at")
+        .eq("customer_id", customer.id)
+        .order("created_at", { ascending: false })
+        .limit(100),
+      supabaseAdmin
+        .from("store_analyses")
+        .select("id, store_url, snapshot, report, created_at, next_refresh_at")
+        .eq("customer_id", customer.id)
+        .order("created_at", { ascending: false })
+        .limit(20),
+      supabaseAdmin
+        .from("competitors")
+        .select("id, competitor_url, competitor_name, source, active, last_checked_at, next_check_at, created_at")
+        .eq("customer_id", customer.id)
+        .order("created_at", { ascending: false }),
+    ]);
+
+    return {
+      customer,
+      updates: updatesRes.data ?? [],
+      analyses: analysesRes.data ?? [],
+      competitors: competitorsRes.data ?? [],
+    };
   });
+
 
