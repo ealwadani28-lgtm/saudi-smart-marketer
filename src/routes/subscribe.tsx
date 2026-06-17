@@ -74,7 +74,7 @@ function buildWhatsappMessage(form: {
 }
 
 function SubscribePage() {
-  const [tab, setTab] = useState<"paypal" | "bank">("bank");
+  const [tab, setTab] = useState<PaymentMethod>("bank");
   const [copied, setCopied] = useState<string | null>(null);
 
   const copy = async (value: string, key: string) => {
@@ -173,9 +173,9 @@ function SubscribePage() {
                   <Building2 className="h-4 w-4" />
                   تحويل بنكي
                 </TabButton>
-                <TabButton active={tab === "paypal"} onClick={() => setTab("paypal")}>
-                  <CreditCard className="h-4 w-4" />
-                  PayPal
+                <TabButton active={tab === "stc_pay"} onClick={() => setTab("stc_pay")}>
+                  <Smartphone className="h-4 w-4" />
+                  STC Pay
                 </TabButton>
               </div>
 
@@ -209,31 +209,20 @@ function SubscribePage() {
                   />
                 </div>
               ) : (
-                <div className="mt-6 space-y-4">
-                  <p className="text-sm leading-relaxed text-muted-foreground">
-                    ادفع <span className="font-semibold text-foreground">{PRICE_SAR} ريال</span>{" "}
-                    (ما يعادلها بالدولار) عبر رابط PayPal الرسمي الخاص بنا.
-                  </p>
-
-                  <a
-                    href={PAYPAL_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center justify-between rounded-xl border border-border bg-background px-4 py-3.5 transition-colors hover:border-primary/50 hover:bg-primary/5"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="grid h-10 w-10 place-items-center rounded-lg bg-[#003087] text-white text-xs font-bold">
-                        Pay<span className="text-[#009cde]">Pal</span>
-                      </div>
-                      <div>
-                        <div className="text-sm font-semibold">paypal.me/justlator</div>
-                        <div className="text-xs text-muted-foreground">
-                          المستفيد: Essa Alwadani
-                        </div>
-                      </div>
-                    </div>
-                    <ExternalLink className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary" />
-                  </a>
+                <div className="mt-6 space-y-3">
+                  <CopyRow
+                    label="رقم STC Pay"
+                    value={STC_PAY.phone}
+                    mono
+                    onCopy={() => copy(STC_PAY.phone, "stc-phone")}
+                    copied={copied === "stc-phone"}
+                  />
+                  <CopyRow
+                    label="اسم المستفيد"
+                    value={STC_PAY.beneficiary}
+                    onCopy={() => copy(STC_PAY.beneficiary, "stc-ben")}
+                    copied={copied === "stc-ben"}
+                  />
                 </div>
               )}
             </div>
