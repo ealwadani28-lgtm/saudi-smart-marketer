@@ -5,7 +5,7 @@ const SubmitInput = z.object({
   full_name: z.string().trim().min(2).max(120),
   email: z.string().trim().toLowerCase().email().max(255),
   phone: z.string().trim().min(5).max(40).optional().nullable(),
-  payment_method: z.enum(["bank", "paypal"]),
+  payment_method: z.enum(["bank", "stc_pay", "paypal"]),
   reference: z.string().trim().max(200).optional().nullable(),
   notes: z.string().trim().max(1000).optional().nullable(),
 });

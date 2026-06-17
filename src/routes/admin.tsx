@@ -56,7 +56,7 @@ type SubRequest = {
   full_name: string;
   email: string;
   phone: string | null;
-  payment_method: "bank" | "paypal";
+  payment_method: "bank" | "stc_pay" | "paypal";
   reference: string | null;
   notes: string | null;
   amount_sar: number;
@@ -234,7 +234,7 @@ function AdminPage() {
   function downloadInvoice(r: SubRequest) {
     const date = new Date(r.created_at).toLocaleDateString("ar-SA");
     const invoiceNo = r.id.slice(0, 8).toUpperCase();
-    const payment = r.payment_method === "paypal" ? "PayPal" : "تحويل بنكي";
+    const payment = getPaymentLabel(r.payment_method);
     const amount = r.amount_sar.toLocaleString("ar-SA");
     const html = `<!doctype html>
 <html lang="ar" dir="rtl"><head><meta charset="utf-8" />
