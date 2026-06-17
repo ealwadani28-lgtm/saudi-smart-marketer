@@ -184,7 +184,7 @@ function extractSocialLinks(html: string): { social: Record<string, string>; wha
   return { social, whatsapp };
 }
 
-async function fetchStoreHtml(url: string): Promise<string> {
+export async function fetchStoreHtml(url: string): Promise<string> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 12_000);
   try {
