@@ -654,9 +654,9 @@ function AdminPage() {
                               <button
                                 onClick={() => openCustomerView(r.email)}
                                 className="inline-flex items-center gap-1 rounded-md bg-primary/15 px-2 py-1 text-xs font-medium text-primary transition hover:bg-primary/25"
-                                title="عرض بيانات العميل (للأدمن فقط، بدون انتحال هوية)"
+                                title="فتح ورك سبيس العميل من لوحة الأدمن بدون تسجيل عميل"
                               >
-                                <ExternalLink className="h-3 w-3" /> اعرض البيانات
+                                <ExternalLink className="h-3 w-3" /> ورك سبيس
                               </button>
                             )}
                             {r.status !== "rejected" && (
