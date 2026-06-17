@@ -18,7 +18,7 @@ const MagicLinkInput = z.object({
  * Admin: approve a subscription request → create Supabase Auth user → send magic link
  */
 export const activateCustomer = createServerFn({ method: "POST" })
-  .validator((d) => ActivateInput.parse(d))
+  .inputValidator((d) => ActivateInput.parse(d))
   .handler(async ({ data }) => {
     const { verifyAdminToken } = await import("./admin-token.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -106,7 +106,7 @@ export const activateCustomer = createServerFn({ method: "POST" })
  * Customer: fetch their workspace data (requires auth)
  */
 export const getWorkspace = createServerFn({ method: "POST" })
-  .validator((d) => WorkspaceInput.parse(d))
+  .inputValidator((d) => WorkspaceInput.parse(d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -132,7 +132,7 @@ export const getWorkspace = createServerFn({ method: "POST" })
  * Customer: request a new magic link by email
  */
 export const requestMagicLink = createServerFn({ method: "POST" })
-  .validator((d) => MagicLinkInput.parse(d))
+  .inputValidator((d) => MagicLinkInput.parse(d))
   .handler(async ({ data }) => {
     const { rateLimit, getClientIp } = await import("./rate-limit.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

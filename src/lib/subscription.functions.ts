@@ -18,7 +18,7 @@ const UpdateInput = z.object({
 });
 
 export const submitSubscriptionRequest = createServerFn({ method: "POST" })
-  .validator((d) => SubmitInput.parse(d))
+  .inputValidator((d) => SubmitInput.parse(d))
   .handler(async ({ data }) => {
     const { rateLimit, getClientIp } = await import("./rate-limit.server");
     const { hashWithSalt } = await import("./hash.server");
@@ -61,7 +61,7 @@ export const submitSubscriptionRequest = createServerFn({ method: "POST" })
   });
 
 export const adminListSubscriptionRequests = createServerFn({ method: "POST" })
-  .validator((d) => TokenInput.parse(d))
+  .inputValidator((d) => TokenInput.parse(d))
   .handler(async ({ data }) => {
     const { verifyAdminToken } = await import("./admin-token.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -79,7 +79,7 @@ export const adminListSubscriptionRequests = createServerFn({ method: "POST" })
   });
 
 export const adminUpdateSubscriptionStatus = createServerFn({ method: "POST" })
-  .validator((d) => UpdateInput.parse(d))
+  .inputValidator((d) => UpdateInput.parse(d))
   .handler(async ({ data }) => {
     const { verifyAdminToken } = await import("./admin-token.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
