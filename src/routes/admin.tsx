@@ -76,6 +76,7 @@ function AdminPage() {
   const listSubsFn = useServerFn(adminListSubscriptionRequests);
   const updateSubFn = useServerFn(adminUpdateSubscriptionStatus);
   const activateFn = useServerFn(activateCustomer);
+  const listCustomersFn = useServerFn(adminListCustomers);
 
   function openCustomerView(email: string) {
     window.open(`/admin/customer/${encodeURIComponent(email)}`, "_blank", "noopener,noreferrer");
