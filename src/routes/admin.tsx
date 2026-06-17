@@ -667,6 +667,12 @@ function truncate(s: string, n: number) {
   return s.length > n ? s.slice(0, n) + "…" : s;
 }
 
+function getPaymentLabel(method: SubRequest["payment_method"]) {
+  if (method === "paypal") return "PayPal";
+  if (method === "stc_pay") return "STC Pay";
+  return "تحويل بنكي";
+}
+
 function escapeHtml(s: string) {
   return s
     .replace(/&/g, "&amp;")

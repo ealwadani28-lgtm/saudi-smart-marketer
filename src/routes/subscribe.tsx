@@ -5,14 +5,13 @@ import {
   ArrowLeft,
   Check,
   Copy,
-  CreditCard,
   Mail,
   MessageCircle,
   Sparkles,
   Building2,
-  ExternalLink,
   Loader2,
   CheckCircle2,
+  Smartphone,
 } from "lucide-react";
 import { JustlatorFooter } from "@/components/JustlatorFooter";
 import { submitSubscriptionRequest } from "@/lib/subscription.functions";
@@ -24,12 +23,12 @@ export const Route = createFileRoute("/subscribe")({
       {
         name: "description",
         content:
-          "اشترك في Justlator بـ 1500 ريال شهرياً. ادفع عبر PayPal أو تحويل بنكي مباشر، وسنفعّل حسابك خلال ساعات.",
+          "اشترك في Justlator بـ 1500 ريال شهرياً. ادفع عبر تحويل بنكي أو STC Pay، وسنفعّل حسابك خلال ساعات.",
       },
       { property: "og:title", content: "الاشتراك الشهري — Justlator" },
       {
         property: "og:description",
-        content: "1500 ريال / شهر. PayPal أو تحويل بنكي مباشر للبنك الأهلي السعودي.",
+        content: "1500 ريال / شهر. تحويل بنكي مباشر أو STC Pay.",
       },
     ],
   }),
@@ -37,9 +36,9 @@ export const Route = createFileRoute("/subscribe")({
 });
 
 const PRICE_SAR = 1500;
-const PAYPAL_URL = "https://paypal.me/justlator";
 const WHATSAPP_NUMBER = "96654681368";
 const CONTACT_EMAIL = "contact@justlator.tech";
+type PaymentMethod = "bank" | "stc_pay";
 
 const BANK = {
   name: "البنك الأهلي السعودي (SNB)",
@@ -48,14 +47,19 @@ const BANK = {
   beneficiary: "Essa Alwadani",
 };
 
+const STC_PAY = {
+  phone: "+96654681368",
+  beneficiary: "Essa Alwadani",
+};
+
 function buildWhatsappMessage(form: {
   full_name: string;
   email: string;
   phone: string;
-  payment_method: "paypal" | "bank";
+  payment_method: PaymentMethod;
   reference?: string;
 }) {
-  const label = form.payment_method === "paypal" ? "PayPal" : "تحويل بنكي";
+  const label = form.payment_method === "stc_pay" ? "STC Pay" : "تحويل بنكي";
   const lines = [
     "السلام عليكم،",
     `أرغب بتفعيل اشتراك Justlator الشهري (${PRICE_SAR} ريال).`,
