@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import {
   Sparkles, LogOut, CheckCircle2, Clock, AlertCircle,
-  Store, CalendarDays, ChevronRight,
+  Store, CalendarDays, ChevronRight, FileText, Loader2, Download, RefreshCw,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getWorkspace } from "@/lib/customer.functions";
+import { analyzeStorePaid, listStoreAnalyses, type StoreSnapshot, type StoreReport } from "@/lib/analyzer.functions";
+import { printStoreReport } from "@/lib/storeReportPdf";
 
 export const Route = createFileRoute("/workspace")({
   head: () => ({
@@ -37,6 +39,15 @@ type Customer = {
   status: string;
 };
 
+type Analysis = {
+  id: string;
+  store_url: string;
+  snapshot: StoreSnapshot;
+  report: StoreReport;
+  created_at: string;
+  next_refresh_at: string | null;
+};
+
 const TYPE_ICON: Record<string, React.ReactNode> = {
   welcome:    <Sparkles className="h-5 w-5 text-primary" />,
   analysis:   <Store className="h-5 w-5 text-gold" />,
@@ -59,11 +70,20 @@ function formatDate(iso: string) {
 function WorkspacePage() {
   const navigate = useNavigate();
   const fetchWorkspace = useServerFn(getWorkspace);
+  const runAnalysis = useServerFn(analyzeStorePaid);
+  const listAnalyses = useServerFn(listStoreAnalyses);
 
   const [loading, setLoading] = useState(true);
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [updates, setUpdates] = useState<Update[]>([]);
+  const [analyses, setAnalyses] = useState<Analysis[]>([]);
   const [error, setError] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Analyzer form state
+  const [shopUrlInput, setShopUrlInput] = useState("");
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analyzeError, setAnalyzeError] = useState("");
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
@@ -71,10 +91,16 @@ function WorkspacePage() {
         navigate({ to: "/login" });
         return;
       }
+      setUserId(session.user.id);
       try {
-        const res = await fetchWorkspace({ data: { userId: session.user.id } });
-        setCustomer(res.customer);
-        setUpdates(res.updates);
+        const [ws, an] = await Promise.all([
+          fetchWorkspace({ data: { userId: session.user.id } }),
+          listAnalyses({ data: { userId: session.user.id } }),
+        ]);
+        setCustomer(ws.customer);
+        setUpdates(ws.updates);
+        setAnalyses(an.analyses as Analysis[]);
+        if (ws.customer?.shop_url) setShopUrlInput(ws.customer.shop_url);
       } catch (e) {
         setError(e instanceof Error ? e.message : "حدث خطأ");
       } finally {
@@ -82,6 +108,32 @@ function WorkspacePage() {
       }
     });
   }, []);
+
+  async function handleAnalyze() {
+    if (!userId || !shopUrlInput.trim()) return;
+    setAnalyzeError("");
+    setAnalyzing(true);
+    try {
+      const res = await runAnalysis({ data: { userId, storeUrl: shopUrlInput.trim() } });
+      const newRow: Analysis = {
+        id: res.id!,
+        store_url: shopUrlInput.trim(),
+        snapshot: res.snapshot,
+        report: res.report,
+        created_at: res.createdAt ?? new Date().toISOString(),
+        next_refresh_at: null,
+      };
+      setAnalyses((prev) => [newRow, ...prev]);
+      // Refresh updates feed
+      const ws = await fetchWorkspace({ data: { userId } });
+      setUpdates(ws.updates);
+      setCustomer(ws.customer);
+    } catch (e) {
+      setAnalyzeError(e instanceof Error ? e.message : "تعذّر التحليل");
+    } finally {
+      setAnalyzing(false);
+    }
+  }
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -114,10 +166,10 @@ function WorkspacePage() {
   }
 
   const days = daysLeft(customer?.subscription_end ?? null);
+  const latest = analyses[0];
 
   return (
     <div className="min-h-screen bg-background text-foreground" dir="rtl">
-      {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
@@ -137,19 +189,13 @@ function WorkspacePage() {
       </header>
 
       <main className="mx-auto max-w-4xl px-6 py-10">
-        {/* Welcome */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <h1 className="font-display text-2xl font-bold md:text-3xl">
             أهلاً، {customer?.full_name?.split(" ")[0]} 👋
           </h1>
           <p className="mt-1 text-muted-foreground">هذي مساحة عملك — كل شيء موثّق هنا بشفافية كاملة.</p>
         </motion.div>
 
-        {/* Stats bar */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -175,6 +221,82 @@ function WorkspacePage() {
           />
         </motion.div>
 
+        {/* Analyzer section */}
+        <motion.section
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.15 }}
+          className="mt-10 rounded-2xl border border-border bg-card p-6 md:p-8"
+        >
+          <div className="flex items-center gap-3">
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
+              <Store className="h-5 w-5" />
+            </div>
+            <div>
+              <h2 className="font-display text-lg font-bold">تحليل متجرك</h2>
+              <p className="text-sm text-muted-foreground">
+                {latest ? "آخر تحليل + إمكانية تشغيل تحليل جديد" : "ابدأ بتحليل متجرك الآن"}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+            <input
+              dir="ltr"
+              value={shopUrlInput}
+              onChange={(e) => setShopUrlInput(e.target.value)}
+              placeholder="https://yourstore.com"
+              className="flex-1 rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+            />
+            <button
+              onClick={handleAnalyze}
+              disabled={analyzing || !shopUrlInput.trim()}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground transition hover:opacity-90 disabled:opacity-50"
+            >
+              {analyzing ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  جاري التحليل (قد يأخذ دقيقة)...
+                </>
+              ) : latest ? (
+                <>
+                  <RefreshCw className="h-4 w-4" />
+                  تحليل جديد
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4" />
+                  حلّل الآن
+                </>
+              )}
+            </button>
+          </div>
+
+          {analyzeError && (
+            <div className="mt-3 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive">
+              {analyzeError}
+            </div>
+          )}
+
+          {latest && (
+            <div className="mt-6">
+              <AnalysisCard analysis={latest} tier="paid" />
+              {analyses.length > 1 && (
+                <details className="mt-4">
+                  <summary className="cursor-pointer text-sm font-bold text-muted-foreground hover:text-primary">
+                    التحليلات السابقة ({analyses.length - 1})
+                  </summary>
+                  <div className="mt-3 space-y-3">
+                    {analyses.slice(1).map((a) => (
+                      <AnalysisCard key={a.id} analysis={a} tier="paid" compact />
+                    ))}
+                  </div>
+                </details>
+              )}
+            </div>
+          )}
+        </motion.section>
+
         {/* Updates feed */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -198,9 +320,7 @@ function WorkspacePage() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.35, delay: i * 0.06 }}
                   className={`flex gap-4 rounded-2xl border p-5 ${
-                    u.done
-                      ? "border-success/20 bg-success/5"
-                      : "border-border bg-card"
+                    u.done ? "border-success/20 bg-success/5" : "border-border bg-card"
                   }`}
                 >
                   <div className="mt-0.5 shrink-0">
@@ -231,6 +351,87 @@ function WorkspacePage() {
           </a>
         </p>
       </main>
+    </div>
+  );
+}
+
+function AnalysisCard({ analysis, tier, compact }: { analysis: Analysis; tier: "free" | "paid"; compact?: boolean }) {
+  const { report, snapshot, created_at } = analysis;
+  return (
+    <div className="rounded-2xl border border-border bg-background p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="truncate font-bold">{snapshot.title || analysis.store_url}</p>
+          <p className="text-xs text-muted-foreground">{formatDate(created_at)}</p>
+        </div>
+        <button
+          onClick={() => printStoreReport({ snapshot, report, createdAt: created_at, tier })}
+          className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-primary/40 bg-primary/5 px-3 py-1.5 text-xs font-bold text-primary transition hover:bg-primary hover:text-primary-foreground"
+        >
+          <Download className="h-3.5 w-3.5" />
+          PDF
+        </button>
+      </div>
+
+      {!compact && (
+        <>
+          <p className="mt-3 rounded-lg bg-primary/5 px-4 py-3 text-sm leading-relaxed">
+            {report.summary}
+          </p>
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <ReportList title="💪 نقاط قوة" items={report.strengths} color="text-success" />
+            <ReportList title="⚠️ نقاط ضعف" items={report.weaknesses} color="text-destructive" />
+            <ReportList title="🚀 فرص" items={report.opportunities} color="text-gold" />
+            <div>
+              <h4 className="mb-2 text-sm font-bold text-primary">✅ توصيات</h4>
+              <div className="space-y-2">
+                {report.recommendations.slice(0, 4).map((r, i) => (
+                  <div key={i} className="rounded-lg border border-border p-2.5">
+                    <p className="text-sm font-bold">{r.title}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{r.detail}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          {report.competitors && report.competitors.length > 0 && (
+            <div className="mt-4">
+              <h4 className="mb-2 text-sm font-bold text-purple-600">🎯 منافسون</h4>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {report.competitors.map((c, i) => (
+                  <div key={i} className="rounded-lg bg-purple-500/5 px-3 py-2 text-xs">
+                    <strong className="block">{c.name}</strong>
+                    <span className="text-muted-foreground">{c.note}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {report.contentPlan && report.contentPlan.length > 0 && (
+            <div className="mt-4">
+              <h4 className="mb-2 flex items-center gap-2 text-sm font-bold text-cyan-700">
+                <FileText className="h-4 w-4" />
+                خطة محتوى {report.contentPlan.length} يوم
+              </h4>
+              <p className="text-xs text-muted-foreground">حمّل PDF لرؤية الخطة الكاملة.</p>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+function ReportList({ title, items, color }: { title: string; items: string[]; color: string }) {
+  if (!items?.length) return null;
+  return (
+    <div>
+      <h4 className={`mb-2 text-sm font-bold ${color}`}>{title}</h4>
+      <ul className="space-y-1.5 text-xs">
+        {items.slice(0, 5).map((it, i) => (
+          <li key={i} className="rounded bg-muted/40 px-3 py-2">{it}</li>
+        ))}
+      </ul>
     </div>
   );
 }
