@@ -253,7 +253,7 @@ function SubscribePage() {
   );
 }
 
-function RequestForm({ paymentMethod }: { paymentMethod: "paypal" | "bank" }) {
+function RequestForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
   const submitFn = useServerFn(submitSubscriptionRequest);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
