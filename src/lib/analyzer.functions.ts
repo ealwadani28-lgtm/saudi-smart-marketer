@@ -210,7 +210,7 @@ export async function fetchStoreHtml(url: string): Promise<string> {
   }
 }
 
-function buildSnapshot(html: string, url: string): StoreSnapshot {
+export function buildSnapshot(html: string, url: string): StoreSnapshot {
   const title =
     pickMeta(html, ["og:title", "twitter:title"]) ||
     (html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1] ?? "").trim();
