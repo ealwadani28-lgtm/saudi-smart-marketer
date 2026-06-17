@@ -649,6 +649,15 @@ function AdminPage() {
                                 {activating === r.id ? "جاري..." : "فعّل + أرسل"}
                               </button>
                             )}
+                            {r.status === "approved" && (
+                              <button
+                                onClick={() => impersonate(r.email)}
+                                className="inline-flex items-center gap-1 rounded-md bg-primary/15 px-2 py-1 text-xs font-medium text-primary transition hover:bg-primary/25"
+                                title="افتح workspace كهذا العميل (رابط مؤقت)"
+                              >
+                                <ExternalLink className="h-3 w-3" /> ادخل كعميل
+                              </button>
+                            )}
                             {r.status !== "rejected" && (
                               <button
                                 onClick={() => updateSubStatus(r.id, "rejected")}
