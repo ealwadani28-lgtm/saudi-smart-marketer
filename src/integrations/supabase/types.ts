@@ -14,6 +14,86 @@ export type Database = {
   }
   public: {
     Tables: {
+      customer_updates: {
+        Row: {
+          body: string
+          created_at: string
+          customer_id: string
+          done: boolean
+          id: string
+          title: string
+          type: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          customer_id: string
+          done?: boolean
+          id?: string
+          title: string
+          type: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          customer_id?: string
+          done?: boolean
+          id?: string
+          title?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_updates_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customers: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          shop_name: string | null
+          shop_url: string | null
+          status: string
+          subscription_end: string | null
+          subscription_start: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          shop_name?: string | null
+          shop_url?: string | null
+          status?: string
+          subscription_end?: string | null
+          subscription_start?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          shop_name?: string | null
+          shop_url?: string | null
+          status?: string
+          subscription_end?: string | null
+          subscription_start?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       early_signups: {
         Row: {
           created_at: string
