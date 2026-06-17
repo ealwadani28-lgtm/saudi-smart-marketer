@@ -52,6 +52,20 @@ export const adminListSignups = createServerFn({ method: "POST" })
     return { signups: rows ?? [], total: rows?.length ?? 0 };
   });
 
+export const adminListCustomers = createServerFn({ method: "POST" })
+  .inputValidator((d) => TokenInput.parse(d))
+  .handler(async ({ data }) => {
+    const { verifyAdminToken } = await import("./admin-token.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (!verifyAdminToken(data.token)) throw new Error("Unauthorized");
+    const { data: rows, error } = await supabaseAdmin
+      .from("customers")
+      .select("id, full_name, email, shop_url, shop_name, status, subscription_start, subscription_end, created_at")
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return { customers: rows ?? [] };
+  });
+
 const CustomerViewInput = z.object({
   token: z.string().min(8).max(512),
   email: z.string().email().max(256),

@@ -6,7 +6,7 @@ import {
   AlertTriangle, ShieldCheck, Activity, CreditCard, Check, X, MessageCircle,
   FileDown, FileText,
 } from "lucide-react";
-import { adminListSignups, adminLogin } from "@/lib/admin.functions";
+import { adminListSignups, adminLogin, adminListCustomers } from "@/lib/admin.functions";
 import { adminGetAlerts, adminResolveAlert, adminGetSignupAttempts } from "@/lib/telemetry.functions";
 import {
   adminListSubscriptionRequests,
@@ -76,6 +76,7 @@ function AdminPage() {
   const listSubsFn = useServerFn(adminListSubscriptionRequests);
   const updateSubFn = useServerFn(adminUpdateSubscriptionStatus);
   const activateFn = useServerFn(activateCustomer);
+  const listCustomersFn = useServerFn(adminListCustomers);
 
   function openCustomerView(email: string) {
     window.open(`/admin/customer/${encodeURIComponent(email)}`, "_blank", "noopener,noreferrer");
@@ -91,17 +92,24 @@ function AdminPage() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [attemptStats, setAttemptStats] = useState<AttemptStats | null>(null);
   const [subRequests, setSubRequests] = useState<SubRequest[]>([]);
+  const [customers, setCustomers] = useState<Array<{
+    id: string; full_name: string; email: string; shop_url: string | null;
+    shop_name: string | null; status: string;
+    subscription_start: string | null; subscription_end: string | null; created_at: string;
+  }>>([]);
 
   async function loadAlertsAndStats(tk: string) {
     try {
-      const [a, s, r] = await Promise.all([
+      const [a, s, r, c] = await Promise.all([
         alertsFn({ data: { token: tk } }),
         attemptsFn({ data: { token: tk } }),
         listSubsFn({ data: { token: tk } }),
+        listCustomersFn({ data: { token: tk } }),
       ]);
       setAlerts(a.alerts as Alert[]);
       setAttemptStats(s.stats);
       setSubRequests(r.requests as SubRequest[]);
+      setCustomers(c.customers as typeof customers);
     } catch {
       // non-fatal
     }
@@ -677,6 +685,84 @@ function AdminPage() {
                               📝 {r.notes}
                             </div>
                           )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        {/* Customers (active workspaces) */}
+        <div className="mt-10">
+          <div className="mb-4 flex items-center gap-2">
+            <Users className="h-5 w-5 text-primary" />
+            <h2 className="font-display text-lg font-bold">العملاء (ورك سبيس)</h2>
+            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
+              {customers.length}
+            </span>
+          </div>
+          <div className="overflow-hidden rounded-2xl border border-border bg-card">
+            <div className="overflow-x-auto">
+              <table className="w-full text-right text-sm">
+                <thead className="border-b border-border bg-muted/30">
+                  <tr>
+                    <th className="px-4 py-3 font-medium">العميل</th>
+                    <th className="px-4 py-3 font-medium">المتجر</th>
+                    <th className="px-4 py-3 font-medium">الحالة</th>
+                    <th className="px-4 py-3 font-medium">انتهاء الاشتراك</th>
+                    <th className="px-4 py-3 font-medium">إجراءات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {customers.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="px-4 py-12 text-center text-muted-foreground">
+                        لا يوجد عملاء بعد
+                      </td>
+                    </tr>
+                  ) : (
+                    customers.map((c) => (
+                      <tr key={c.id} className="border-b border-border last:border-0 transition hover:bg-muted/20">
+                        <td className="px-4 py-3">
+                          <div className="font-medium">{c.full_name}</div>
+                          <a href={`mailto:${c.email}`} className="text-xs text-primary hover:underline">{c.email}</a>
+                        </td>
+                        <td className="px-4 py-3">
+                          {c.shop_url ? (
+                            <a
+                              href={c.shop_url.startsWith("http") ? c.shop_url : `https://${c.shop_url}`}
+                              target="_blank" rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-primary hover:underline"
+                            >
+                              {truncate(c.shop_name || c.shop_url, 30)}
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                            c.status === "active"
+                              ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+                              : "bg-muted text-muted-foreground"
+                          }`}>
+                            {c.status === "active" ? "مفعّل" : c.status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-muted-foreground" dir="ltr">
+                          {c.subscription_end ? new Date(c.subscription_end).toLocaleDateString("ar-SA") : "—"}
+                        </td>
+                        <td className="px-4 py-3">
+                          <button
+                            onClick={() => openCustomerView(c.email)}
+                            className="inline-flex items-center gap-1 rounded-md bg-primary/15 px-2 py-1 text-xs font-medium text-primary transition hover:bg-primary/25"
+                          >
+                            <ExternalLink className="h-3 w-3" /> ورك سبيس
+                          </button>
                         </td>
                       </tr>
                     ))
