@@ -384,7 +384,7 @@ function RequestForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
 
         <Field
           label={
-            paymentMethod === "paypal" ? "رقم عملية PayPal (اختياري)" : "رقم مرجع التحويل (اختياري)"
+            paymentMethod === "stc_pay" ? "رقم عملية STC Pay (اختياري)" : "رقم مرجع التحويل (اختياري)"
           }
         >
           <input
@@ -393,7 +393,7 @@ function RequestForm({ paymentMethod }: { paymentMethod: PaymentMethod }) {
             value={reference}
             onChange={(e) => setReference(e.target.value)}
             className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20"
-            placeholder={paymentMethod === "paypal" ? "Transaction ID" : "مرجع التحويل البنكي"}
+            placeholder={paymentMethod === "stc_pay" ? "رقم العملية" : "مرجع التحويل البنكي"}
             dir="ltr"
           />
         </Field>
