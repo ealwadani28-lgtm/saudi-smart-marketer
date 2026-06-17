@@ -14,6 +14,98 @@ export type Database = {
   }
   public: {
     Tables: {
+      competitor_snapshots: {
+        Row: {
+          changes: Json | null
+          competitor_id: string
+          created_at: string
+          customer_id: string
+          id: string
+          snapshot: Json
+          summary: string | null
+        }
+        Insert: {
+          changes?: Json | null
+          competitor_id: string
+          created_at?: string
+          customer_id: string
+          id?: string
+          snapshot: Json
+          summary?: string | null
+        }
+        Update: {
+          changes?: Json | null
+          competitor_id?: string
+          created_at?: string
+          customer_id?: string
+          id?: string
+          snapshot?: Json
+          summary?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competitor_snapshots_competitor_id_fkey"
+            columns: ["competitor_id"]
+            isOneToOne: false
+            referencedRelation: "competitors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "competitor_snapshots_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      competitors: {
+        Row: {
+          active: boolean
+          competitor_name: string | null
+          competitor_url: string
+          created_at: string
+          customer_id: string
+          id: string
+          last_checked_at: string | null
+          next_check_at: string
+          source: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          competitor_name?: string | null
+          competitor_url: string
+          created_at?: string
+          customer_id: string
+          id?: string
+          last_checked_at?: string | null
+          next_check_at?: string
+          source?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          competitor_name?: string | null
+          competitor_url?: string
+          created_at?: string
+          customer_id?: string
+          id?: string
+          last_checked_at?: string | null
+          next_check_at?: string
+          source?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competitors_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_updates: {
         Row: {
           body: string
