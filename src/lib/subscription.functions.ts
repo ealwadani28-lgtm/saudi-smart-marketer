@@ -95,7 +95,7 @@ export const adminUpdateSubscriptionStatus = createServerFn({ method: "POST" })
         reviewed_at: reviewedAt,
         updated_at: now.toISOString(),
       })
-      .eq("id", data.id);
+      .eq("id", data.id)
       .select("id, full_name, email, phone, notes, status")
       .single();
     if (error) throw new Error(error.message);
