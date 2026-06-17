@@ -79,7 +79,7 @@ function AdminPage() {
   const listCustomersFn = useServerFn(adminListCustomers);
 
   function openCustomerView(email: string) {
-    window.open(`/admin/customer/${encodeURIComponent(email)}`, "_blank", "noopener,noreferrer");
+    window.location.assign(`/admin/customer/${encodeURIComponent(email)}`);
   }
 
   const [activating, setActivating] = useState<string | null>(null);
