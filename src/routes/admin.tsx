@@ -76,17 +76,11 @@ function AdminPage() {
   const listSubsFn = useServerFn(adminListSubscriptionRequests);
   const updateSubFn = useServerFn(adminUpdateSubscriptionStatus);
   const activateFn = useServerFn(activateCustomer);
-  const impersonateFn = useServerFn(adminImpersonateCustomer);
 
-  async function impersonate(email: string) {
-    try {
-      const token = localStorage.getItem(TOKEN_KEY) || "";
-      const res = await impersonateFn({ data: { token, email } });
-      window.open(res.url, "_blank", "noopener,noreferrer");
-    } catch (e) {
-      alert(e instanceof Error ? e.message : "فشل إنشاء الرابط");
-    }
+  function openCustomerView(email: string) {
+    window.open(`/admin/customer/${encodeURIComponent(email)}`, "_blank", "noopener,noreferrer");
   }
+
   const [activating, setActivating] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [token, setToken] = useState<string | null>(null);
