@@ -102,12 +102,18 @@ function TryPage() {
             <ArrowLeft className="h-4 w-4" />
             الرئيسية
           </Link>
-          <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
-            <Sparkles className="h-3 w-3" />
-            MVP تجريبي
-          </span>
+          <div className="flex items-center gap-3">
+            <Link to="/analyze" className="hidden sm:inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold text-primary transition hover:bg-primary/20">
+              🔍 حلّل متجرك
+            </Link>
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+              <Sparkles className="h-3 w-3" />
+              MVP تجريبي
+            </span>
+          </div>
         </div>
       </header>
+
 
       <main className="mx-auto max-w-5xl px-6 py-10 md:py-16">
         <div className="text-center">
