@@ -205,6 +205,53 @@ export type Database = {
         }
         Relationships: []
       }
+      store_analyses: {
+        Row: {
+          created_at: string
+          customer_id: string | null
+          email: string | null
+          id: string
+          next_refresh_at: string | null
+          report: Json
+          snapshot: Json
+          store_url: string
+          tier: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id?: string | null
+          email?: string | null
+          id?: string
+          next_refresh_at?: string | null
+          report?: Json
+          snapshot?: Json
+          store_url: string
+          tier?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string | null
+          email?: string | null
+          id?: string
+          next_refresh_at?: string | null
+          report?: Json
+          snapshot?: Json
+          store_url?: string
+          tier?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_analyses_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscription_requests: {
         Row: {
           amount_sar: number
