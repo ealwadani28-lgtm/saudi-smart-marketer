@@ -51,3 +51,33 @@ export const adminListSignups = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { signups: rows ?? [], total: rows?.length ?? 0 };
   });
+
+const ImpersonateInput = z.object({
+  token: z.string().min(8).max(512),
+  email: z.string().email().max(256),
+});
+
+export const adminImpersonateCustomer = createServerFn({ method: "POST" })
+  .inputValidator((d) => ImpersonateInput.parse(d))
+  .handler(async ({ data }) => {
+    const { verifyAdminToken } = await import("./admin-token.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    if (!verifyAdminToken(data.token)) {
+      throw new Error("Unauthorized");
+    }
+
+    const siteUrl = process.env.SITE_URL || process.env.VITE_SITE_URL || "";
+    const { data: linkData, error } = await supabaseAdmin.auth.admin.generateLink({
+      type: "magiclink",
+      email: data.email,
+      options: {
+        redirectTo: siteUrl ? `${siteUrl}/workspace` : undefined,
+      },
+    });
+    if (error) throw new Error(error.message);
+    const actionLink = linkData?.properties?.action_link;
+    if (!actionLink) throw new Error("تعذّر إنشاء رابط الدخول");
+    return { url: actionLink, email: data.email };
+  });
+
