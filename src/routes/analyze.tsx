@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Sparkles, ArrowLeft, Loader2, Wand2, Download, Store, AlertCircle,
+  Sparkles, ArrowLeft, Loader2, Wand2, Download, Store,
   CheckCircle2, AlertTriangle, Rocket, Target,
 } from "lucide-react";
 import { analyzeStoreFree, type StoreSnapshot, type StoreReport } from "@/lib/analyzer.functions";
