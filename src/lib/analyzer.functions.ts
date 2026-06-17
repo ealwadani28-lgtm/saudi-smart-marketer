@@ -184,7 +184,7 @@ function extractSocialLinks(html: string): { social: Record<string, string>; wha
   return { social, whatsapp };
 }
 
-async function fetchStoreHtml(url: string): Promise<string> {
+export async function fetchStoreHtml(url: string): Promise<string> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 12_000);
   try {
@@ -210,7 +210,7 @@ async function fetchStoreHtml(url: string): Promise<string> {
   }
 }
 
-function buildSnapshot(html: string, url: string): StoreSnapshot {
+export function buildSnapshot(html: string, url: string): StoreSnapshot {
   const title =
     pickMeta(html, ["og:title", "twitter:title"]) ||
     (html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1] ?? "").trim();
@@ -292,7 +292,7 @@ const SYSTEM_PAID = `أنت محلل تسويق رقمي خبير في السو�
 }
 أعطِ خطة محتوى 30 يوماً (30 عنصر). و 3-5 منافسين.`;
 
-async function callGemini(snapshot: StoreSnapshot, tier: "free" | "paid"): Promise<StoreReport> {
+export async function callGemini(snapshot: StoreSnapshot, tier: "free" | "paid"): Promise<StoreReport> {
   const apiKey = process.env.LOVABLE_API_KEY;
   if (!apiKey) throw new Error("LOVABLE_API_KEY غير مهيأ");
 
