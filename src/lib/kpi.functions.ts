@@ -124,6 +124,88 @@ export const adminAddKpiEntry = createServerFn({ method: "POST" })
     return { id: row.id, entryHash: row.entry_hash, sealedAt: row.sealed_at };
   });
 
+// ---------- bulk import from platform CSV ----------
+
+const BulkRow = z.object({
+  periodStart: dateStr,
+  periodEnd: dateStr,
+  channel: z.string().trim().min(1).max(60),
+  views: z.number().int().min(0).max(1_000_000_000),
+  clicks: z.number().int().min(0).max(1_000_000_000),
+  conversions: z.number().int().min(0).max(1_000_000_000),
+  costSar: z.number().min(0).max(10_000_000),
+});
+
+const BulkInput = z.object({
+  token: z.string().min(8).max(512),
+  email: z.string().email().max(256),
+  marketingPlanId: z.string().uuid().optional().nullable(),
+  source: z.enum(ALLOWED_SOURCES),
+  evidenceUrl: z
+    .string()
+    .trim()
+    .url("رابط الإثبات غير صالح")
+    .max(2000)
+    .refine((u) => /^https?:\/\//i.test(u), "يجب أن يبدأ بـ http(s)"),
+  fileName: z.string().trim().min(1).max(300),
+  fileHash: z.string().regex(/^[a-f0-9]{64}$/i, "بصمة الملف يجب أن تكون SHA-256 hex"),
+  rows: z.array(BulkRow).min(1).max(500),
+});
+
+export const adminBulkImportKpi = createServerFn({ method: "POST" })
+  .inputValidator((d) => BulkInput.parse(d))
+  .handler(async ({ data }) => {
+    const { verifyAdminToken } = await import("./admin-token.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (!verifyAdminToken(data.token)) throw new Error("Unauthorized");
+
+    const { data: customer, error: cErr } = await supabaseAdmin
+      .from("customers")
+      .select("id")
+      .eq("email", data.email)
+      .maybeSingle();
+    if (cErr) throw new Error(cErr.message);
+    if (!customer) throw new Error("لم نجد عميلاً بهذا البريد");
+
+    // Validate row-level invariants up front so nothing partial is committed.
+    for (const [i, r] of data.rows.entries()) {
+      if (new Date(r.periodEnd) < new Date(r.periodStart)) {
+        throw new Error(`السطر ${i + 1}: نهاية الفترة قبل بدايتها`);
+      }
+      if (r.clicks > r.views && r.views > 0) {
+        throw new Error(`السطر ${i + 1}: النقرات تتجاوز المشاهدات`);
+      }
+      if (r.conversions > r.clicks && r.clicks > 0) {
+        throw new Error(`السطر ${i + 1}: التحويلات تتجاوز النقرات`);
+      }
+    }
+
+    const proofTag = `[auto-import] ${data.source} • file=${data.fileName} • sha256=${data.fileHash}`;
+    const payload = data.rows.map((r) => ({
+      customer_id: customer.id,
+      marketing_plan_id: data.marketingPlanId ?? null,
+      period_start: r.periodStart,
+      period_end: r.periodEnd,
+      channel: r.channel,
+      views: r.views,
+      clicks: r.clicks,
+      conversions: r.conversions,
+      cost_sar: r.costSar,
+      source: data.source,
+      evidence_url: data.evidenceUrl,
+      notes: proofTag,
+      entered_by: `admin-import:${data.email}`,
+      entry_hash: "pending",
+    }));
+
+    const { data: rows, error } = await supabaseAdmin
+      .from("kpi_entries")
+      .insert(payload)
+      .select("id");
+    if (error) throw new Error(`فشل الاستيراد: ${error.message}`);
+    return { inserted: rows?.length ?? 0, fileHash: data.fileHash };
+
+
 export const adminListKpiEntries = createServerFn({ method: "POST" })
   .inputValidator((d) => ListByEmailInput.parse(d))
   .handler(async ({ data }) => {
