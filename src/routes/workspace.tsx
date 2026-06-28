@@ -309,6 +309,16 @@ function WorkspacePage() {
           )}
         </motion.section>
 
+        {userId && (
+          <MarketingPlanSection
+            userId={userId}
+            hasAnalysis={analyses.length > 0}
+            initialPlans={marketingPlans}
+          />
+        )}
+
+
+
         {/* Updates feed */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
