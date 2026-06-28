@@ -98,31 +98,14 @@ function AdminCustomerView() {
   const [analyzeError, setAnalyzeError] = useState("");
 
   useEffect(() => {
-<<<<<<< Updated upstream
     const token = sessionStorage.getItem(TOKEN_KEY) || localStorage.getItem(TOKEN_KEY) || "";
     if (!token) {
       sessionStorage.setItem("admin_return_to", `/admin/customer/${encodeURIComponent(email)}`);
       window.location.replace("/admin");
-=======
-    // Read token from URL param first (cross-tab), then fall back to storage
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlToken = urlParams.get("t");
-    const stored = sessionStorage.getItem(TOKEN_KEY) || localStorage.getItem(TOKEN_KEY) || "";
-    const resolved = urlToken || stored;
-
-    if (urlToken) {
-      // Persist for this tab and clean the URL
-      sessionStorage.setItem(TOKEN_KEY, urlToken);
-      localStorage.setItem(TOKEN_KEY, urlToken);
-      window.history.replaceState({}, "", window.location.pathname);
-    }
-
-    if (!resolved) {
-      setError("الرجاء تسجيل الدخول كأدمن أولاً من /admin");
->>>>>>> Stashed changes
       setLoading(false);
       return;
     }
+    const resolved = token;
     setToken(resolved);
     getView({ data: { token: resolved, email } })
       .then((res) => {

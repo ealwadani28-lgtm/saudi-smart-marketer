@@ -9,8 +9,10 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { getWorkspace } from "@/lib/customer.functions";
 import { analyzeStorePaid, listStoreAnalyses, type StoreSnapshot, type StoreReport } from "@/lib/analyzer.functions";
+import { listMarketingPlans } from "@/lib/marketing-plan.functions";
 import { printStoreReport } from "@/lib/storeReportPdf";
 import { ContentPlanView } from "@/components/ContentPlanView";
+import { MarketingPlanSection } from "@/components/MarketingPlanSection";
 
 export const Route = createFileRoute("/workspace")({
   head: () => ({
@@ -73,11 +75,13 @@ function WorkspacePage() {
   const fetchWorkspace = useServerFn(getWorkspace);
   const runAnalysis = useServerFn(analyzeStorePaid);
   const listAnalyses = useServerFn(listStoreAnalyses);
+  const listPlans = useServerFn(listMarketingPlans);
 
   const [loading, setLoading] = useState(true);
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [updates, setUpdates] = useState<Update[]>([]);
   const [analyses, setAnalyses] = useState<Analysis[]>([]);
+  const [marketingPlans, setMarketingPlans] = useState<Array<{ id: string; store_url: string; plan: import("@/lib/marketing-plan.functions").MarketingPlan; created_at: string }>>([]);
   const [error, setError] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -99,13 +103,15 @@ function WorkspacePage() {
       }
       setUserId(session.user.id);
       try {
-        const [ws, an] = await Promise.all([
+        const [ws, an, mp] = await Promise.all([
           fetchWorkspace({ data: { userId: session.user.id } }),
           listAnalyses({ data: { userId: session.user.id } }),
+          listPlans({ data: { userId: session.user.id } }),
         ]);
         setCustomer(ws.customer);
         setUpdates(ws.updates);
         setAnalyses(an.analyses as Analysis[]);
+        setMarketingPlans(mp.plans as typeof marketingPlans);
         if (ws.customer?.shop_url) setShopUrlInput(ws.customer.shop_url);
       } catch (e) {
         setError(e instanceof Error ? e.message : "حدث خطأ");
@@ -302,6 +308,16 @@ function WorkspacePage() {
             </div>
           )}
         </motion.section>
+
+        {userId && (
+          <MarketingPlanSection
+            userId={userId}
+            hasAnalysis={analyses.length > 0}
+            initialPlans={marketingPlans}
+          />
+        )}
+
+
 
         {/* Updates feed */}
         <motion.div
