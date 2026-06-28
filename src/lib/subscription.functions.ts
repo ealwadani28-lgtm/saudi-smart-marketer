@@ -70,7 +70,7 @@ export const adminListSubscriptionRequests = createServerFn({ method: "POST" })
     const { data: rows, error } = await supabaseAdmin
       .from("subscription_requests")
       .select(
-        "id, full_name, email, phone, payment_method, reference, notes, amount_sar, status, created_at, reviewed_at",
+        "id, full_name, email, phone, payment_method, reference, notes, amount_sar, status, created_at, reviewed_at, proof_path, extracted_amount, extracted_currency, extracted_payee, extracted_reference, extracted_date, verification_status, verification_notes, verified_at",
       )
       .order("created_at", { ascending: false })
       .limit(200);
