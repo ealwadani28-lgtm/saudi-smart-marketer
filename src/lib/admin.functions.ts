@@ -197,3 +197,23 @@ export const adminAnalyzeCustomerStore = createServerFn({ method: "POST" })
   });
 
 
+
+const DeleteCustomerInput = z.object({
+  token: z.string().min(8).max(512),
+  id: z.string().uuid(),
+});
+
+export const adminDeleteCustomer = createServerFn({ method: "POST" })
+  .inputValidator((d) => DeleteCustomerInput.parse(d))
+  .handler(async ({ data }) => {
+    const { verifyAdminToken } = await import("./admin-token.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (!verifyAdminToken(data.token)) throw new Error("Unauthorized");
+
+    const { error } = await supabaseAdmin
+      .from("customers")
+      .delete()
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
