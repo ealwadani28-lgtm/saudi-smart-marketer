@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ShieldCheck, ExternalLink, Lock, TrendingUp, Eye, MousePointerClick, Target, Wallet, Info } from "lucide-react";
+import { ShieldCheck, ExternalLink, Lock, TrendingUp, Eye, MousePointerClick, Target, Wallet, Info, FileDown } from "lucide-react";
 import {
   listKpiEntries,
   aggregateKpis,
   computeKpiProgress,
   type KpiEntry,
 } from "@/lib/kpi.functions";
+import { printKpiReport } from "@/lib/kpiReportPdf";
 import type { MarketingPlan } from "@/lib/marketing-plan.functions";
+
 
 const SOURCE_LABEL: Record<string, string> = {
   meta_ads: "Meta Ads",
