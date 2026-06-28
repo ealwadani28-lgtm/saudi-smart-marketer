@@ -13,6 +13,7 @@ import {
   adminUpdateSubscriptionStatus,
 } from "@/lib/subscription.functions";
 import { activateCustomer } from "@/lib/customer.functions";
+import { adminGetProofUrl } from "@/lib/payment-verify.functions";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
