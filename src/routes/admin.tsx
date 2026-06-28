@@ -13,6 +13,7 @@ import {
   adminUpdateSubscriptionStatus,
 } from "@/lib/subscription.functions";
 import { activateCustomer } from "@/lib/customer.functions";
+import { adminGetProofUrl } from "@/lib/payment-verify.functions";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -65,6 +66,15 @@ type SubRequest = {
   status: "pending" | "approved" | "rejected";
   created_at: string;
   reviewed_at: string | null;
+  proof_path?: string | null;
+  extracted_amount?: number | null;
+  extracted_currency?: string | null;
+  extracted_payee?: string | null;
+  extracted_reference?: string | null;
+  extracted_date?: string | null;
+  verification_status?: "pending" | "auto_verified" | "needs_review" | "rejected" | null;
+  verification_notes?: string | null;
+  verified_at?: string | null;
 };
 
 
@@ -78,6 +88,17 @@ function AdminPage() {
   const updateSubFn = useServerFn(adminUpdateSubscriptionStatus);
   const activateFn = useServerFn(activateCustomer);
   const listCustomersFn = useServerFn(adminListCustomers);
+  const proofUrlFn = useServerFn(adminGetProofUrl);
+
+  async function viewProof(path: string) {
+    if (!token) return;
+    try {
+      const res = await proofUrlFn({ data: { token, path } });
+      window.open(res.url, "_blank", "noopener,noreferrer");
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "تعذّر فتح الإيصال");
+    }
+  }
 
   function openCustomerView(email: string) {
     window.location.assign(`/admin/customer/${encodeURIComponent(email)}`);
@@ -683,6 +704,47 @@ function AdminPage() {
                               </button>
                             )}
                           </div>
+                          {r.verification_status && r.verification_status !== "pending" && (
+                            <div className="mt-1.5 space-y-0.5">
+                              <div
+                                className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+                                  r.verification_status === "auto_verified"
+                                    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+                                    : r.verification_status === "needs_review"
+                                      ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+                                      : "bg-destructive/15 text-destructive"
+                                }`}
+                              >
+                                {r.verification_status === "auto_verified"
+                                  ? "✓ تحقق تلقائي"
+                                  : r.verification_status === "needs_review"
+                                    ? "⚠ مراجعة يدوية"
+                                    : "✕ مرفوض"}
+                              </div>
+                              {(r.extracted_amount || r.extracted_payee) && (
+                                <div className="text-[10px] text-muted-foreground">
+                                  {r.extracted_amount} {r.extracted_currency || ""} —{" "}
+                                  {r.extracted_payee || "—"}
+                                </div>
+                              )}
+                              {r.proof_path && (
+                                <button
+                                  onClick={() => viewProof(r.proof_path!)}
+                                  className="text-[10px] text-primary hover:underline"
+                                >
+                                  📎 عرض الإيصال
+                                </button>
+                              )}
+                              {r.verification_notes && (
+                                <div
+                                  className="max-w-[220px] truncate text-[10px] text-muted-foreground"
+                                  title={r.verification_notes}
+                                >
+                                  {r.verification_notes}
+                                </div>
+                              )}
+                            </div>
+                          )}
                           {r.notes && (
                             <div
                               className="mt-1 max-w-[220px] truncate text-[11px] text-muted-foreground"
