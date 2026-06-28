@@ -259,6 +259,29 @@ function AdminPage() {
     }
   }
 
+  async function deleteSubRequest(id: string, email: string) {
+    if (!token) return;
+    if (!confirm(`حذف طلب الاشتراك (${email}) نهائيًا؟ لا يمكن التراجع.`)) return;
+    try {
+      await deleteSubFn({ data: { token, id } });
+      setSubRequests((prev) => prev.filter((r) => r.id !== id));
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "فشل الحذف");
+    }
+  }
+
+  async function deleteCustomerRow(id: string, email: string) {
+    if (!token) return;
+    if (!confirm(`حذف العميل (${email}) نهائيًا؟ سيتم فقدان بيانات ورك سبيس المرتبطة.`)) return;
+    try {
+      await deleteCustomerFn({ data: { token, id } });
+      setCustomers((prev) => prev.filter((c) => c.id !== id));
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "فشل الحذف");
+    }
+  }
+
+
   function exportCSV() {
     const header = ["id", "email", "shop_url", "source", "created_at"];
     const rows = signups.map((s) =>
