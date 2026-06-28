@@ -1,71 +1,35 @@
-# خطة: محلّل المتاجر الذكي + تقرير PDF
+# خطة الجلسة القادمة — المسوّق الذكي
 
-## الهدف
-العميل يدخل رابط متجره (زد/سلة)، السيرفر يجيب HTML، Gemini يحلل، التقرير يُعرض ويُحفظ، وزر "تحميل PDF" يولّد تقرير عربي احترافي في المتصفح.
+## المهام المجدولة (بالترتيب)
 
-## نسختان
+### 1) قسم FAQ في الصفحة الرئيسية
+- يوضح بصراحة أن النشر على TikTok/Snapchat يتم عبر **نسخ المحتوى الجاهز** من المستخدم ولصقه يدوياً، **وليس نشراً تلقائياً مباشراً**.
+- يشمل أسئلة شائعة أخرى: ما الذي يولّده النظام؟ هل يتطلب ربط حسابات؟ كيف تُحسب النتائج؟
+- الملف: `src/routes/index.tsx` (إضافة قسم FAQ accordion).
 
-| الميزة | مجاني `/try` | مدفوع `/workspace` |
-|---|---|---|
-| تحليل أساسي | ✅ | ✅ أعمق |
-| منافسون | ❌ | ✅ 3-5 |
-| خطة محتوى 30 يوم | ❌ | ✅ |
-| تحديث تلقائي | ❌ مرة واحدة | ✅ كل أسبوعين |
-| PDF | ✅ مع watermark خفيف | ✅ نظيف باسم المتجر |
-| CTA داخل التقرير | "اشترك للمزيد" | — |
+### 2) صفحة لوحة KPIs المخصصة (`/kpis`)
+- صفحة كاملة تعرض `KpiDashboard` بشكل موسّع.
+- بطاقات: المشاهدات، النقرات، التحويلات، CTR، CPA، ROAS.
+- فلاتر: حسب القناة، حسب الفترة الزمنية، حسب الخطة.
+- أزرار: تصدير PDF، تصدير CSV، استيراد CSV.
+- توضيح أن البيانات Append-only ومختومة بـ SHA-256.
 
-## التنفيذ التقني
+### 3) صفحة خطة 30 يوم (`/plan-30`)
+- جدول نشر يومي (٣٠ يوم) مع: التاريخ، المنصة، نوع المحتوى، النص الجاهز، الـ Hashtags.
+- مخرجات أسبوعية جاهزة للنسخ (٤ أسابيع × ٣ منصات).
+- توضيح صريح: **"ما الذي ستسلمه لك المنصة"** vs **"ما يجب أن تنفذه بنفسك"**.
+- زر تصدير PDF + زر نسخ كل عنصر.
 
-### 1) جلب HTML المتجر — server function
-- `src/lib/analyzer.functions.ts` → `fetchStoreSnapshot({ url })`
-- `fetch()` عادي (Workers-compatible، بدون puppeteer)
-- استخراج بـ regex + DOM lite (linkedom أو cheerio-lite — نتحقق من توافق Worker)
-- نستخرج: title, meta description, og:*, منتجات (أسماء/أسعار/صور)، روابط سوشيال، واتساب، categories
-- rate-limit per IP/user عبر `rl_hit`
+### 4) نموذج ربط/رفع بيانات Meta و Google
+- خياران:
+  - **رفع CSV** (موجود حالياً في `KpiCsvImport`) — تحسين القوالب.
+  - **ربط API** (جديد): Meta Marketing API + Google Ads API عبر OAuth لاستيراد المشاهدات/النقرات/التحويلات تلقائياً.
+- تحديث لوحة KPIs تلقائياً عند الاستيراد.
+- حفظ token المستخدم بشكل آمن (server-only).
 
-### 2) تحليل Gemini — نفس الملف
-- `analyzeStore({ url, tier: 'free' | 'paid' })`
-- يستخدم `google/gemini-3-flash-preview` عبر Lovable AI Gateway (مفتاح موجود)
-- prompt عربي مهيكل يُرجع JSON: `{ strengths[], weaknesses[], opportunities[], recommendations[], competitors?, contentPlan? }`
-- الفرق بين tier: depth + الأقسام الإضافية للـ paid
+---
 
-### 3) التخزين
-جدول جديد `store_analyses`:
-```
-id, customer_id (nullable للمجاني), email (nullable), store_url,
-tier ('free'|'paid'), snapshot jsonb, report jsonb,
-created_at, next_refresh_at
-```
-+ GRANTs + RLS (المجاني: insert من anon مع rate-limit؛ المدفوع: قراءة عبر server fn).
-
-### 4) التحديث التلقائي (paid)
-- `next_refresh_at = now() + interval '14 days'`
-- pg_cron job يستدعي endpoint عام `/api/public/refresh-analyses` يعيد التحليل للسجلات المستحقّة ويضيف entry في `customer_updates` type=`analysis`.
-
-### 5) واجهة `/workspace`
-- قسم "تحليل متجرك": إدخال رابط أول مرة → زر "حلّل الآن"
-- بعد التحليل: بطاقات للأقسام (قوة/ضعف/فرص/توصيات/منافسون/خطة محتوى)
-- timeline للتحليلات السابقة
-- زر "تحميل PDF" لكل تقرير
-
-### 6) واجهة `/try`
-- نموذج بسيط: email + store_url
-- نتيجة فورية (tier=free)
-- watermark خفيف في PDF + CTA للاشتراك
-
-### 7) PDF عربي في المتصفح
-- نفس أسلوب فاتورة الأدمن: `window.open()` بـ HTML/CSS عربي RTL + خط Tajawal من Google Fonts + `@media print`
-- بدون مكتبات خارجية
-- يحتوي: شعار، اسم المتجر، التاريخ، كل الأقسام، تذييل
-
-## الأسئلة قبل التنفيذ
-1. خط الـ PDF: Tajawal (موجود)، Cairo، أم IBM Plex Sans Arabic؟
-2. في `/try` المجاني — نطلب email إجباري قبل عرض التقرير (lead capture)، أم نعرض مباشرة بدون email؟
-3. التحليل الأول في `/workspace` — تلقائي بعد التفعيل، أم بضغطة من العميل؟
-
-## ترتيب التنفيذ (PRs مستقلة)
-1. Migration: جدول `store_analyses` + RLS + GRANTs
-2. `analyzer.functions.ts`: fetch + parse + Gemini
-3. تحديث `/workspace`: قسم التحليل + عرض + PDF
-4. `/try`: نموذج + نتيجة + PDF مع watermark
-5. pg_cron + endpoint التحديث التلقائي
+## ملاحظات تنفيذية
+- استخدام الخط الرسمي **IBM Plex Sans Arabic** في كل الواجهات الجديدة.
+- الالتزام بنمط Append-only في `kpi_entries` (لا تعديل، لا حذف).
+- اختبارات أمنية بعد كل ميزة عبر `bun run scripts/security-tests.ts`.
