@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import {
   Lock, Download, RefreshCw, Users, Mail, ExternalLink, LogOut,
   AlertTriangle, ShieldCheck, Activity, CreditCard, Check, X, MessageCircle,
-  FileDown, FileText,
+  FileDown, FileText, Trash2,
 } from "lucide-react";
-import { adminListSignups, adminLogin, adminListCustomers } from "@/lib/admin.functions";
+import { adminListSignups, adminLogin, adminListCustomers, adminDeleteCustomer } from "@/lib/admin.functions";
 import { adminGetAlerts, adminResolveAlert, adminGetSignupAttempts } from "@/lib/telemetry.functions";
 import {
   adminListSubscriptionRequests,
   adminUpdateSubscriptionStatus,
+  adminDeleteSubscriptionRequest,
 } from "@/lib/subscription.functions";
 import { activateCustomer } from "@/lib/customer.functions";
 import { adminGetProofUrl } from "@/lib/payment-verify.functions";
