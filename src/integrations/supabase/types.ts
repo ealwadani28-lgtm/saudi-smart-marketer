@@ -213,6 +213,81 @@ export type Database = {
         }
         Relationships: []
       }
+      kpi_entries: {
+        Row: {
+          channel: string
+          clicks: number
+          conversions: number
+          cost_sar: number
+          created_at: string
+          customer_id: string
+          entered_by: string
+          entry_hash: string
+          evidence_url: string
+          id: string
+          marketing_plan_id: string | null
+          notes: string | null
+          period_end: string
+          period_start: string
+          sealed_at: string
+          source: string
+          views: number
+        }
+        Insert: {
+          channel?: string
+          clicks?: number
+          conversions?: number
+          cost_sar?: number
+          created_at?: string
+          customer_id: string
+          entered_by: string
+          entry_hash: string
+          evidence_url: string
+          id?: string
+          marketing_plan_id?: string | null
+          notes?: string | null
+          period_end: string
+          period_start: string
+          sealed_at?: string
+          source: string
+          views?: number
+        }
+        Update: {
+          channel?: string
+          clicks?: number
+          conversions?: number
+          cost_sar?: number
+          created_at?: string
+          customer_id?: string
+          entered_by?: string
+          entry_hash?: string
+          evidence_url?: string
+          id?: string
+          marketing_plan_id?: string | null
+          notes?: string | null
+          period_end?: string
+          period_start?: string
+          sealed_at?: string
+          source?: string
+          views?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kpi_entries_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kpi_entries_marketing_plan_id_fkey"
+            columns: ["marketing_plan_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       marketing_plans: {
         Row: {
           analysis_id: string | null
