@@ -111,6 +111,7 @@ function isAllowedOrigin(origin: string | null): boolean {
 export const Route = createFileRoute("/api/generate-image")({
   server: {
     handlers: {
+      GET: async () => new Response("Method Not Allowed", { status: 405, headers: { Allow: "POST", "X-Robots-Tag": "noindex" } }),
       POST: async ({ request }) => {
         const apiKey = process.env.LOVABLE_API_KEY;
         if (!apiKey) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
