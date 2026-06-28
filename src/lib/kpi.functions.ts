@@ -204,6 +204,9 @@ export const adminBulkImportKpi = createServerFn({ method: "POST" })
       .select("id");
     if (error) throw new Error(`فشل الاستيراد: ${error.message}`);
     return { inserted: rows?.length ?? 0, fileHash: data.fileHash };
+  });
+
+
 
 
 export const adminListKpiEntries = createServerFn({ method: "POST" })
