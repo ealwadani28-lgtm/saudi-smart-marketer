@@ -692,6 +692,47 @@ function AdminPage() {
                               </button>
                             )}
                           </div>
+                          {r.verification_status && r.verification_status !== "pending" && (
+                            <div className="mt-1.5 space-y-0.5">
+                              <div
+                                className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+                                  r.verification_status === "auto_verified"
+                                    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+                                    : r.verification_status === "needs_review"
+                                      ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+                                      : "bg-destructive/15 text-destructive"
+                                }`}
+                              >
+                                {r.verification_status === "auto_verified"
+                                  ? "✓ تحقق تلقائي"
+                                  : r.verification_status === "needs_review"
+                                    ? "⚠ مراجعة يدوية"
+                                    : "✕ مرفوض"}
+                              </div>
+                              {(r.extracted_amount || r.extracted_payee) && (
+                                <div className="text-[10px] text-muted-foreground">
+                                  {r.extracted_amount} {r.extracted_currency || ""} —{" "}
+                                  {r.extracted_payee || "—"}
+                                </div>
+                              )}
+                              {r.proof_path && (
+                                <button
+                                  onClick={() => viewProof(r.proof_path!)}
+                                  className="text-[10px] text-primary hover:underline"
+                                >
+                                  📎 عرض الإيصال
+                                </button>
+                              )}
+                              {r.verification_notes && (
+                                <div
+                                  className="max-w-[220px] truncate text-[10px] text-muted-foreground"
+                                  title={r.verification_notes}
+                                >
+                                  {r.verification_notes}
+                                </div>
+                              )}
+                            </div>
+                          )}
                           {r.notes && (
                             <div
                               className="mt-1 max-w-[220px] truncate text-[11px] text-muted-foreground"
