@@ -7,6 +7,8 @@ import {
   aggregateKpis,
   type KpiEntry,
 } from "@/lib/kpi.functions";
+import { KpiCsvImport } from "./KpiCsvImport";
+
 
 const SOURCES: Array<{ value: string; label: string }> = [
   { value: "meta_ads", label: "Meta Ads" },
