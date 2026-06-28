@@ -305,39 +305,45 @@ function RequestForm({ paymentMethod }: { paymentMethod: "paypal" | "bank" }) {
 
   if (success) {
     return (
-      <div className="rounded-2xl border border-primary/30 bg-primary/5 p-6 text-center">
-        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-primary/15">
-          <CheckCircle2 className="h-8 w-8 text-primary" />
+      <div className="space-y-5">
+        <div className="rounded-2xl border border-primary/30 bg-primary/5 p-6 text-center">
+          <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-primary/15">
+            <CheckCircle2 className="h-8 w-8 text-primary" />
+          </div>
+          <h3 className="mt-4 text-lg font-semibold">تم استلام طلبك بنجاح</h3>
+          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+            ارفع إيصال الدفع الآن وسيتم{" "}
+            <span className="font-semibold text-primary">تفعيل حسابك تلقائياً</span>{" "}
+            خلال ثوانٍ بعد التحقق بالذكاء الاصطناعي.
+          </p>
         </div>
-        <h3 className="mt-4 text-lg font-semibold">تم استلام طلبك بنجاح</h3>
-        <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-          مبلغ الاشتراك:{" "}
-          <span className="font-semibold text-foreground">
-            {PRICE_SAR.toLocaleString("ar-SA")} ريال
-          </span>
-          . أرسل لنا إيصال الدفع عبر واتساب لتسريع التفعيل. سنرسل إيميل تأكيد
-          الاشتراك خلال ساعات عمل.
-        </p>
-        <div className="mt-5 flex flex-wrap justify-center gap-2.5">
-          <a
-            href={success.waLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg bg-[#25D366] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-          >
-            <MessageCircle className="h-4 w-4" />
-            فتح واتساب لإرسال الإيصال
-          </a>
-          <a
-            href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("إيصال دفع اشتراك Justlator")}`}
-            className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-muted"
-          >
-            <Mail className="h-4 w-4" />
-            إرسال الإيصال بالإيميل
-          </a>
+
+        <ProofUploader requestId={success.requestId} email={success.email} />
+
+        <div className="rounded-xl border border-border bg-muted/30 p-4 text-center">
+          <p className="text-xs text-muted-foreground">أو أرسل الإيصال يدوياً:</p>
+          <div className="mt-2.5 flex flex-wrap justify-center gap-2">
+            <a
+              href={success.waLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#25D366] px-3.5 py-2 text-xs font-semibold text-white transition-opacity hover:opacity-90"
+            >
+              <MessageCircle className="h-3.5 w-3.5" />
+              واتساب
+            </a>
+            <a
+              href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("إيصال دفع اشتراك Justlator")}`}
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-3.5 py-2 text-xs font-semibold transition-colors hover:bg-muted"
+            >
+              <Mail className="h-3.5 w-3.5" />
+              إيميل
+            </a>
+          </div>
         </div>
       </div>
     );
+  }
   }
 
   return (
