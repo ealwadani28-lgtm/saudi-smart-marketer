@@ -169,6 +169,9 @@ export function AdminKpiEntry({ token, email }: Props) {
         </div>
       </form>
 
+      <KpiCsvImport token={token} email={email} onImported={reload} />
+
+
       <div className="mt-5 grid grid-cols-2 gap-2 text-xs md:grid-cols-4">
         <Stat label="مشاهدات" value={agg.views.toLocaleString("ar-SA")} />
         <Stat label="نقرات" value={`${agg.clicks.toLocaleString("ar-SA")} (CTR ${agg.ctr.toFixed(2)}%)`} />
