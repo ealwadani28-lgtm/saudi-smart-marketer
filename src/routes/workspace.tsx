@@ -81,6 +81,7 @@ function WorkspacePage() {
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [updates, setUpdates] = useState<Update[]>([]);
   const [analyses, setAnalyses] = useState<Analysis[]>([]);
+  const [marketingPlans, setMarketingPlans] = useState<Array<{ id: string; store_url: string; plan: import("@/lib/marketing-plan.functions").MarketingPlan; created_at: string }>>([]);
   const [error, setError] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -102,13 +103,15 @@ function WorkspacePage() {
       }
       setUserId(session.user.id);
       try {
-        const [ws, an] = await Promise.all([
+        const [ws, an, mp] = await Promise.all([
           fetchWorkspace({ data: { userId: session.user.id } }),
           listAnalyses({ data: { userId: session.user.id } }),
+          listPlans({ data: { userId: session.user.id } }),
         ]);
         setCustomer(ws.customer);
         setUpdates(ws.updates);
         setAnalyses(an.analyses as Analysis[]);
+        setMarketingPlans(mp.plans as typeof marketingPlans);
         if (ws.customer?.shop_url) setShopUrlInput(ws.customer.shop_url);
       } catch (e) {
         setError(e instanceof Error ? e.message : "حدث خطأ");
