@@ -7,6 +7,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { adminAnalyzeCustomerStore, adminGetCustomerView } from "@/lib/admin.functions";
+import { AdminKpiEntry } from "@/components/AdminKpiEntry";
 
 const TOKEN_KEY = "admin_token_v2";
 
@@ -92,7 +93,7 @@ function AdminCustomerView() {
   const [updates, setUpdates] = useState<Update[]>([]);
   const [analyses, setAnalyses] = useState<Analysis[]>([]);
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
-  const [tab, setTab] = useState<"updates" | "analyses" | "competitors">("updates");
+  const [tab, setTab] = useState<"updates" | "analyses" | "competitors" | "kpis">("updates");
   const [shopUrlInput, setShopUrlInput] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzeError, setAnalyzeError] = useState("");
@@ -222,7 +223,14 @@ function AdminCustomerView() {
           <TabBtn active={tab === "competitors"} onClick={() => setTab("competitors")}>
             المنافسون ({competitors.length})
           </TabBtn>
+          <TabBtn active={tab === "kpis"} onClick={() => setTab("kpis")}>
+            KPIs
+          </TabBtn>
         </div>
+
+        {tab === "kpis" && token && (
+          <AdminKpiEntry token={token} email={email} />
+        )}
 
         {tab === "updates" && (
           <section className="space-y-2">
