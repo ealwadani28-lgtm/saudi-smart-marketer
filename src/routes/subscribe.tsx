@@ -278,7 +278,7 @@ function RequestForm({ paymentMethod }: { paymentMethod: "paypal" | "bank" }) {
     setError("");
     setLoading(true);
     try {
-      await submitFn({
+      const result = await submitFn({
         data: {
           full_name: fullName.trim(),
           email: email.trim(),
@@ -295,9 +295,7 @@ function RequestForm({ paymentMethod }: { paymentMethod: "paypal" | "bank" }) {
         payment_method: paymentMethod,
         reference: reference.trim(),
       });
-      setSuccess({ waLink });
-      // Auto-open WhatsApp
-      window.open(waLink, "_blank", "noopener,noreferrer");
+      setSuccess({ waLink, requestId: result.id, email: email.trim() });
     } catch (err) {
       setError(err instanceof Error ? err.message : "حدث خطأ، حاول مرة أخرى");
     } finally {
