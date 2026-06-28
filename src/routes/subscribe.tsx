@@ -271,7 +271,7 @@ function RequestForm({ paymentMethod }: { paymentMethod: "paypal" | "bank" }) {
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState<{ waLink: string } | null>(null);
+  const [success, setSuccess] = useState<{ waLink: string; requestId: string; email: string } | null>(null);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
