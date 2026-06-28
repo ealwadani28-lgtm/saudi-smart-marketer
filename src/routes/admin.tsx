@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import {
   Lock, Download, RefreshCw, Users, Mail, ExternalLink, LogOut,
   AlertTriangle, ShieldCheck, Activity, CreditCard, Check, X, MessageCircle,
-  FileDown, FileText,
+  FileDown, FileText, Trash2,
 } from "lucide-react";
-import { adminListSignups, adminLogin, adminListCustomers } from "@/lib/admin.functions";
+import { adminListSignups, adminLogin, adminListCustomers, adminDeleteCustomer } from "@/lib/admin.functions";
 import { adminGetAlerts, adminResolveAlert, adminGetSignupAttempts } from "@/lib/telemetry.functions";
 import {
   adminListSubscriptionRequests,
   adminUpdateSubscriptionStatus,
+  adminDeleteSubscriptionRequest,
 } from "@/lib/subscription.functions";
 import { activateCustomer } from "@/lib/customer.functions";
 import { adminGetProofUrl } from "@/lib/payment-verify.functions";
@@ -86,6 +87,8 @@ function AdminPage() {
   const attemptsFn = useServerFn(adminGetSignupAttempts);
   const listSubsFn = useServerFn(adminListSubscriptionRequests);
   const updateSubFn = useServerFn(adminUpdateSubscriptionStatus);
+  const deleteSubFn = useServerFn(adminDeleteSubscriptionRequest);
+  const deleteCustomerFn = useServerFn(adminDeleteCustomer);
   const activateFn = useServerFn(activateCustomer);
   const listCustomersFn = useServerFn(adminListCustomers);
   const proofUrlFn = useServerFn(adminGetProofUrl);
@@ -255,6 +258,29 @@ function AdminPage() {
       /* ignore */
     }
   }
+
+  async function deleteSubRequest(id: string, email: string) {
+    if (!token) return;
+    if (!confirm(`حذف طلب الاشتراك (${email}) نهائيًا؟ لا يمكن التراجع.`)) return;
+    try {
+      await deleteSubFn({ data: { token, id } });
+      setSubRequests((prev) => prev.filter((r) => r.id !== id));
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "فشل الحذف");
+    }
+  }
+
+  async function deleteCustomerRow(id: string, email: string) {
+    if (!token) return;
+    if (!confirm(`حذف العميل (${email}) نهائيًا؟ سيتم فقدان بيانات ورك سبيس المرتبطة.`)) return;
+    try {
+      await deleteCustomerFn({ data: { token, id } });
+      setCustomers((prev) => prev.filter((c) => c.id !== id));
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "فشل الحذف");
+    }
+  }
+
 
   function exportCSV() {
     const header = ["id", "email", "shop_url", "source", "created_at"];
@@ -703,6 +729,13 @@ function AdminPage() {
                                 <X className="h-3 w-3" /> ارفض
                               </button>
                             )}
+                            <button
+                              onClick={() => deleteSubRequest(r.id, r.email)}
+                              className="inline-flex items-center gap-1 rounded-md bg-destructive/10 px-2 py-1 text-xs font-medium text-destructive transition hover:bg-destructive/20"
+                              title="حذف الطلب نهائيًا"
+                            >
+                              <Trash2 className="h-3 w-3" /> احذف
+                            </button>
                           </div>
                           {r.verification_status && r.verification_status !== "pending" && (
                             <div className="mt-1.5 space-y-0.5">
@@ -825,12 +858,21 @@ function AdminPage() {
                           {c.subscription_end ? new Date(c.subscription_end).toLocaleDateString("ar-SA") : "—"}
                         </td>
                         <td className="px-4 py-3">
-                          <button
-                            onClick={() => openCustomerView(c.email)}
-                            className="inline-flex items-center gap-1 rounded-md bg-primary/15 px-2 py-1 text-xs font-medium text-primary transition hover:bg-primary/25"
-                          >
-                            <ExternalLink className="h-3 w-3" /> ورك سبيس
-                          </button>
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <button
+                              onClick={() => openCustomerView(c.email)}
+                              className="inline-flex items-center gap-1 rounded-md bg-primary/15 px-2 py-1 text-xs font-medium text-primary transition hover:bg-primary/25"
+                            >
+                              <ExternalLink className="h-3 w-3" /> ورك سبيس
+                            </button>
+                            <button
+                              onClick={() => deleteCustomerRow(c.id, c.email)}
+                              className="inline-flex items-center gap-1 rounded-md bg-destructive/10 px-2 py-1 text-xs font-medium text-destructive transition hover:bg-destructive/20"
+                              title="حذف العميل نهائيًا"
+                            >
+                              <Trash2 className="h-3 w-3" /> احذف
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
