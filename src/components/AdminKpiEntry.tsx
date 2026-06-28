@@ -7,6 +7,8 @@ import {
   aggregateKpis,
   type KpiEntry,
 } from "@/lib/kpi.functions";
+import { KpiCsvImport } from "./KpiCsvImport";
+
 
 const SOURCES: Array<{ value: string; label: string }> = [
   { value: "meta_ads", label: "Meta Ads" },
@@ -166,6 +168,9 @@ export function AdminKpiEntry({ token, email }: Props) {
           </button>
         </div>
       </form>
+
+      <KpiCsvImport token={token} email={email} onImported={reload} />
+
 
       <div className="mt-5 grid grid-cols-2 gap-2 text-xs md:grid-cols-4">
         <Stat label="مشاهدات" value={agg.views.toLocaleString("ar-SA")} />
