@@ -9,8 +9,10 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { getWorkspace } from "@/lib/customer.functions";
 import { analyzeStorePaid, listStoreAnalyses, type StoreSnapshot, type StoreReport } from "@/lib/analyzer.functions";
+import { listMarketingPlans } from "@/lib/marketing-plan.functions";
 import { printStoreReport } from "@/lib/storeReportPdf";
 import { ContentPlanView } from "@/components/ContentPlanView";
+import { MarketingPlanSection } from "@/components/MarketingPlanSection";
 
 export const Route = createFileRoute("/workspace")({
   head: () => ({
