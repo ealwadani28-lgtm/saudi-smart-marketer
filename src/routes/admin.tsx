@@ -80,13 +80,7 @@ function AdminPage() {
   const listCustomersFn = useServerFn(adminListCustomers);
 
   function openCustomerView(email: string) {
-<<<<<<< Updated upstream
     window.location.assign(`/admin/customer/${encodeURIComponent(email)}`);
-=======
-    const t = token ?? sessionStorage.getItem(TOKEN_KEY) ?? localStorage.getItem(TOKEN_KEY) ?? "";
-    const url = `/admin/customer/${encodeURIComponent(email)}?t=${encodeURIComponent(t)}`;
-    window.open(url, "_blank", "noopener,noreferrer");
->>>>>>> Stashed changes
   }
 
   const [activating, setActivating] = useState<string | null>(null);
