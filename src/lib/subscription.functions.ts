@@ -16,6 +16,11 @@ const UpdateInput = z.object({
   id: z.string().uuid(),
   status: z.enum(["pending", "approved", "rejected"]),
 });
+const DeleteInput = z.object({
+  token: z.string().min(8).max(512),
+  id: z.string().uuid(),
+});
+
 
 export const submitSubscriptionRequest = createServerFn({ method: "POST" })
   .inputValidator((d) => SubmitInput.parse(d))
