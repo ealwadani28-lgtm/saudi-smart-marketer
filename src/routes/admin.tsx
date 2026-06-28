@@ -858,12 +858,21 @@ function AdminPage() {
                           {c.subscription_end ? new Date(c.subscription_end).toLocaleDateString("ar-SA") : "—"}
                         </td>
                         <td className="px-4 py-3">
-                          <button
-                            onClick={() => openCustomerView(c.email)}
-                            className="inline-flex items-center gap-1 rounded-md bg-primary/15 px-2 py-1 text-xs font-medium text-primary transition hover:bg-primary/25"
-                          >
-                            <ExternalLink className="h-3 w-3" /> ورك سبيس
-                          </button>
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <button
+                              onClick={() => openCustomerView(c.email)}
+                              className="inline-flex items-center gap-1 rounded-md bg-primary/15 px-2 py-1 text-xs font-medium text-primary transition hover:bg-primary/25"
+                            >
+                              <ExternalLink className="h-3 w-3" /> ورك سبيس
+                            </button>
+                            <button
+                              onClick={() => deleteCustomerRow(c.id, c.email)}
+                              className="inline-flex items-center gap-1 rounded-md bg-destructive/10 px-2 py-1 text-xs font-medium text-destructive transition hover:bg-destructive/20"
+                              title="حذف العميل نهائيًا"
+                            >
+                              <Trash2 className="h-3 w-3" /> احذف
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
