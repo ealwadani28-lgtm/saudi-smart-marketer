@@ -640,13 +640,24 @@ function PricingSection() {
               ))}
             </ul>
 
-            <a
-              href="#final-cta"
+            <Link
+              to="/subscribe"
               className="btn-gold mt-8 flex w-full items-center justify-center gap-2 rounded-2xl px-7 py-4 text-base font-bold"
             >
-              احجز مكانك في القائمة المبكرة
+              اشترك الآن وفعّل حسابك
               <ArrowLeft className="h-5 w-5" />
-            </a>
+            </Link>
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs">
+              <span className="rounded-full bg-success/10 px-3 py-1 font-semibold text-success">
+                ✓ جاهز لمتاجر سلة وزد
+              </span>
+              <span className="rounded-full bg-primary/10 px-3 py-1 font-semibold text-primary">
+                💳 تحويل بنكي مباشر
+              </span>
+              <span className="rounded-full bg-gold/15 px-3 py-1 font-semibold text-foreground">
+                🅿️ PayPal.me
+              </span>
+            </div>
             <p className="mt-4 text-center text-sm text-muted-foreground">
               قارن: المسوقين يطلبون{" "}
               <span className="font-bold text-destructive line-through">٣٬٠٠٠ - ١٠٬٠٠٠ ريال</span>{" "}
