@@ -466,49 +466,79 @@ export type Database = {
           amount_sar: number
           created_at: string
           email: string
+          extracted_amount: number | null
+          extracted_currency: string | null
+          extracted_date: string | null
+          extracted_payee: string | null
+          extracted_reference: string | null
           full_name: string
           id: string
           ip_hash: string | null
           notes: string | null
           payment_method: string
           phone: string | null
+          proof_path: string | null
           reference: string | null
           reviewed_at: string | null
           status: string
           updated_at: string
           user_agent: string | null
+          verification_attempts: number
+          verification_notes: string | null
+          verification_status: string
+          verified_at: string | null
         }
         Insert: {
           amount_sar?: number
           created_at?: string
           email: string
+          extracted_amount?: number | null
+          extracted_currency?: string | null
+          extracted_date?: string | null
+          extracted_payee?: string | null
+          extracted_reference?: string | null
           full_name: string
           id?: string
           ip_hash?: string | null
           notes?: string | null
           payment_method: string
           phone?: string | null
+          proof_path?: string | null
           reference?: string | null
           reviewed_at?: string | null
           status?: string
           updated_at?: string
           user_agent?: string | null
+          verification_attempts?: number
+          verification_notes?: string | null
+          verification_status?: string
+          verified_at?: string | null
         }
         Update: {
           amount_sar?: number
           created_at?: string
           email?: string
+          extracted_amount?: number | null
+          extracted_currency?: string | null
+          extracted_date?: string | null
+          extracted_payee?: string | null
+          extracted_reference?: string | null
           full_name?: string
           id?: string
           ip_hash?: string | null
           notes?: string | null
           payment_method?: string
           phone?: string | null
+          proof_path?: string | null
           reference?: string | null
           reviewed_at?: string | null
           status?: string
           updated_at?: string
           user_agent?: string | null
+          verification_attempts?: number
+          verification_notes?: string | null
+          verification_status?: string
+          verified_at?: string | null
         }
         Relationships: []
       }
