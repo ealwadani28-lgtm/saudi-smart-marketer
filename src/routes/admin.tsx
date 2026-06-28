@@ -87,6 +87,8 @@ function AdminPage() {
   const attemptsFn = useServerFn(adminGetSignupAttempts);
   const listSubsFn = useServerFn(adminListSubscriptionRequests);
   const updateSubFn = useServerFn(adminUpdateSubscriptionStatus);
+  const deleteSubFn = useServerFn(adminDeleteSubscriptionRequest);
+  const deleteCustomerFn = useServerFn(adminDeleteCustomer);
   const activateFn = useServerFn(activateCustomer);
   const listCustomersFn = useServerFn(adminListCustomers);
   const proofUrlFn = useServerFn(adminGetProofUrl);
