@@ -729,6 +729,13 @@ function AdminPage() {
                                 <X className="h-3 w-3" /> ارفض
                               </button>
                             )}
+                            <button
+                              onClick={() => deleteSubRequest(r.id, r.email)}
+                              className="inline-flex items-center gap-1 rounded-md bg-destructive/10 px-2 py-1 text-xs font-medium text-destructive transition hover:bg-destructive/20"
+                              title="حذف الطلب نهائيًا"
+                            >
+                              <Trash2 className="h-3 w-3" /> احذف
+                            </button>
                           </div>
                           {r.verification_status && r.verification_status !== "pending" && (
                             <div className="mt-1.5 space-y-0.5">
