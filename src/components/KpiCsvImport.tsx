@@ -226,13 +226,16 @@ function parseCsv(text: string): ParseResult {
   });
 
   const required: Array<keyof ParsedRow> = ["periodStart", "views", "clicks", "conversions", "costSar"];
-  const missing = required.filter((f) => colIndex[f] === undefined).map((f) => ({
+  const labels: Record<keyof ParsedRow, string> = {
     periodStart: "تاريخ (date / day / التاريخ)",
+    periodEnd: "تاريخ نهاية (end_date)",
+    channel: "قناة (campaign / channel)",
     views: "مشاهدات (impressions / views / مشاهدات)",
     clicks: "نقرات (clicks / النقرات)",
     conversions: "تحويلات (conversions / results / طلبات)",
     costSar: "تكلفة (spend / cost / التكلفة)",
-  }[f]));
+  };
+  const missing: string[] = required.filter((f) => colIndex[f] === undefined).map((f) => labels[f]);
 
   if (missing.length > 0) {
     return { rows: [], errors: [], missingColumns: missing, detectedColumns: detected, totalLines: lines.length - 1 };
