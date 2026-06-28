@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import { JustlatorFooter } from "@/components/JustlatorFooter";
 import { submitSubscriptionRequest } from "@/lib/subscription.functions";
+import { submitPaymentProof } from "@/lib/payment-verify.functions";
+import { Upload, AlertCircle, Sparkle } from "lucide-react";
 
 export const Route = createFileRoute("/subscribe")({
   head: () => ({
