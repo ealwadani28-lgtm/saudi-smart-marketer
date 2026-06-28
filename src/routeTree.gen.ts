@@ -15,6 +15,7 @@ import { Route as ThankYouRouteImport } from './routes/thank-you'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SubscribeRouteImport } from './routes/subscribe'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AnalyzeRouteImport } from './routes/analyze'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -52,6 +53,11 @@ const SubscribeRoute = SubscribeRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/analyze': typeof AnalyzeRoute
   '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/subscribe': typeof SubscribeRoute
   '/terms': typeof TermsRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRouteWithChildren
   '/analyze': typeof AnalyzeRoute
   '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/subscribe': typeof SubscribeRoute
   '/terms': typeof TermsRoute
@@ -135,6 +143,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/analyze': typeof AnalyzeRoute
   '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/subscribe': typeof SubscribeRoute
   '/terms': typeof TermsRoute
@@ -153,6 +162,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/analyze'
     | '/login'
+    | '/pricing'
     | '/privacy'
     | '/subscribe'
     | '/terms'
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/analyze'
     | '/login'
+    | '/pricing'
     | '/privacy'
     | '/subscribe'
     | '/terms'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/analyze'
     | '/login'
+    | '/pricing'
     | '/privacy'
     | '/subscribe'
     | '/terms'
@@ -202,6 +214,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AnalyzeRoute: typeof AnalyzeRoute
   LoginRoute: typeof LoginRoute
+  PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   SubscribeRoute: typeof SubscribeRoute
   TermsRoute: typeof TermsRoute
@@ -255,6 +268,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -331,6 +351,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AnalyzeRoute: AnalyzeRoute,
   LoginRoute: LoginRoute,
+  PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   SubscribeRoute: SubscribeRoute,
   TermsRoute: TermsRoute,
