@@ -65,6 +65,15 @@ type SubRequest = {
   status: "pending" | "approved" | "rejected";
   created_at: string;
   reviewed_at: string | null;
+  proof_path?: string | null;
+  extracted_amount?: number | null;
+  extracted_currency?: string | null;
+  extracted_payee?: string | null;
+  extracted_reference?: string | null;
+  extracted_date?: string | null;
+  verification_status?: "pending" | "auto_verified" | "needs_review" | "rejected" | null;
+  verification_notes?: string | null;
+  verified_at?: string | null;
 };
 
 
