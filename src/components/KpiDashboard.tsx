@@ -62,16 +62,29 @@ export function KpiDashboard({ userId, plan, planId }: Props) {
 
   return (
     <section className="mt-10 rounded-3xl border border-border bg-card p-6 shadow-soft">
-      <div className="mb-2 flex items-center justify-between gap-3">
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
         <h2 className="flex items-center gap-2 font-display text-lg font-bold">
           <TrendingUp className="h-5 w-5 text-primary" />
           لوحة الأداء (KPIs)
         </h2>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
-          <ShieldCheck className="h-3.5 w-3.5" />
-          سجل موثّق وغير قابل للتعديل
-        </span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            disabled={entries.length === 0}
+            onClick={() => printKpiReport({ entries, aggregate: agg, planProgress })}
+            className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-bold text-primary hover:bg-primary/10 disabled:opacity-50"
+            title="تصدير التقرير إلى PDF مع ملخص التقدم وروابط الإثبات"
+          >
+            <FileDown className="h-3.5 w-3.5" />
+            تصدير PDF
+          </button>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            سجل موثّق وغير قابل للتعديل
+          </span>
+        </div>
       </div>
+
 
       <p className="mb-5 flex items-start gap-2 rounded-xl bg-muted/40 p-3 text-xs leading-relaxed text-muted-foreground">
         <Lock className="mt-0.5 h-4 w-4 shrink-0" />
