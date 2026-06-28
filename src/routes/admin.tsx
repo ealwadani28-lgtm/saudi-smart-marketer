@@ -88,6 +88,17 @@ function AdminPage() {
   const updateSubFn = useServerFn(adminUpdateSubscriptionStatus);
   const activateFn = useServerFn(activateCustomer);
   const listCustomersFn = useServerFn(adminListCustomers);
+  const proofUrlFn = useServerFn(adminGetProofUrl);
+
+  async function viewProof(path: string) {
+    if (!token) return;
+    try {
+      const res = await proofUrlFn({ data: { token, path } });
+      window.open(res.url, "_blank", "noopener,noreferrer");
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "تعذّر فتح الإيصال");
+    }
+  }
 
   function openCustomerView(email: string) {
     window.location.assign(`/admin/customer/${encodeURIComponent(email)}`);
