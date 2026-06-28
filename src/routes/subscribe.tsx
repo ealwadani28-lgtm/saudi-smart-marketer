@@ -553,3 +553,144 @@ function CopyRow({
     </div>
   );
 }
+
+function ProofUploader({ requestId, email }: { requestId: string; email: string }) {
+  const uploadFn = useServerFn(submitPaymentProof);
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [result, setResult] = useState<{ ok: boolean; auto: boolean; message: string } | null>(null);
+  const [err, setErr] = useState("");
+
+  async function onUpload() {
+    if (!file) return;
+    setErr("");
+    setUploading(true);
+    try {
+      if (file.size > 6 * 1024 * 1024) {
+        throw new Error("الحد الأقصى ٦ ميجابايت");
+      }
+      const buf = await file.arrayBuffer();
+      // Base64 encode in chunks to avoid call stack overflow
+      const bytes = new Uint8Array(buf);
+      let binary = "";
+      const CHUNK = 0x8000;
+      for (let i = 0; i < bytes.length; i += CHUNK) {
+        binary += String.fromCharCode(...bytes.subarray(i, i + CHUNK));
+      }
+      const base64 = btoa(binary);
+
+      const res = await uploadFn({
+        data: {
+          subscriptionRequestId: requestId,
+          email,
+          fileName: file.name,
+          mimeType: file.type || "image/jpeg",
+          base64,
+        },
+      });
+      setResult({ ok: true, auto: res.auto_verified, message: res.message });
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "فشل الرفع");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  if (result?.auto) {
+    return (
+      <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-6 text-center">
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-emerald-500/20">
+          <Sparkle className="h-7 w-7 text-emerald-600" />
+        </div>
+        <h3 className="mt-4 text-lg font-bold text-emerald-700 dark:text-emerald-400">
+          🎉 تم التفعيل التلقائي!
+        </h3>
+        <p className="mx-auto mt-2 max-w-md text-sm text-foreground/80">{result.message}</p>
+        <p className="mt-3 text-xs text-muted-foreground">
+          تحقق من بريدك <span className="font-mono">{email}</span> لرابط الدخول.
+        </p>
+      </div>
+    );
+  }
+
+  if (result && !result.auto) {
+    return (
+      <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 text-center">
+        <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-amber-500/20">
+          <AlertCircle className="h-6 w-6 text-amber-600" />
+        </div>
+        <h3 className="mt-4 text-base font-semibold">قيد المراجعة اليدوية</h3>
+        <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">{result.message}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+      <div className="flex items-start gap-3">
+        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+          <Sparkle className="h-5 w-5" />
+        </div>
+        <div>
+          <h3 className="text-base font-semibold">⚡ تفعيل فوري بالذكاء الاصطناعي</h3>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+            ارفع صورة الإيصال (أو PDF) — سيقرأه نظامنا تلقائياً، يتحقق من المبلغ
+            والمستفيد، ويفعّل حسابك خلال ثوانٍ بدون انتظار.
+          </p>
+        </div>
+      </div>
+
+      <label
+        className={`mt-4 block cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition-colors ${
+          file ? "border-primary/50 bg-primary/5" : "border-border hover:border-primary/40 hover:bg-muted/30"
+        }`}
+      >
+        <input
+          type="file"
+          accept="image/png,image/jpeg,image/jpg,image/webp,image/heic,application/pdf"
+          className="hidden"
+          onChange={(e) => {
+            setFile(e.target.files?.[0] ?? null);
+            setErr("");
+          }}
+        />
+        <Upload className="mx-auto h-7 w-7 text-muted-foreground" />
+        <div className="mt-2 text-sm font-medium">
+          {file ? file.name : "اضغط لاختيار ملف الإيصال"}
+        </div>
+        <div className="mt-1 text-[11px] text-muted-foreground">
+          PNG / JPG / WebP / HEIC / PDF — حتى ٦ ميجابايت
+        </div>
+      </label>
+
+      {err && (
+        <div className="mt-3 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+          {err}
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={onUpload}
+        disabled={!file || uploading}
+        className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:opacity-90 disabled:opacity-60"
+      >
+        {uploading ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            جارٍ التحقق…
+          </>
+        ) : (
+          <>
+            <Sparkle className="h-4 w-4" />
+            ارفع وفعّل حسابي تلقائياً
+          </>
+        )}
+      </button>
+
+      <p className="mt-2.5 text-center text-[10px] leading-relaxed text-muted-foreground">
+        🔒 الإيصال مخزّن بشكل خاص ولا يُعرض إلا للأدمن.
+      </p>
+    </div>
+  );
+}
