@@ -75,6 +75,7 @@ function WorkspacePage() {
   const fetchWorkspace = useServerFn(getWorkspace);
   const runAnalysis = useServerFn(analyzeStorePaid);
   const listAnalyses = useServerFn(listStoreAnalyses);
+  const listPlans = useServerFn(listMarketingPlans);
 
   const [loading, setLoading] = useState(true);
   const [customer, setCustomer] = useState<Customer | null>(null);
