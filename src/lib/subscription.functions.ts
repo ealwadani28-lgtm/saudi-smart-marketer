@@ -101,3 +101,29 @@ export const adminUpdateSubscriptionStatus = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
+
+export const adminDeleteSubscriptionRequest = createServerFn({ method: "POST" })
+  .inputValidator((d) => DeleteInput.parse(d))
+  .handler(async ({ data }) => {
+    const { verifyAdminToken } = await import("./admin-token.server");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (!verifyAdminToken(data.token)) throw new Error("Unauthorized");
+
+    // Fetch proof_path so we can clean up storage too
+    const { data: row } = await supabaseAdmin
+      .from("subscription_requests")
+      .select("proof_path")
+      .eq("id", data.id)
+      .maybeSingle();
+
+    if (row?.proof_path) {
+      await supabaseAdmin.storage.from("payment-proofs").remove([row.proof_path]);
+    }
+
+    const { error } = await supabaseAdmin
+      .from("subscription_requests")
+      .delete()
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
