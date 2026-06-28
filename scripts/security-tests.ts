@@ -80,41 +80,53 @@ function record(r: TestResult) {
 async function rlsTests() {
   console.log("\n══ RLS — anon role attempting CRUD on sensitive tables ══");
 
+  type Tbl =
+    | "early_signups" | "rate_limits"
+    | "customers" | "customer_updates" | "kpi_entries" | "marketing_plans"
+    | "subscription_requests" | "store_analyses"
+    | "competitors" | "competitor_snapshots"
+    | "signup_attempts" | "security_alerts" | "visitor_pings";
+
   const tableOps: Array<{
-    table: "early_signups" | "rate_limits";
+    table: Tbl;
     op: "select" | "insert" | "update" | "delete";
     run: () => Promise<{ error: unknown; data?: unknown }>;
   }> = [
+    // existing
     { table: "early_signups", op: "select", run: () => anon.from("early_signups").select("*").limit(1) },
-    {
-      table: "early_signups",
-      op: "insert",
-      run: () => anon.from("early_signups").insert({ email: `t-${Date.now()}@x.io`, source: "audit" }),
-    },
-    {
-      table: "early_signups",
-      op: "update",
-      run: () => anon.from("early_signups").update({ email: "x@x.x" }).neq("id", "00000000-0000-0000-0000-000000000000"),
-    },
-    {
-      table: "early_signups",
-      op: "delete",
-      run: () => anon.from("early_signups").delete().neq("id", "00000000-0000-0000-0000-000000000000"),
-    },
+    { table: "early_signups", op: "insert", run: () => anon.from("early_signups").insert({ email: `t-${Date.now()}@x.io`, source: "audit" }) },
+    { table: "early_signups", op: "update", run: () => anon.from("early_signups").update({ email: "x@x.x" }).neq("id", "00000000-0000-0000-0000-000000000000") },
+    { table: "early_signups", op: "delete", run: () => anon.from("early_signups").delete().neq("id", "00000000-0000-0000-0000-000000000000") },
     { table: "rate_limits", op: "select", run: () => anon.from("rate_limits").select("*").limit(1) },
     { table: "rate_limits", op: "insert", run: () => anon.from("rate_limits").insert({ key: "x", count: 1 }) },
-    {
-      table: "rate_limits",
-      op: "update",
-      run: () => anon.from("rate_limits").update({ count: 999 }).eq("key", "any"),
-    },
+    { table: "rate_limits", op: "update", run: () => anon.from("rate_limits").update({ count: 999 }).eq("key", "any") },
     { table: "rate_limits", op: "delete", run: () => anon.from("rate_limits").delete().eq("key", "any") },
+    // customer + business data — must be fully blocked for anon
+    { table: "customers", op: "select", run: () => anon.from("customers").select("*").limit(1) },
+    { table: "customers", op: "insert", run: () => anon.from("customers").insert({ email: `c-${Date.now()}@x.io` }) },
+    { table: "customers", op: "update", run: () => anon.from("customers").update({ email: "x@x.x" }).neq("id", "00000000-0000-0000-0000-000000000000") },
+    { table: "customers", op: "delete", run: () => anon.from("customers").delete().neq("id", "00000000-0000-0000-0000-000000000000") },
+    { table: "customer_updates", op: "select", run: () => anon.from("customer_updates").select("*").limit(1) },
+    { table: "customer_updates", op: "insert", run: () => anon.from("customer_updates").insert({ customer_id: "00000000-0000-0000-0000-000000000000", title: "x", body: "x" }) },
+    // KPIs — must be invisible to anon (workspace token gated on server)
+    { table: "kpi_entries", op: "select", run: () => anon.from("kpi_entries").select("*").limit(1) },
+    { table: "kpi_entries", op: "insert", run: () => anon.from("kpi_entries").insert({ customer_id: "00000000-0000-0000-0000-000000000000", period_start: "2026-01-01", period_end: "2026-01-01", channel: "x", views: 0, clicks: 0, conversions: 0, cost_sar: 0, source: "manual_dashboard", evidence_url: "https://x.io", entered_by: "anon", entry_hash: "x" }) },
+    { table: "kpi_entries", op: "update", run: () => anon.from("kpi_entries").update({ views: 999 }).neq("id", "00000000-0000-0000-0000-000000000000") },
+    { table: "kpi_entries", op: "delete", run: () => anon.from("kpi_entries").delete().neq("id", "00000000-0000-0000-0000-000000000000") },
+    { table: "marketing_plans", op: "select", run: () => anon.from("marketing_plans").select("*").limit(1) },
+    { table: "subscription_requests", op: "select", run: () => anon.from("subscription_requests").select("*").limit(1) },
+    { table: "store_analyses", op: "select", run: () => anon.from("store_analyses").select("*").limit(1) },
+    { table: "competitors", op: "select", run: () => anon.from("competitors").select("*").limit(1) },
+    { table: "competitor_snapshots", op: "select", run: () => anon.from("competitor_snapshots").select("*").limit(1) },
+    // telemetry — must be invisible to anon
+    { table: "signup_attempts", op: "select", run: () => anon.from("signup_attempts").select("*").limit(1) },
+    { table: "security_alerts", op: "select", run: () => anon.from("security_alerts").select("*").limit(1) },
+    { table: "visitor_pings", op: "select", run: () => anon.from("visitor_pings").select("*").limit(1) },
   ];
 
   for (const t of tableOps) {
     const res = await t.run();
     const err = res.error as { message?: string; code?: string } | null;
-    // "Blocked" = error from PostgREST, OR zero rows affected/returned (RLS USING false silently no-ops writes)
     const rowCount = Array.isArray(res.data) ? res.data.length : 0;
     const blocked = err !== null || rowCount === 0;
     record({
