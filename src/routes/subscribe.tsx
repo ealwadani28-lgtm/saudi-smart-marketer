@@ -344,7 +344,6 @@ function RequestForm({ paymentMethod }: { paymentMethod: "paypal" | "bank" }) {
       </div>
     );
   }
-  }
 
   return (
     <form
