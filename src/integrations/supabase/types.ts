@@ -213,6 +213,48 @@ export type Database = {
         }
         Relationships: []
       }
+      marketing_plans: {
+        Row: {
+          analysis_id: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          plan: Json
+          store_url: string
+        }
+        Insert: {
+          analysis_id?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          plan: Json
+          store_url: string
+        }
+        Update: {
+          analysis_id?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          plan?: Json
+          store_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketing_plans_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "store_analyses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "marketing_plans_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rate_limits: {
         Row: {
           count: number
