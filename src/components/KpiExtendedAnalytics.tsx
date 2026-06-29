@@ -35,12 +35,23 @@ function isoWeekStart(iso: string): string {
 }
 
 type Props = {
-  entries: KpiEntry[];
+  userId: string;
+  planId?: string | null;
 };
 
-export function KpiExtendedAnalytics({ entries }: Props) {
+export function KpiExtendedAnalytics({ userId, planId }: Props) {
+  const fetchEntries = useServerFn(listKpiEntries);
+  const [entries, setEntries] = useState<KpiEntry[]>([]);
+  const [loading, setLoading] = useState(true);
   const [avgOrder, setAvgOrder] = useState<number>(150);
   const [margin, setMargin] = useState<number>(35);
+
+  useEffect(() => {
+    setLoading(true);
+    fetchEntries({ data: { userId, marketingPlanId: planId ?? null } })
+      .then((r) => setEntries(r.entries))
+      .finally(() => setLoading(false));
+  }, [userId, planId, fetchEntries]);
 
   const total = useMemo(() => aggregateKpis(entries), [entries]);
 
