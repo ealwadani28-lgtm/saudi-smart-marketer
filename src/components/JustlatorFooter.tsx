@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { LiveVisitorCounter } from "@/components/LiveVisitorCounter";
 
 const LOGO_URL =
   "https://justlator.com/__l5e/assets-v1/ba8c8d6c-29a5-4b43-9b01-8ae6a0ddd2a0/justlator-emblem.png";
@@ -147,8 +148,9 @@ export function JustlatorFooter() {
 
       {/* Bottom */}
       <div className="border-t border-border">
-        <div className="mx-auto max-w-6xl px-6 py-5 text-center text-xs text-muted-foreground">
-          © ٢٠٢٦ Justlator Technologies · جميع الحقوق محفوظة
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-6 py-5 text-center text-xs text-muted-foreground md:flex-row md:text-right">
+          <span>© ٢٠٢٦ Justlator Technologies · جميع الحقوق محفوظة</span>
+          <LiveVisitorCounter />
         </div>
       </div>
     </footer>
