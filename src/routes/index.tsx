@@ -113,6 +113,7 @@ function Nav() {
           <Link to="/how-it-works" className="transition hover:text-primary">كيف يعمل</Link>
           <Link to="/preview" className="transition hover:text-primary">معاينة الحملة</Link>
           <Link to="/calculator" className="transition hover:text-primary">حاسبة التعادل</Link>
+          <Link to="/plan-30" className="transition hover:text-primary">خطة 30 يوم</Link>
           <Link to="/faq" className="transition hover:text-primary">الأسئلة</Link>
           <a href="#pricing" className="transition hover:text-primary">السعر</a>
         </nav>
