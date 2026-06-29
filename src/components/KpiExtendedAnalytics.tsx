@@ -104,6 +104,13 @@ export function KpiExtendedAnalytics({ userId, planId }: Props) {
       ? Math.ceil((SUBSCRIPTION_COST_SAR + Number(total.costSar)) / (avgOrder * (margin / 100)))
       : 0;
 
+  if (loading) {
+    return (
+      <section className="mt-6 rounded-3xl border border-dashed border-border bg-card/50 p-6 text-center text-sm text-muted-foreground">
+        جاري تحميل التحليلات الموسّعة…
+      </section>
+    );
+  }
   if (entries.length === 0) {
     return (
       <section className="mt-6 rounded-3xl border border-dashed border-border bg-card/50 p-6 text-center">
