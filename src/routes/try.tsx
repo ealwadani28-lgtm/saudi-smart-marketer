@@ -318,6 +318,8 @@ function TryPage() {
                         <img
                           src={imgUrl}
                           alt="صورة إعلانية مولّدة"
+                          loading="lazy"
+                          decoding="async"
                           className={`w-full transition-[filter] duration-500 ${imgFinal ? "blur-0" : "blur-2xl"}`}
                         />
                         {!imgFinal && (
