@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { BarChart3, Radio, Calendar, Coins, TrendingUp, AlertCircle } from "lucide-react";
-import { aggregateKpis, type KpiEntry } from "@/lib/kpi.functions";
+import { aggregateKpis, listKpiEntries, type KpiEntry } from "@/lib/kpi.functions";
 
 const SOURCE_LABEL: Record<string, string> = {
   meta_ads: "Meta Ads",
