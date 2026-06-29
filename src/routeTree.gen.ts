@@ -19,6 +19,7 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PreviewRouteImport } from './routes/preview'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as CalculatorRouteImport } from './routes/calculator'
 import { Route as AnalyzeRouteImport } from './routes/analyze'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -78,6 +79,11 @@ const HowItWorksRoute = HowItWorksRouteImport.update({
   path: '/how-it-works',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CalculatorRoute = CalculatorRouteImport.update({
   id: '/calculator',
   path: '/calculator',
@@ -126,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/analyze': typeof AnalyzeRoute
   '/calculator': typeof CalculatorRoute
+  '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/preview': typeof PreviewRoute
@@ -146,6 +153,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRouteWithChildren
   '/analyze': typeof AnalyzeRoute
   '/calculator': typeof CalculatorRoute
+  '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/preview': typeof PreviewRoute
@@ -167,6 +175,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/analyze': typeof AnalyzeRoute
   '/calculator': typeof CalculatorRoute
+  '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
   '/login': typeof LoginRoute
   '/preview': typeof PreviewRoute
@@ -189,6 +198,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/analyze'
     | '/calculator'
+    | '/faq'
     | '/how-it-works'
     | '/login'
     | '/preview'
@@ -209,6 +219,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/analyze'
     | '/calculator'
+    | '/faq'
     | '/how-it-works'
     | '/login'
     | '/preview'
@@ -229,6 +240,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/analyze'
     | '/calculator'
+    | '/faq'
     | '/how-it-works'
     | '/login'
     | '/preview'
@@ -250,6 +262,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AnalyzeRoute: typeof AnalyzeRoute
   CalculatorRoute: typeof CalculatorRoute
+  FaqRoute: typeof FaqRoute
   HowItWorksRoute: typeof HowItWorksRoute
   LoginRoute: typeof LoginRoute
   PreviewRoute: typeof PreviewRoute
@@ -337,6 +350,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HowItWorksRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/calculator': {
       id: '/calculator'
       path: '/calculator'
@@ -411,6 +431,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AnalyzeRoute: AnalyzeRoute,
   CalculatorRoute: CalculatorRoute,
+  FaqRoute: FaqRoute,
   HowItWorksRoute: HowItWorksRoute,
   LoginRoute: LoginRoute,
   PreviewRoute: PreviewRoute,
