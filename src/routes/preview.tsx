@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { z } from "zod";
 import { generateCampaignPreview, type CampaignPreview } from "@/lib/campaign-preview.functions";
+import { validateStoreUrl } from "@/lib/url-validator";
 import { JustlatorFooter } from "@/components/JustlatorFooter";
 
 export const Route = createFileRoute("/preview")({
