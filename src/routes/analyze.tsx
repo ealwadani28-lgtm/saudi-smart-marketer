@@ -7,6 +7,7 @@ import {
   CheckCircle2, AlertTriangle, Rocket, Target,
 } from "lucide-react";
 import { analyzeStoreFree, type StoreSnapshot, type StoreReport } from "@/lib/analyzer.functions";
+import { validateStoreUrl } from "@/lib/url-validator";
 import { printStoreReport } from "@/lib/storeReportPdf";
 import { JustlatorFooter } from "@/components/JustlatorFooter";
 
