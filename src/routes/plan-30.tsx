@@ -161,7 +161,7 @@ function Plan30Page() {
                     {meta.label}
                   </span>
                 </div>
-                <h3 className="mb-1.5 font-display text-base font-bold">{d.title}</h3>
+                <h2 className="mb-1.5 font-display text-base font-bold">{d.title}</h2>
                 <p className="mb-3 text-sm text-muted-foreground leading-6">{d.brief}</p>
                 <div className="mb-2 flex flex-wrap gap-1.5">
                   {d.channels.map((c) => (

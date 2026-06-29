@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /login
+Disallow: /workspace
+Disallow: /thank-you
+Disallow: /api/
+
+Sitemap: https://justmarketing.justlator.com/sitemap.xml
