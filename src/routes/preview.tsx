@@ -47,9 +47,15 @@ function PreviewPage() {
   async function go(u: string) {
     setError("");
     setData(null);
+    // Pre-flight: catch obvious bad URLs before spending a server call
+    const check = validateStoreUrl(u);
+    if (!check.ok) {
+      setError(check.reason);
+      return;
+    }
     setLoading(true);
     try {
-      const r = await run({ data: { storeUrl: u } });
+      const r = await run({ data: { storeUrl: check.url } });
       setData(r);
     } catch (e) {
       setError(e instanceof Error ? e.message : "خطأ غير متوقع");
