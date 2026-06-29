@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { LiveVisitorCounter } from "@/components/LiveVisitorCounter";
 
 const LOGO_URL =
   "https://justlator.com/__l5e/assets-v1/ba8c8d6c-29a5-4b43-9b01-8ae6a0ddd2a0/justlator-emblem.png";
