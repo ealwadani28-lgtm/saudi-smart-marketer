@@ -109,9 +109,10 @@ function Nav() {
             <span className="font-display text-[15px] font-bold text-primary leading-none tracking-tight">JustMarketing</span>
           </div>
         </div>
-        <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
-          <a href="#problem" className="transition hover:text-primary">المشكلة</a>
-          <a href="#solution" className="transition hover:text-primary">الحل</a>
+        <nav className="hidden items-center gap-6 text-sm text-muted-foreground md:flex">
+          <Link to="/how-it-works" className="transition hover:text-primary">كيف يعمل</Link>
+          <Link to="/preview" className="transition hover:text-primary">معاينة الحملة</Link>
+          <Link to="/calculator" className="transition hover:text-primary">حاسبة التعادل</Link>
           <a href="#pricing" className="transition hover:text-primary">السعر</a>
           <a href="#faq" className="transition hover:text-primary">الأسئلة</a>
         </nav>

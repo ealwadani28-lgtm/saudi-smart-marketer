@@ -232,16 +232,25 @@ function AnalyzePage() {
                 </div>
 
                 <div className="mt-8 rounded-2xl bg-gradient-to-br from-primary to-primary/70 p-6 text-primary-foreground">
-                  <h3 className="font-display text-xl font-bold">تبي تحليل أعمق وتحديث تلقائي؟</h3>
+                  <h3 className="font-display text-xl font-bold">تبي تشوف حملتك قبل ما تدفع؟ 👀</h3>
                   <p className="mt-2 text-sm opacity-95">
-                    النسخة الكاملة: تحليل المنافسين + خطة محتوى 30 يوم + تحديث كل أسبوعين + متابعة دورية.
+                    معاينة مجانية: ٣ منشورات جاهزة + جدول نشر أسبوع + نموذج تقرير أسبوعي — بنفس بيانات متجرك.
                   </p>
-                  <Link
-                    to="/subscribe"
-                    className="mt-4 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-primary transition hover:opacity-90"
-                  >
-                    اشترك الآن
-                  </Link>
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <Link
+                      to="/preview"
+                      search={{ url: result.snapshot.url }}
+                      className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-primary transition hover:opacity-90"
+                    >
+                      شوف معاينة الحملة
+                    </Link>
+                    <Link
+                      to="/subscribe"
+                      className="inline-flex items-center gap-2 rounded-xl bg-white/15 px-5 py-2.5 text-sm font-bold backdrop-blur hover:bg-white/25"
+                    >
+                      اشترك الآن
+                    </Link>
+                  </div>
                 </div>
               </div>
 
