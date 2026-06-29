@@ -10,7 +10,7 @@ import {
   adminRunDomainScan,
 } from "@/lib/domain-scan.functions";
 
-export const Route = createFileRoute("/admin.domains")({
+export const Route = createFileRoute("/admin/domains")({
   head: () => ({
     meta: [
       { title: "فحص الدومينات — المسوق الذكي" },
