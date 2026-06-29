@@ -319,11 +319,17 @@ function WorkspacePage() {
         )}
 
         {userId && (
-          <KpiDashboard
-            userId={userId}
-            plan={marketingPlans[0]?.plan ?? null}
-            planId={marketingPlans[0]?.id ?? null}
-          />
+          <>
+            <KpiDashboard
+              userId={userId}
+              plan={marketingPlans[0]?.plan ?? null}
+              planId={marketingPlans[0]?.id ?? null}
+            />
+            <KpiExtendedAnalytics
+              userId={userId}
+              planId={marketingPlans[0]?.id ?? null}
+            />
+          </>
         )}
 
 
