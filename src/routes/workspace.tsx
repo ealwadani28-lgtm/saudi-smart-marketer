@@ -14,6 +14,7 @@ import { printStoreReport } from "@/lib/storeReportPdf";
 import { ContentPlanView } from "@/components/ContentPlanView";
 import { MarketingPlanSection } from "@/components/MarketingPlanSection";
 import { KpiDashboard } from "@/components/KpiDashboard";
+import { KpiExtendedAnalytics } from "@/components/KpiExtendedAnalytics";
 
 export const Route = createFileRoute("/workspace")({
   head: () => ({
@@ -319,11 +320,17 @@ function WorkspacePage() {
         )}
 
         {userId && (
-          <KpiDashboard
-            userId={userId}
-            plan={marketingPlans[0]?.plan ?? null}
-            planId={marketingPlans[0]?.id ?? null}
-          />
+          <>
+            <KpiDashboard
+              userId={userId}
+              plan={marketingPlans[0]?.plan ?? null}
+              planId={marketingPlans[0]?.id ?? null}
+            />
+            <KpiExtendedAnalytics
+              userId={userId}
+              planId={marketingPlans[0]?.id ?? null}
+            />
+          </>
         )}
 
 
