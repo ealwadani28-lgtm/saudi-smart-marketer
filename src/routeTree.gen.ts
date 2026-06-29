@@ -19,6 +19,7 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PreviewRouteImport } from './routes/preview'
 import { Route as Plan30RouteImport } from './routes/plan-30'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as CalculatorRouteImport } from './routes/calculator'
@@ -78,6 +79,11 @@ const Plan30Route = Plan30RouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegrationsRoute = IntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HowItWorksRoute = HowItWorksRouteImport.update({
@@ -140,6 +146,7 @@ export interface FileRoutesByFullPath {
   '/calculator': typeof CalculatorRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/plan-30': typeof Plan30Route
   '/preview': typeof PreviewRoute
@@ -162,6 +169,7 @@ export interface FileRoutesByTo {
   '/calculator': typeof CalculatorRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/plan-30': typeof Plan30Route
   '/preview': typeof PreviewRoute
@@ -185,6 +193,7 @@ export interface FileRoutesById {
   '/calculator': typeof CalculatorRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/plan-30': typeof Plan30Route
   '/preview': typeof PreviewRoute
@@ -209,6 +218,7 @@ export interface FileRouteTypes {
     | '/calculator'
     | '/faq'
     | '/how-it-works'
+    | '/integrations'
     | '/login'
     | '/plan-30'
     | '/preview'
@@ -231,6 +241,7 @@ export interface FileRouteTypes {
     | '/calculator'
     | '/faq'
     | '/how-it-works'
+    | '/integrations'
     | '/login'
     | '/plan-30'
     | '/preview'
@@ -253,6 +264,7 @@ export interface FileRouteTypes {
     | '/calculator'
     | '/faq'
     | '/how-it-works'
+    | '/integrations'
     | '/login'
     | '/plan-30'
     | '/preview'
@@ -276,6 +288,7 @@ export interface RootRouteChildren {
   CalculatorRoute: typeof CalculatorRoute
   FaqRoute: typeof FaqRoute
   HowItWorksRoute: typeof HowItWorksRoute
+  IntegrationsRoute: typeof IntegrationsRoute
   LoginRoute: typeof LoginRoute
   Plan30Route: typeof Plan30Route
   PreviewRoute: typeof PreviewRoute
@@ -361,6 +374,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integrations': {
+      id: '/integrations'
+      path: '/integrations'
+      fullPath: '/integrations'
+      preLoaderRoute: typeof IntegrationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/how-it-works': {
@@ -453,6 +473,7 @@ const rootRouteChildren: RootRouteChildren = {
   CalculatorRoute: CalculatorRoute,
   FaqRoute: FaqRoute,
   HowItWorksRoute: HowItWorksRoute,
+  IntegrationsRoute: IntegrationsRoute,
   LoginRoute: LoginRoute,
   Plan30Route: Plan30Route,
   PreviewRoute: PreviewRoute,
