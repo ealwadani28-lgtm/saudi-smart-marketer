@@ -165,7 +165,8 @@ export const Route = createFileRoute("/api/generate-image")({
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              model: "google/gemini-3.1-flash-image-preview",
+              // Nano Banana 2 — جودة Pro بسعر Flash، أفضل قيمة حالياً للصور التجارية
+              model: "google/gemini-3.1-flash-image",
               messages: [{ role: "user", content: prompt }],
               modalities: ["image", "text"],
               stream: true,
