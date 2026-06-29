@@ -207,6 +207,77 @@ export const adminBulkImportKpi = createServerFn({ method: "POST" })
   });
 
 
+// ---------- user-scoped bulk import (Snap/TikTok Ads Insights) ----------
+
+const UserBulkInput = z.object({
+  userId: z.string().uuid(),
+  source: z.enum(["tiktok_ads", "snapchat_ads"]),
+  fileName: z.string().trim().min(1).max(300),
+  fileHash: z.string().regex(/^[a-f0-9]{64}$/i, "بصمة الملف يجب أن تكون SHA-256 hex"),
+  evidenceUrl: z
+    .string()
+    .trim()
+    .url("رابط الإثبات غير صالح")
+    .max(2000)
+    .refine((u) => /^https?:\/\//i.test(u), "يجب أن يبدأ بـ http(s)"),
+  rows: z.array(BulkRow).min(1).max(500),
+});
+
+export const userBulkImportKpi = createServerFn({ method: "POST" })
+  .inputValidator((d) => UserBulkInput.parse(d))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: customer, error: cErr } = await supabaseAdmin
+      .from("customers")
+      .select("id")
+      .eq("user_id", data.userId)
+      .maybeSingle();
+    if (cErr) throw new Error(cErr.message);
+    if (!customer) throw new Error("لم نجد ملف عميل مرتبط بحسابك");
+
+    for (const [i, r] of data.rows.entries()) {
+      if (new Date(r.periodEnd) < new Date(r.periodStart)) {
+        throw new Error(`السطر ${i + 1}: نهاية الفترة قبل بدايتها`);
+      }
+      if (r.clicks > r.views && r.views > 0) {
+        throw new Error(`السطر ${i + 1}: النقرات تتجاوز المشاهدات`);
+      }
+      if (r.conversions > r.clicks && r.clicks > 0) {
+        throw new Error(`السطر ${i + 1}: التحويلات تتجاوز النقرات`);
+      }
+    }
+
+    const proofTag = `[ads-import] ${data.source} • file=${data.fileName} • sha256=${data.fileHash}`;
+    const payload = data.rows.map((r) => ({
+      customer_id: customer.id,
+      marketing_plan_id: null,
+      period_start: r.periodStart,
+      period_end: r.periodEnd,
+      channel: r.channel,
+      views: r.views,
+      clicks: r.clicks,
+      conversions: r.conversions,
+      cost_sar: r.costSar,
+      source: data.source,
+      evidence_url: data.evidenceUrl,
+      notes: proofTag,
+      entered_by: `user:${data.userId}`,
+      entry_hash: "pending",
+    }));
+
+    const { data: rows, error } = await supabaseAdmin
+      .from("kpi_entries")
+      .insert(payload)
+      .select("id");
+    if (error) throw new Error(`فشل الاستيراد: ${error.message}`);
+    return { inserted: rows?.length ?? 0, fileHash: data.fileHash };
+  });
+
+
+
+
+
 
 
 export const adminListKpiEntries = createServerFn({ method: "POST" })
