@@ -140,7 +140,7 @@ function HowItWorksPage() {
                 </span>
               </div>
               <div>
-                <h3 className="text-xl font-bold">{s.title}</h3>
+                <h2 className="text-xl font-bold">{s.title}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-base">{s.body}</p>
                 <p className="mt-3 inline-flex items-center gap-2 rounded-lg bg-success/10 px-3 py-1.5 text-xs font-bold text-success">
                   <CheckCircle2 className="h-3.5 w-3.5" />

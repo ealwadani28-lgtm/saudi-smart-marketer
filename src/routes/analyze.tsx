@@ -198,7 +198,7 @@ function AnalyzePage() {
                 </div>
 
                 <div className="mt-5 rounded-xl border border-primary/20 bg-primary/5 p-5">
-                  <h3 className="mb-1.5 text-sm font-bold text-primary">الخلاصة</h3>
+                  <h2 className="mb-1.5 text-sm font-bold text-primary">الخلاصة</h2>
                   <p className="text-sm leading-relaxed md:text-base">{result.report.summary}</p>
                 </div>
 
