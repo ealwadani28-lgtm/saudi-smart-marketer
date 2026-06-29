@@ -91,6 +91,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:description", content: "حلّل متجرك ومنافسيك واحصل على خطة تسويق ذكية لمدة 30 يوم بسعر منافس — لمتاجر سلة وزد." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9c338e55-1655-4506-a82f-bc6e78fd4f5f/id-preview-9cd69933--fbca4300-86b5-4c34-86a8-68863dace247.lovable.app-1781644932089.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9c338e55-1655-4506-a82f-bc6e78fd4f5f/id-preview-9cd69933--fbca4300-86b5-4c34-86a8-68863dace247.lovable.app-1781644932089.png" },
+      { name: "google-site-verification", content: "SMmWytGRgUR9FLfotuvynHMewIWvNy_Q8q1l3LlJQBs" },
     ],
     links: [
       { rel: "icon", type: "image/png", href: faviconAsset.url },
