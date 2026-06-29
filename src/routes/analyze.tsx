@@ -7,6 +7,7 @@ import {
   CheckCircle2, AlertTriangle, Rocket, Target,
 } from "lucide-react";
 import { analyzeStoreFree, type StoreSnapshot, type StoreReport } from "@/lib/analyzer.functions";
+import { validateStoreUrl } from "@/lib/url-validator";
 import { printStoreReport } from "@/lib/storeReportPdf";
 import { JustlatorFooter } from "@/components/JustlatorFooter";
 
@@ -44,10 +45,15 @@ function AnalyzePage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    const check = validateStoreUrl(storeUrl);
+    if (!check.ok) {
+      setError(check.reason);
+      return;
+    }
     setLoading(true);
     setResult(null);
     try {
-      const res = await analyze({ data: { storeUrl, email } });
+      const res = await analyze({ data: { storeUrl: check.url, email } });
       setResult({ snapshot: res.snapshot, report: res.report, createdAt: new Date().toISOString() });
     } catch (err) {
       setError(err instanceof Error ? err.message : "حدث خطأ غير متوقع");

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { z } from "zod";
 import { generateCampaignPreview, type CampaignPreview } from "@/lib/campaign-preview.functions";
+import { validateStoreUrl } from "@/lib/url-validator";
 import { JustlatorFooter } from "@/components/JustlatorFooter";
 
 export const Route = createFileRoute("/preview")({
@@ -46,9 +47,15 @@ function PreviewPage() {
   async function go(u: string) {
     setError("");
     setData(null);
+    // Pre-flight: catch obvious bad URLs before spending a server call
+    const check = validateStoreUrl(u);
+    if (!check.ok) {
+      setError(check.reason);
+      return;
+    }
     setLoading(true);
     try {
-      const r = await run({ data: { storeUrl: u } });
+      const r = await run({ data: { storeUrl: check.url } });
       setData(r);
     } catch (e) {
       setError(e instanceof Error ? e.message : "خطأ غير متوقع");

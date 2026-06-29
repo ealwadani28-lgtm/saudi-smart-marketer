@@ -1,20 +1,20 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { validateStoreUrl } from "./url-validator";
 
 const StoreUrlSchema = z
   .string()
   .trim()
   .min(4)
   .max(500)
-  .transform((s) => (s.startsWith("http") ? s : `https://${s}`))
-  .refine((s) => {
-    try {
-      const u = new URL(s);
-      return u.protocol === "http:" || u.protocol === "https:";
-    } catch {
-      return false;
+  .transform((s, ctx) => {
+    const r = validateStoreUrl(s);
+    if (!r.ok) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: r.reason });
+      return z.NEVER;
     }
-  }, "رابط غير صالح");
+    return r.url;
+  });
 
 const Input = z.object({ storeUrl: StoreUrlSchema });
 
