@@ -203,6 +203,12 @@ export async function fetchStoreHtml(url: string): Promise<string> {
     if (!ct.includes("html")) throw new Error("الرابط لا يشير إلى صفحة HTML");
     const text = await res.text();
     if (text.length < 500) throw new Error("محتوى المتجر فارغ أو محمي");
+    // Detect Lovable preview placeholder shell (auth-gated preview returns generic HTML)
+    if (/Internal Lovable project|data-lovable-blank-page-placeholder/i.test(text)) {
+      throw new Error(
+        "هذا الرابط يبدو أنه رابط معاينة محمي — استخدم رابط متجرك الفعلي أو الدومين المنشور (مثل yourstore.com).",
+      );
+    }
     // Cap at 600KB to keep tokens reasonable
     return text.slice(0, 600_000);
   } finally {
