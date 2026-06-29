@@ -28,6 +28,7 @@ import { Route as AnalyzeRouteImport } from './routes/analyze'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiGenerateImageRouteImport } from './routes/api/generate-image'
+import { Route as AdminDomainsRouteImport } from './routes/admin.domains'
 import { Route as ApiPublicRefreshCompetitorsRouteImport } from './routes/api/public/refresh-competitors'
 import { Route as ApiPublicRefreshAnalysesRouteImport } from './routes/api/public/refresh-analyses'
 import { Route as AdminCustomerEmailRouteImport } from './routes/admin.customer.$email'
@@ -127,6 +128,11 @@ const ApiGenerateImageRoute = ApiGenerateImageRouteImport.update({
   path: '/api/generate-image',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminDomainsRoute = AdminDomainsRouteImport.update({
+  id: '/domains',
+  path: '/domains',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ApiPublicRefreshCompetitorsRoute =
   ApiPublicRefreshCompetitorsRouteImport.update({
     id: '/api/public/refresh-competitors',
@@ -164,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/thank-you': typeof ThankYouRoute
   '/try': typeof TryRoute
   '/workspace': typeof WorkspaceRoute
+  '/admin/domains': typeof AdminDomainsRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/admin/customer/$email': typeof AdminCustomerEmailRoute
   '/api/public/refresh-analyses': typeof ApiPublicRefreshAnalysesRoute
@@ -188,6 +195,7 @@ export interface FileRoutesByTo {
   '/thank-you': typeof ThankYouRoute
   '/try': typeof TryRoute
   '/workspace': typeof WorkspaceRoute
+  '/admin/domains': typeof AdminDomainsRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/admin/customer/$email': typeof AdminCustomerEmailRoute
   '/api/public/refresh-analyses': typeof ApiPublicRefreshAnalysesRoute
@@ -213,6 +221,7 @@ export interface FileRoutesById {
   '/thank-you': typeof ThankYouRoute
   '/try': typeof TryRoute
   '/workspace': typeof WorkspaceRoute
+  '/admin/domains': typeof AdminDomainsRoute
   '/api/generate-image': typeof ApiGenerateImageRoute
   '/admin/customer/$email': typeof AdminCustomerEmailRoute
   '/api/public/refresh-analyses': typeof ApiPublicRefreshAnalysesRoute
@@ -239,6 +248,7 @@ export interface FileRouteTypes {
     | '/thank-you'
     | '/try'
     | '/workspace'
+    | '/admin/domains'
     | '/api/generate-image'
     | '/admin/customer/$email'
     | '/api/public/refresh-analyses'
@@ -263,6 +273,7 @@ export interface FileRouteTypes {
     | '/thank-you'
     | '/try'
     | '/workspace'
+    | '/admin/domains'
     | '/api/generate-image'
     | '/admin/customer/$email'
     | '/api/public/refresh-analyses'
@@ -287,6 +298,7 @@ export interface FileRouteTypes {
     | '/thank-you'
     | '/try'
     | '/workspace'
+    | '/admin/domains'
     | '/api/generate-image'
     | '/admin/customer/$email'
     | '/api/public/refresh-analyses'
@@ -452,6 +464,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiGenerateImageRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/domains': {
+      id: '/admin/domains'
+      path: '/domains'
+      fullPath: '/admin/domains'
+      preLoaderRoute: typeof AdminDomainsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/api/public/refresh-competitors': {
       id: '/api/public/refresh-competitors'
       path: '/api/public/refresh-competitors'
@@ -477,10 +496,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminDomainsRoute: typeof AdminDomainsRoute
   AdminCustomerEmailRoute: typeof AdminCustomerEmailRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminDomainsRoute: AdminDomainsRoute,
   AdminCustomerEmailRoute: AdminCustomerEmailRoute,
 }
 

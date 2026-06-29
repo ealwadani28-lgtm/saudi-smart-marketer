@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import {
@@ -457,6 +457,13 @@ function AdminPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Link
+              to="/admin/domains"
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm transition hover:bg-accent"
+            >
+              <ShieldCheck className="h-4 w-4" />
+              فحص الدومينات
+            </Link>
             <button
               onClick={() => token && loadWithToken(token)}
               disabled={loading}

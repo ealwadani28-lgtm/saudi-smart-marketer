@@ -186,6 +186,74 @@ export type Database = {
         }
         Relationships: []
       }
+      domain_scans: {
+        Row: {
+          cert_issuer: string | null
+          cert_subject: string | null
+          cert_valid_from: string | null
+          cert_valid_to: string | null
+          completed_at: string | null
+          domain: string
+          domain_id: string
+          endpoints: Json | null
+          error: string | null
+          grade: string | null
+          has_warnings: boolean | null
+          id: string
+          protocols: Json | null
+          raw_result: Json | null
+          source: string
+          started_at: string
+          status: string
+        }
+        Insert: {
+          cert_issuer?: string | null
+          cert_subject?: string | null
+          cert_valid_from?: string | null
+          cert_valid_to?: string | null
+          completed_at?: string | null
+          domain: string
+          domain_id: string
+          endpoints?: Json | null
+          error?: string | null
+          grade?: string | null
+          has_warnings?: boolean | null
+          id?: string
+          protocols?: Json | null
+          raw_result?: Json | null
+          source?: string
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          cert_issuer?: string | null
+          cert_subject?: string | null
+          cert_valid_from?: string | null
+          cert_valid_to?: string | null
+          completed_at?: string | null
+          domain?: string
+          domain_id?: string
+          endpoints?: Json | null
+          error?: string | null
+          grade?: string | null
+          has_warnings?: boolean | null
+          id?: string
+          protocols?: Json | null
+          raw_result?: Json | null
+          source?: string
+          started_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "domain_scans_domain_id_fkey"
+            columns: ["domain_id"]
+            isOneToOne: false
+            referencedRelation: "monitored_domains"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       early_signups: {
         Row: {
           created_at: string
@@ -329,6 +397,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      monitored_domains: {
+        Row: {
+          created_at: string
+          domain: string
+          id: string
+          label: string | null
+        }
+        Insert: {
+          created_at?: string
+          domain: string
+          id?: string
+          label?: string | null
+        }
+        Update: {
+          created_at?: string
+          domain?: string
+          id?: string
+          label?: string | null
+        }
+        Relationships: []
       }
       rate_limits: {
         Row: {
