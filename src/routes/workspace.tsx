@@ -14,6 +14,7 @@ import { printStoreReport } from "@/lib/storeReportPdf";
 import { ContentPlanView } from "@/components/ContentPlanView";
 import { MarketingPlanSection } from "@/components/MarketingPlanSection";
 import { KpiDashboard } from "@/components/KpiDashboard";
+import { KpiExtendedAnalytics } from "@/components/KpiExtendedAnalytics";
 
 export const Route = createFileRoute("/workspace")({
   head: () => ({
