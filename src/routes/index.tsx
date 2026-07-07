@@ -75,15 +75,18 @@ function Landing() {
       <MagicLampToggle theme={theme} onToggle={toggleTheme} variant="emerald" position="top-right" />
 
       <Nav />
-      <Hero />
-      <ProblemSection />
-      <SolutionSection />
-      <ComparisonSection />
-      <PricingSection />
-      <SocialProofSection />
-      <FAQSection />
-      <FinalCTA />
+      <main>
+        <Hero />
+        <ProblemSection />
+        <SolutionSection />
+        <ComparisonSection />
+        <PricingSection />
+        <SocialProofSection />
+        <FAQSection />
+        <FinalCTA />
+      </main>
       <JustlatorFooter />
+
       <ExitIntentPopup />
       <div className="pointer-events-none fixed bottom-4 left-4 z-40 sm:bottom-6 sm:left-6">
         <div className="pointer-events-auto">
@@ -368,7 +371,7 @@ function ProblemSection() {
             >
               <div className="mb-4 text-4xl">{p.emoji}</div>
               <h3 className="font-display text-xl font-bold">{p.title}</h3>
-              <p className="mt-3 leading-relaxed text-white/75">{p.body}</p>
+              <p className="mt-3 leading-relaxed text-white/90">{p.body}</p>
             </motion.div>
           ))}
         </div>
@@ -847,7 +850,7 @@ function FinalCTA() {
           <br />
           <span className="text-gradient-gold">تسويق صادق؟</span>
         </motion.h2>
-        <p className="mt-6 text-lg text-white/80 md:text-xl">
+        <p className="mt-6 text-lg text-white/90 md:text-xl">
           احصل على تحليل متجرك مجاناً — بدون التزام، بدون دفع.
         </p>
 
@@ -902,7 +905,7 @@ function SignupForm({
   const [loading, setLoading] = useState(false);
 
   const inputBase = onDark
-    ? "w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3.5 text-base text-white placeholder:text-white/60 outline-none transition focus:border-gold focus:bg-white/15"
+    ? "w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3.5 text-base text-white placeholder:text-white/90 outline-none transition focus:border-gold focus:bg-white/15"
     : "w-full rounded-xl border border-border bg-card px-4 py-3.5 text-base outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10";
 
   async function submit(e: React.FormEvent) {
@@ -964,7 +967,7 @@ function SignupForm({
       <div className="relative">
         <Mail
           className={`pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 ${
-            onDark ? "text-white/60" : "text-muted-foreground"
+            onDark ? "text-white/90" : "text-muted-foreground"
           }`}
         />
         <input
@@ -985,7 +988,7 @@ function SignupForm({
         <div className="relative">
           <LinkIcon
             className={`pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 ${
-              onDark ? "text-white/60" : "text-muted-foreground"
+              onDark ? "text-white/90" : "text-muted-foreground"
             }`}
           />
           <input
